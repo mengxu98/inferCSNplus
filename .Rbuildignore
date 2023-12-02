@@ -1,0 +1,17 @@
+^renv$
+^renv\.lock$
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^_pkgdown\.yml$
+^\.github$
+^dev$
+^libs
+^.*\.o$
+^.*\.so$
+^.*\.dll$
+^scripts$
+^CRAN-SUBMISSION$
+^cran-comments\.md$
+^\.vscode$
+^DIRECTNET$

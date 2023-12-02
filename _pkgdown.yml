@@ -1,0 +1,74 @@
+destination: docs
+
+toc:
+  depth: 3
+
+url: https://mengxu98.github.io/inferCSN/
+
+template:
+  package: mxtemplate
+
+navbar:
+  structure:
+    left:  [articles, reference, tutorials, news]
+    right: [github, mengxu]
+
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/mengxu98/inferCSN
+
+    mengxu:
+      icon: fas fa-home fa-lg
+      href: https://github.com/mengxu98
+      title: MengXu
+
+    reference:
+      text: Reference
+      href: reference/index.html
+
+reference:
+- title: "Inferring gene regulatory network"
+
+- subtitle: "inferCSN"
+- contents:
+  - inferCSN-package
+  - inferCSN
+
+- subtitle: "Network visualization"
+- contents:
+  - dynamic.networks
+  - contrast.networks
+  - network.heatmap
+
+- subtitle: "Network evaluation"
+- contents:
+  - auc.calculate
+  - acc.calculate
+
+- subtitle: "Compute gene rank"
+- contents:
+  - compute.gene.rank
+
+- subtitle: "Sparse regression model"
+- contents:
+  - sparse.regression
+  - sub.inferCSN
+  - inferCSN.fit
+
+- subtitle: "Utils functions"
+- contents:
+  - check.parameters
+  - net.format
+  - coef.inferCSN
+  - coef.inferCSNCV
+  - print.inferCSN
+  - print.inferCSNCV
+  - predict.inferCSN
+  - predict.inferCSNCV
+  - is.scalar
+
+- subtitle: "Example data"
+- contents:
+  - exampleMatrix
+  - exampleGroundTruth
