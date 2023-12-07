@@ -24,6 +24,22 @@
 #' weightDT <- inferCSN(exampleMatrix, verbose = TRUE, cores = 2)
 #' head(weightDT)
 #'
-inferCSN <- function(object, ...) {
-  UseMethod(generic = 'inferCSN', object = object)
-}
+setGeneric("inferCSN",
+           signature = "object",
+           function(object, ...) {
+             UseMethod(generic = "inferCSN", object = object)
+           })
+
+#' peaks.filter
+#'
+#' @param object The object for inferCSN
+#' @param ... Arguments for other methods
+#'
+#' @return Returns a object
+#' @export
+#'
+setGeneric("peaks.filter",
+           signature = "object",
+           function(object, ...) {
+             UseMethod(generic = "peaks.filter", object = object)
+           })

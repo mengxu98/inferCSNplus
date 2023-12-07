@@ -37,6 +37,8 @@ genome.info$genes <- genes
 unik <- !duplicated(genes)# filter out different transcript
 genome.info <- genome.info[unik,]
 
+
+
 peak <- rownames(atac.counts)
 peak1 <- strsplit(peak,"-")
 peaks <- matrix(0, nrow = length(peak),ncol = 1)
@@ -55,11 +57,11 @@ grange.counts <- StringToGRanges(rownames(atac.counts), sep = c(":", "-"))
 grange.use <- seqnames(grange.counts) %in% GenomeInfoDb::standardChromosomes(grange.counts)
 atac.counts <- atac.counts[as.vector(grange.use), ]
 annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
-seqlevelsStyle(annotations) <- 'UCSC'
+GenomeInfoDb::seqlevelsStyle(annotations) <- 'UCSC'
 genome.name <- "hg19"
 genome(annotations) <- genome.name
 
-chrom_assay <- CreateChromatinAssay(
+chrom_assay <- Signac::CreateChromatinAssay(
   counts = atac.counts,
   sep = c(":", "-"),
   genome = genome.name,
@@ -97,7 +99,6 @@ combined <- RunUMAP(combined, dims = 1:40)
 # We exclude the first dimension as this is typically correlated with sequencing depth
 DefaultAssay(combined) <- "ATAC"
 combined <- Signac::RunTFIDF(combined)
-#> Performing TF-IDF normalization
 combined <- Signac::FindTopFeatures(combined, min.cutoff = 'q0')
 combined <- Signac::RunSVD(combined)
 combined <- RunUMAP(combined, reduction = 'lsi', dims = 2:50, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
