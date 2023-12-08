@@ -1,6 +1,6 @@
 #' @param filter_value The value to filter peaks
 #'
-#' @return
+#' @return filtered peaks matrix
 #' @export
 #'
 #' @rdname peaks.filter
@@ -13,24 +13,26 @@ peaks.filter.default <- function(object,
   return(object)
 }
 
-#' @param filter_value The value to filter peaks
-#'
-#' @return
 #' @export
 #'
-#' @rdname peaks.filter matrix
+#' @rdname peaks.filter
+#' @method peaks.filter matrix
 #'
 peaks.filter.matrix <- function(object,
                                  filter_value = 0.9) {
+  # object <- Signac::CreateChromatinAssay(
+  #   counts = object,
+  #   sep = c(":", "-"),
+  #   genome = genome.name,
+  #   min.cells = 0,
+  #   annotation = annotations
+  # )
   peaks_table <- Signac::FindTopFeatures(object)
   peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
   object <- object[rownames(peaks_table), ]
   return(object)
 }
 
-#' @param filter_value The value to filter peaks
-#'
-#' @return
 #' @export
 #'
 #' @rdname peaks.filter

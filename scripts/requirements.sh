@@ -99,10 +99,11 @@ install_dependence() {
           libclang-dev
           cmake
           libmagick++-dev
+          libgsl-dev
       )
 
       for package in "${required_packages[@]}"; do
-          if ! dpkg -l | grep -q "ii  $package"; then
+          if ! dpkg -l | grep -q "ii $package"; then
               echo "Installing $package......"
               apt-get install -y "$package"
           else
@@ -131,6 +132,7 @@ install_dependence() {
           clang-devel
           cmake
           ImageMagick-c++-devel
+          libgsl-dev
       )
 
       wget http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.19_amd64.deb
@@ -290,7 +292,7 @@ install_packages() {
         cd stringi
         R CMD INSTALL .
     fi
-    
+
     cd ..
 
     # List of required packages

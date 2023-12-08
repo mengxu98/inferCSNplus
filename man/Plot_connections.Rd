@@ -26,6 +26,9 @@ Plot_connections(
 
 \item{downstream}{the number of distance downstream to TSS}
 }
+\value{
+ggplot2 object
+}
 \description{
 Plot links of inferCSN on focused genes
 }

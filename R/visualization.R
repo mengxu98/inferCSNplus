@@ -7,7 +7,7 @@
 #' @param upstream the number of distance upstream to TSS
 #' @param downstream the number of distance downstream to TSS
 #' @importFrom cicero plot_connections
-#' @return
+#' @return ggplot2 object
 #' @export
 Plot_connections <- function(DIRECT_NET_Result, gene_anno, marker, cutoff = NULL, upstream = 250000, downstream = 250000) {
   # take out the result of marker

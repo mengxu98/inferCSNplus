@@ -6,7 +6,7 @@
 #' @param groups cell type information
 #' @return TF-G dataframe
 #' @export
-
+#'
 generate_links_for_Cytoscape <- function(L_G_record, L_TF_record, P_L_G_record, P_L_TF_record, groups) {
   TF_G_C <- get_TF_G(L_G_record, L_TF_record, groups)
   P_TF_G_C <- get_TF_G(P_L_G_record, P_L_TF_record, groups)
