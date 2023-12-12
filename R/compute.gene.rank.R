@@ -13,8 +13,9 @@
 #' ranks <- compute.gene.rank(weightDT)
 #' head(ranks)
 #'
-compute.gene.rank <- function(weightDT,
-                              directedGraph = FALSE) {
+compute.gene.rank <- function(
+    weightDT,
+    directedGraph = FALSE) {
   colnames(weightDT) <- c("regulatory", "target", "weight")
   weightDT$weight <- abs(weightDT$weight)
   tfnet <- igraph::graph_from_data_frame(weightDT, directed = directedGraph)

@@ -13,6 +13,12 @@ peaks.filter.default(object, filter_value = 0.9)
 
 \method{peaks.filter}{Seurat}(object, filter_value = 0.9)
 
+peaks.filter.default(object, filter_value = 0.9)
+
+\method{peaks.filter}{matrix}(object, filter_value = 0.9)
+
+\method{peaks.filter}{Seurat}(object, filter_value = 0.9)
+
 peaks.filter(object, ...)
 }
 \arguments{
@@ -23,6 +29,8 @@ peaks.filter(object, ...)
 \item{...}{Arguments for other methods}
 }
 \value{
+filtered peaks matrix
+
 filtered peaks matrix
 
 Returns a object

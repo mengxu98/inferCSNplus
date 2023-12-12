@@ -29,6 +29,9 @@ setGeneric("inferCSN",
            function(object, ...) {
              UseMethod(generic = "inferCSN", object = object)
            })
+# inferCSN <- function(object, ...) {
+#   UseMethod(generic = "inferCSN", object = object)
+# }
 
 #' peaks.filter
 #'

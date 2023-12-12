@@ -23,36 +23,39 @@
 #'
 #' @rdname inferCSN
 #'
-inferCSN.default <- function(object,
-                             penalty = "L0",
-                             algorithm = "CD",
-                             crossValidation = FALSE,
-                             seed = 1,
-                             nFolds = 10,
-                             kFolds = NULL,
-                             rThreshold = 0,
-                             regulators = NULL,
-                             targets = NULL,
-                             maxSuppSize = NULL,
-                             verbose = FALSE,
-                             cores = 1,
-                             ...) {
-  if(verbose) message("Running start.")
+inferCSN.default <- function(
+    object,
+    penalty = "L0",
+    algorithm = "CD",
+    crossValidation = FALSE,
+    seed = 1,
+    nFolds = 10,
+    kFolds = NULL,
+    rThreshold = 0,
+    regulators = NULL,
+    targets = NULL,
+    maxSuppSize = NULL,
+    verbose = FALSE,
+    cores = 1,
+    ...) {
+  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
   matrix <- object
   # Check input parameters
-  check.parameters(matrix = matrix,
-                   penalty = penalty,
-                   algorithm = algorithm,
-                   crossValidation = crossValidation,
-                   seed = seed,
-                   nFolds = nFolds,
-                   kFolds = kFolds,
-                   rThreshold = rThreshold,
-                   regulators = regulators,
-                   targets = targets,
-                   maxSuppSize = maxSuppSize,
-                   verbose = verbose,
-                   cores = cores)
+  check.parameters(
+    matrix = matrix,
+    penalty = penalty,
+    algorithm = algorithm,
+    crossValidation = crossValidation,
+    seed = seed,
+    nFolds = nFolds,
+    kFolds = kFolds,
+    rThreshold = rThreshold,
+    regulators = regulators,
+    targets = targets,
+    maxSuppSize = maxSuppSize,
+    verbose = verbose,
+    cores = cores
+  )
 
   if (!is.null(regulators)) {
     regulators_matrix <- matrix[, intersect(colnames(matrix), regulators)]
@@ -70,50 +73,57 @@ inferCSN.default <- function(object,
 
   cores <- min((parallel::detectCores(logical = FALSE) - 1), cores, length(targets))
   if (cores == 1) {
-    if(verbose) message("Using 1 core.")
+    if (verbose) message("Using 1 core.")
     # Format progress information
     format <- "Running [:bar] :percent, No.:current of :total genes, :elapsed."
-    pb <- progress::progress_bar$new(format = format,
-                                     total = length(targets),
-                                     clear = TRUE,
-                                     width = 80)
+    pb <- progress::progress_bar$new(
+      format = format,
+      total = length(targets),
+      clear = TRUE,
+      width = 80
+    )
 
     weightDT <- purrr::map_dfr(targets, function(x) {
       if (verbose) pb$tick()
-      sub.inferCSN(regulatorsMatrix = regulators_matrix,
-                   targetsMatrix = targetsMatrix,
-                   target = x,
-                   crossValidation = crossValidation,
-                   seed = seed,
-                   penalty = penalty,
-                   algorithm = algorithm,
-                   nFolds = nFolds,
-                   kFolds = kFolds,
-                   rThreshold = rThreshold,
-                   maxSuppSize = maxSuppSize,
-                   verbose = verbose)
+      sub.inferCSN(
+        regulatorsMatrix = regulators_matrix,
+        targetsMatrix = targetsMatrix,
+        target = x,
+        crossValidation = crossValidation,
+        seed = seed,
+        penalty = penalty,
+        algorithm = algorithm,
+        nFolds = nFolds,
+        kFolds = kFolds,
+        rThreshold = rThreshold,
+        maxSuppSize = maxSuppSize,
+        verbose = verbose
+      )
     })
-
   } else {
     doParallel::registerDoParallel(cores = cores)
-    if(verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
-
+    if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
+    target <- NULL
     "%dopar%" <- foreach::"%dopar%"
-    weightDT <- foreach::foreach(target = targets,
-                                 .export = c("sub.inferCSN", "sparse.regression")) %dopar% {
-                                   sub.inferCSN(regulatorsMatrix = regulators_matrix,
-                                                targetsMatrix = targetsMatrix,
-                                                target = target,
-                                                crossValidation = crossValidation,
-                                                seed = seed,
-                                                penalty = penalty,
-                                                algorithm = algorithm,
-                                                nFolds = nFolds,
-                                                kFolds = kFolds,
-                                                rThreshold = rThreshold,
-                                                maxSuppSize = maxSuppSize,
-                                                verbose = verbose)
-                                 }
+    weightDT <- foreach::foreach(
+      target = targets,
+      .export = c("sub.inferCSN", "sparse.regression")
+    ) %dopar% {
+      sub.inferCSN(
+        regulatorsMatrix = regulators_matrix,
+        targetsMatrix = targetsMatrix,
+        target = target,
+        crossValidation = crossValidation,
+        seed = seed,
+        penalty = penalty,
+        algorithm = algorithm,
+        nFolds = nFolds,
+        kFolds = kFolds,
+        rThreshold = rThreshold,
+        maxSuppSize = maxSuppSize,
+        verbose = verbose
+      )
+    }
     weightDT <- data.table::rbindlist(weightDT)
     attr(weightDT, ".internal.selfref") <- NULL
     doParallel::stopImplicitCluster()
@@ -125,75 +135,44 @@ inferCSN.default <- function(object,
 }
 
 #' @export
-#' @method inferCSN matrix
-#'
-#' @rdname inferCSN
-#'
-inferCSN.matrix <- function(object,
-                            penalty = "L0",
-                            algorithm = "CD",
-                            crossValidation = FALSE,
-                            seed = 1,
-                            nFolds = 10,
-                            kFolds = NULL,
-                            rThreshold = 0,
-                            regulators = NULL,
-                            targets = NULL,
-                            maxSuppSize = NULL,
-                            verbose = FALSE,
-                            cores = 1,
-                            ...) {
-  if (verbose) message("Running start.")
-  inferCSN(matrix = object,
-           penalty = penalty,
-           algorithm = algorithm,
-           crossValidation = crossValidation,
-           seed = 1,
-           nFolds = nFolds,
-           kFolds = kFolds,
-           rThreshold = rThreshold,
-           regulators = regulators,
-           targets = targets,
-           maxSuppSize = maxSuppSize,
-           verbose = verbose,
-           cores = cores)
-}
-
-#' @export
 #' @method inferCSN data.frame
 #'
 #' @rdname inferCSN
 #'
-inferCSN.data.frame <- function(object,
-                                penalty = "L0",
-                                algorithm = "CD",
-                                crossValidation = FALSE,
-                                seed = 1,
-                                nFolds = 10,
-                                kFolds = NULL,
-                                rThreshold = 0,
-                                regulators = NULL,
-                                targets = NULL,
-                                maxSuppSize = NULL,
-                                verbose = FALSE,
-                                cores = 1,
-                                ...) {
-  if (verbose) message("Running start.")
-  warning("Converting the class type of input data from <data.frame> to <matrix>.")
+inferCSN.data.frame <- function(
+    object,
+    penalty = "L0",
+    algorithm = "CD",
+    crossValidation = FALSE,
+    seed = 1,
+    nFolds = 10,
+    kFolds = NULL,
+    rThreshold = 0,
+    regulators = NULL,
+    targets = NULL,
+    maxSuppSize = NULL,
+    verbose = FALSE,
+    cores = 1,
+    ...) {
+  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
+  if (verbose) warning("Converting the class type of input data from <data.frame> to <matrix>.")
   matrix <- as.matrix(object)
-  inferCSN(matrix = matrix,
-           penalty = penalty,
-           algorithm = algorithm,
-           crossValidation = crossValidation,
-           seed = 1,
-           nFolds = nFolds,
-           kFolds = kFolds,
-           rThreshold = rThreshold,
-           regulators = regulators,
-           targets = targets,
-           maxSuppSize = maxSuppSize,
-           verbose = verbose,
-           cores = cores)
+  inferCSN(
+    matrix,
+    penalty = penalty,
+    algorithm = algorithm,
+    crossValidation = crossValidation,
+    seed = seed,
+    nFolds = nFolds,
+    kFolds = kFolds,
+    rThreshold = rThreshold,
+    regulators = regulators,
+    targets = targets,
+    maxSuppSize = maxSuppSize,
+    verbose = verbose,
+    cores = cores,
+    ...
+  )
 }
 
 #' @export
@@ -201,35 +180,36 @@ inferCSN.data.frame <- function(object,
 #'
 #' @rdname inferCSN
 #'
-inferCSN.Seurat <- function(object,
-                            penalty = "L0",
-                            algorithm = "CD",
-                            crossValidation = FALSE,
-                            seed = 1,
-                            nFolds = 10,
-                            kFolds = NULL,
-                            rThreshold = 0,
-                            regulators = NULL,
-                            targets = NULL,
-                            maxSuppSize = NULL,
-                            verbose = FALSE,
-                            cores = 1,
-                            aggregate = TRUE,
-                            peakcalling = FALSE,
-                            macs2.path = NULL,
-                            fragments = NULL,
-                            k_neigh = 50,
-                            atacbinary = TRUE,
-                            max_overlap = 0.8,
-                            reduction.name = NULL,
-                            size_factor_normalize = FALSE,
-                            genome.info,
-                            early_stop = FALSE, # crossvaliation + sample?
-                            HC_cutoff = NULL,
-                            LC_cutoff = NULL,
-                            rescued = FALSE,
-                            ...) {
-  if (verbose) message("Running start.")
+inferCSN.Seurat <- function(
+    object,
+    penalty = "L0",
+    algorithm = "CD",
+    crossValidation = FALSE,
+    seed = 1,
+    nFolds = 10,
+    kFolds = NULL,
+    rThreshold = 0,
+    regulators = NULL,
+    targets = NULL,
+    maxSuppSize = NULL,
+    verbose = FALSE,
+    cores = 1,
+    aggregate = TRUE,
+    peakcalling = FALSE,
+    macs2.path = NULL,
+    fragments = NULL,
+    k_neigh = 50,
+    atacbinary = TRUE,
+    max_overlap = 0.8,
+    reduction.name = NULL,
+    size_factor_normalize = FALSE,
+    genome.info,
+    early_stop = FALSE, # crossvaliation + sample?
+    HC_cutoff = NULL,
+    LC_cutoff = NULL,
+    rescued = FALSE,
+    ...) {
+  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
 
   # # step 0. Peak calling
   # if (("ATAC" %in% names(object@assays)) && peakcalling) {
@@ -269,12 +249,14 @@ inferCSN.Seurat <- function(object,
     if ("aggregated_data" %in% names(Seurat::Misc(object))) {
       agg_data <- Seurat::Misc(object, slot = "aggregated_data")
     } else {
-      agg_data <- aggregate.data(object,
-                                 k_neigh = k_neigh,
-                                 atacbinary = atacbinary,
-                                 max_overlap = max_overlap,
-                                 reduction.name = NULL,
-                                 size_factor_normalize = size_factor_normalize)
+      agg_data <- aggregate.data(
+        object,
+        k_neigh = k_neigh,
+        atacbinary = atacbinary,
+        max_overlap = max_overlap,
+        reduction.name = NULL,
+        size_factor_normalize = size_factor_normalize
+      )
       Seurat::Misc(object, slot = "aggregated_data") <- agg_data
     }
 
@@ -327,43 +309,46 @@ inferCSN.Seurat <- function(object,
     chr <- genome.info.used$Chrom
     starts <- genome.info.used$Starts
     ends <- genome.info.used$Ends
-
   }
 
   if ("RNA" %in% names(agg_data)) {
-    weight_network_rna <- inferCSN(matrix = t(data_rna),
-                                   penalty = penalty,
-                                   algorithm = algorithm,
-                                   crossValidation = crossValidation,
-                                   seed = seed,
-                                   nFolds = nFolds,
-                                   kFolds = kFolds,
-                                   rThreshold = rThreshold,
-                                   regulators = targets,
-                                   targets = targets,
-                                   maxSuppSize = maxSuppSize,
-                                   verbose = verbose,
-                                   cores = cores,
-                                   ...)
+    weight_network_rna <- inferCSN(
+      matrix = t(data_rna),
+      penalty = penalty,
+      algorithm = algorithm,
+      crossValidation = crossValidation,
+      seed = seed,
+      nFolds = nFolds,
+      kFolds = kFolds,
+      rThreshold = rThreshold,
+      regulators = targets,
+      targets = targets,
+      maxSuppSize = maxSuppSize,
+      verbose = verbose,
+      cores = cores,
+      ...
+    )
   }
 
   if ("ATAC" %in% names(agg_data)) {
-    weight_network_atac <- .inferCSN.atac(matrix = data_atac,
-                                          penalty = penalty,
-                                          algorithm = algorithm,
-                                          crossValidation = crossValidation,
-                                          seed = seed,
-                                          nFolds = nFolds,
-                                          kFolds = kFolds,
-                                          rThreshold = rThreshold,
-                                          regulators = targets,
-                                          targets = targets,
-                                          maxSuppSize = maxSuppSize,
-                                          verbose = verbose,
-                                          cores = cores,
-                                          chr,
-                                          starts,
-                                          ...)
+    weight_network_atac <- .inferCSN.atac(
+      matrix = data_atac,
+      penalty = penalty,
+      algorithm = algorithm,
+      crossValidation = crossValidation,
+      seed = seed,
+      nFolds = nFolds,
+      kFolds = kFolds,
+      rThreshold = rThreshold,
+      regulators = targets,
+      targets = targets,
+      maxSuppSize = maxSuppSize,
+      verbose = verbose,
+      cores = cores,
+      chr,
+      starts,
+      ...
+    )
   }
   weightDT <- weight_network_atac
   weightDT <- weightDT[order(abs(as.numeric(weightDT$weight)), decreasing = TRUE), ]
@@ -387,25 +372,8 @@ inferCSN.Seurat <- function(object,
     cores = 1,
     chr,
     starts,
-    ...
-) {
+    ...) {
   matrix <- as.matrix(matrix)
-  if (verbose) message("Running start.")
-
-  # Check input parameters
-  # check.parameters(matrix = matrix,
-  #                  penalty = penalty,
-  #                  algorithm = algorithm,
-  #                  crossValidation = crossValidation,
-  #                  seed = seed,
-  #                  nFolds = nFolds,
-  #                  kFolds = kFolds,
-  #                  rThreshold = rThreshold,
-  #                  regulators = regulators,
-  #                  targets = targets,
-  #                  maxSuppSize = maxSuppSize,
-  #                  verbose = verbose,
-  #                  cores = cores)
 
   if (!is.null(regulators)) {
     regulators_matrix <- matrix[, intersect(colnames(matrix), regulators)]
@@ -418,131 +386,39 @@ inferCSN.Seurat <- function(object,
   } else {
     targetsMatrix <- matrix
   }
-  # targets <- colnames(targetsMatrix)
-  # rm(matrix)
 
   targets <- rownames(matrix)
 
-  input_data_sum <- list()
-  for (i in seq_along(targets)) {
-    input_data <- list()
-    p1 <- paste0(chr[i], ":", starts[i] - 500, "-", starts[i])
-    p2 <- paste0(chr[i], ":", starts[i] - 250000, "-", starts[i] + 250000)
-    promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-    enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
-    enhancers <- setdiff(enhancers, promoters)
-
-    if (length(promoters) > 0 && length(enhancers) > 1) {
-      id1 <- na.omit(match(promoters, peaks))
-      # id1 <- id1[!is.na(id1)]
-      id2 <- na.omit(match(enhancers, peaks))
-      # id2 <- id2[!is.na(id2)]
-      X <- matrix[setdiff(id2, id1), ]
-
-      TXs[[i]] <- X
-      Y <- matrix[id1, ]
-      if (length(id1) > 1) {
-        Y <- colSums(Y)
-      }
-      Y <- t(as.matrix(Y))
-      rownames(Y) <- peaks[id1[1]] # Only use the first?
-      TYs[[i]] <- Y
-      # X <- as.matrix(X)
-      if (ncol(X) == 1) {
-        X <- t(X)
-      }
-      Y <- as.matrix(Y)
-      target <- rownames(Y)
-      regulators_matrix <- t(matrix)
-      targetsMatrix <- t(matrix)
-    } else {
-      next
-    }
-  }
-
-  cores <- min((parallel::detectCores(logical = FALSE) - 1), cores, length(targets))
+  cores <- min(
+    (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
+  )
   if (cores == 1) {
-    if(verbose) message("Using 1 core.")
+    if (verbose) message("Using 1 core.")
     # Format progress information
     format <- "Running [:bar] :percent, No.:current of :total peaks, :elapsed."
-    pb <- progress::progress_bar$new(format = format,
-                                     total = length(targets),
-                                     clear = TRUE,
-                                     width = 80)
+    pb <- progress::progress_bar$new(
+      format = format,
+      total = length(targets),
+      clear = TRUE,
+      width = 80
+    )
 
     peaks <- rownames(matrix)
     TXs <- list()
     TYs <- list()
-    weightDT <- c()
-    # for (i in seq_along(targets)) {
-    #   if (verbose) pb$tick()
-    #
-    #   p1 <- paste0(chr[i], ":", starts[i] - 500, "-", starts[i])
-    #   p2 <- paste0(chr[i], ":", starts[i] - 250000, "-", starts[i] + 250000)
-    #   promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-    #   enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
-    #   enhancers <- setdiff(enhancers, promoters)
-    #
-    #   if (length(promoters) > 0 && length(enhancers) > 1) {
-    #     id1 <- na.omit(match(promoters, peaks))
-    #     # id1 <- id1[!is.na(id1)]
-    #     id2 <- na.omit(match(enhancers, peaks))
-    #     # id2 <- id2[!is.na(id2)]
-    #     X <- matrix[setdiff(id2, id1), ]
-    #     TXs[[i]] <- X
-    #     Y <- matrix[id1, ]
-    #     if (length(id1) > 1) {
-    #       Y <- colSums(Y)
-    #     }
-    #     Y <- t(as.matrix(Y))
-    #     rownames(Y) <- peaks[id1[1]] # Only use the first?
-    #     TYs[[i]] <- Y
-    #     # X <- as.matrix(X)
-    #     if (ncol(X) == 1) {
-    #       X <- t(X)
-    #     }
-    #     Y <- as.matrix(Y)
-    #     target <- rownames(Y)
-    #     regulators_matrix <- t(matrix)
-    #     targetsMatrix <- t(matrix)
-    #     weightDT <- rbind(
-    #       weightDT,
-    #       sub.inferCSN(
-    #         regulatorsMatrix = regulators_matrix,
-    #         targetsMatrix = targetsMatrix,
-    #         target = target,
-    #         crossValidation = crossValidation,
-    #         seed = seed,
-    #         penalty = penalty,
-    #         algorithm = algorithm,
-    #         nFolds = nFolds,
-    #         kFolds = kFolds,
-    #         rThreshold = rThreshold,
-    #         maxSuppSize = maxSuppSize,
-    #         verbose = verbose
-    #       )
-    #     )
-    #   } else {
-    #     next
-    #   }
-    # }
-
-
     weightDT <- purrr::map_dfr(
       seq_along(targets), function(i) {
         if (verbose) pb$tick()
 
-        p1 <- paste0(chr[i], ":", starts[i] - 500, "-", starts[i])
-        p2 <- paste0(chr[i], ":", starts[i] - 250000, "-", starts[i] + 250000)
+        p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
+        p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
         promoters <- cicero::find_overlapping_coordinates(peaks, p1)
         enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
         enhancers <- setdiff(enhancers, promoters)
 
         if (length(promoters) > 0 && length(enhancers) > 1) {
           id1 <- na.omit(match(promoters, peaks))
-          # id1 <- id1[!is.na(id1)]
           id2 <- na.omit(match(enhancers, peaks))
-          # id2 <- id2[!is.na(id2)]
           X <- matrix[setdiff(id2, id1), ]
           TXs[[i]] <- X
           Y <- matrix[id1, ]
@@ -552,7 +428,6 @@ inferCSN.Seurat <- function(object,
           Y <- t(as.matrix(Y))
           rownames(Y) <- peaks[id1[1]] # Only use the first?
           TYs[[i]] <- Y
-          # X <- as.matrix(X)
           if (ncol(X) == 1) {
             X <- t(X)
           }
@@ -577,59 +452,57 @@ inferCSN.Seurat <- function(object,
         }
       }
     )
-
   } else {
     doParallel::registerDoParallel(cores = cores)
-    if(verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
+    if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
 
     "%dopar%" <- foreach::"%dopar%"
+    i <- NULL
     weightDT <- foreach::foreach(
       i = seq_along(targets),
-      .export = c("sub.inferCSN", "sparse.regression")) %dopar% {
-        p1 <- paste0(chr[i], ":", starts[i] - 500, "-", starts[i])
-        p2 <- paste0(chr[i], ":", starts[i] - 250000, "-", starts[i] + 250000)
-        promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-        enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
-        enhancers <- setdiff(enhancers, promoters)
+      .export = c("sub.inferCSN", "sparse.regression")
+    ) %dopar% {
+      p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
+      p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
+      promoters <- cicero::find_overlapping_coordinates(peaks, p1)
+      enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
+      enhancers <- setdiff(enhancers, promoters)
 
-        if (length(promoters) > 0 && length(enhancers) > 1) {
-          id1 <- na.omit(match(promoters, peaks))
-          # id1 <- id1[!is.na(id1)]
-          id2 <- na.omit(match(enhancers, peaks))
-          # id2 <- id2[!is.na(id2)]
-          X <- matrix[setdiff(id2, id1), ]
-          TXs[[i]] <- X
-          Y <- matrix[id1, ]
-          if (length(id1) > 1) {
-            Y <- colSums(Y)
-          }
-          Y <- t(as.matrix(Y))
-          rownames(Y) <- peaks[id1[1]] # Only use the first?
-          TYs[[i]] <- Y
-          # X <- as.matrix(X)
-          if (ncol(X) == 1) {
-            X <- t(X)
-          }
-          Y <- as.matrix(Y)
-          target <- rownames(Y)
-          regulators_matrix <- t(matrix)
-          targetsMatrix <- t(matrix)
-          sub.inferCSN(
-            regulatorsMatrix = regulators_matrix,
-            targetsMatrix = targetsMatrix,
-            target = target,
-            crossValidation = crossValidation,
-            seed = seed,
-            penalty = penalty,
-            algorithm = algorithm,
-            nFolds = nFolds,
-            kFolds = kFolds,
-            rThreshold = rThreshold,
-            maxSuppSize = maxSuppSize,
-            verbose = verbose
-          )
+      if (length(promoters) > 0 && length(enhancers) > 1) {
+        id1 <- na.omit(match(promoters, peaks))
+        id2 <- na.omit(match(enhancers, peaks))
+        X <- matrix[setdiff(id2, id1), ]
+        TXs[[i]] <- X
+        Y <- matrix[id1, ]
+        if (length(id1) > 1) {
+          Y <- colSums(Y)
         }
+        Y <- t(as.matrix(Y))
+        rownames(Y) <- peaks[id1[1]] # Only use the first?
+        TYs[[i]] <- Y
+        if (ncol(X) == 1) {
+          X <- t(X)
+        }
+        Y <- as.matrix(Y)
+        target <- rownames(Y)
+        regulators_matrix <- t(matrix)
+        targetsMatrix <- t(matrix)
+        sub.inferCSN(
+          regulatorsMatrix = regulators_matrix,
+          targetsMatrix = targetsMatrix,
+          target = target,
+          crossValidation = crossValidation,
+          seed = seed,
+          penalty = penalty,
+          algorithm = algorithm,
+          nFolds = nFolds,
+          kFolds = kFolds,
+          rThreshold = rThreshold,
+          maxSuppSize = maxSuppSize,
+          verbose = verbose
+        )
       }
+    }
     weightDT <- data.table::rbindlist(weightDT)
     attr(weightDT, ".internal.selfref") <- NULL
     doParallel::stopImplicitCluster()

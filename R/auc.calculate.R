@@ -20,11 +20,12 @@
 #' auc <- auc.calculate(weightDT, exampleGroundTruth, plot = TRUE)
 #' head(auc)
 #'
-auc.calculate <- function(weightDT,
-                          groundTruth,
-                          plot = FALSE,
-                          lineColor = "#1563cc",
-                          lineWidth = 1) {
+auc.calculate <- function(
+    weightDT,
+    groundTruth,
+    plot = FALSE,
+    lineColor = "#1563cc",
+    lineWidth = 1) {
   # Check input data
   colnames(weightDT) <- c("regulator", "target", "weight")
   weightDT$weight <- abs(as.numeric(weightDT$weight))
@@ -34,50 +35,69 @@ auc.calculate <- function(weightDT,
   groundTruth$label <- rep(1, nrow(groundTruth))
 
   gold <- merge(weightDT, groundTruth,
-                by = c("regulator", "target"),
-                all.x = TRUE)
+    by = c("regulator", "target"),
+    all.x = TRUE
+  )
   gold$label[is.na(gold$label)] <- 0
 
-  aucCurves <- precrec::evalmod(scores = gold$weight,
-                                labels = gold$label)
+  aucCurves <- precrec::evalmod(
+    scores = gold$weight,
+    labels = gold$label
+  )
 
   auc <- attr(aucCurves, "auc")
 
-  aucMetric <- data.frame(AUROC = rep(0.000, 1),
-                          AUPRC = rep(0.000, 1),
-                          ACC = rep(0.000, 1))
+  aucMetric <- data.frame(
+    AUROC = rep(0.000, 1),
+    AUPRC = rep(0.000, 1),
+    ACC = rep(0.000, 1)
+  )
   aucMetric[1, "AUROC"] <- sprintf("%0.3f", auc$aucs[1])
   aucMetric[1, "AUPRC"] <- sprintf("%0.3f", auc$aucs[2])
   aucMetric[1, "ACC"] <- sprintf("%0.3f", acc.calculate(gold))
   if (plot) {
     # Separate data
-    aurocDf <- subset(fortify(aucCurves),
-                      curvetype == "ROC")
-    auprcDf <- subset(fortify(aucCurves),
-                      curvetype == "PRC")
+    aurocDf <- subset(
+      fortify(aucCurves),
+      curvetype == "ROC"
+    )
+    auprcDf <- subset(
+      fortify(aucCurves),
+      curvetype == "PRC"
+    )
 
     # Plot
     auroc <- ggplot(aurocDf, aes(x = x, y = y)) +
-      geom_line(color = lineColor,
-                linewidth = lineWidth) +
-      geom_abline(slope = lineWidth,
-                  color = lineColor,
-                  linetype = "dotted",
-                  linewidth = lineWidth) +
-      labs(title = paste("AUROC:", aucMetric[1]),
-           x = "False positive rate",
-           y = "True positive rate") +
+      geom_line(
+        color = lineColor,
+        linewidth = lineWidth
+      ) +
+      geom_abline(
+        slope = lineWidth,
+        color = lineColor,
+        linetype = "dotted",
+        linewidth = lineWidth
+      ) +
+      labs(
+        title = paste("AUROC:", aucMetric[1]),
+        x = "False positive rate",
+        y = "True positive rate"
+      ) +
       xlim(0, 1) +
       ylim(0, 1) +
       coord_fixed() +
       theme_bw()
 
     auprc <- ggplot(auprcDf, aes(x = x, y = y)) +
-      geom_line(color = lineColor,
-                linewidth = 1) +
-      labs(title = paste("AUPRC:", aucMetric[2]),
-           x = "Recall",
-           y = "Precision") +
+      geom_line(
+        color = lineColor,
+        linewidth = 1
+      ) +
+      labs(
+        title = paste("AUPRC:", aucMetric[2]),
+        x = "Recall",
+        y = "Precision"
+      ) +
       xlim(0, 1) +
       ylim(0, 1) +
       coord_fixed() +
@@ -100,8 +120,9 @@ auc.calculate <- function(weightDT,
 #'
 acc.calculate <- function(gold) {
   results <- pROC::roc(gold$label ~ gold$weight,
-                       direction = "<",
-                       levels = c(0, 1))
+    direction = "<",
+    levels = c(0, 1)
+  )
 
   # After this operation, '0' indicate positive
   reverseLabel <- 2 - as.numeric(as.factor(gold$label))

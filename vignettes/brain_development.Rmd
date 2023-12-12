@@ -1,0 +1,82 @@
+---
+title: "brain_development"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+## data information:
+
+Lab: Kriegstein Lab
+
+Institution: University of California, San Francisco
+
+Publication: [Velmeshev et al. Science. 2023.](https://www.science.org/doi/10.1126/science.adf0834)
+
+PubMed Abstract: [37824647](https://pubmed.ncbi.nlm.nih.gov/37824647/)
+
+Publication Fulltext: [10.1126/science.adf0834](https://www.science.org/doi/10.1126/science.adf0834)
+
+Submitted by: Dmitry Velmeshev ([dmitry.velmeshev\@duke.edu](mailto:dmitry.velmeshev@duke.edu){.email}) (2023-08-30), Version 2
+
+Scanpy h5ad: [velmeshev_snRNA_seq.h5ad](https://cells.ucsc.edu/pre-postnatal-cortex/all/rna/velmeshev_snRNA_seq.h5ad)
+
+Direct link to this collection for manuscripts: <https://pre-postnatal-cortex.cells.ucsc.edu>
+
+## data link:
+
+snrna-seq: <https://cells.ucsc.edu/?ds=pre-postnatal-cortex+all+rna>
+
+snatac-seq: <https://cells.ucsc.edu/?ds=pre-postnatal-cortex+all+atac>
+
+gene activity level: <https://cells.ucsc.edu/?ds=pre-postnatal-cortex+all+ga>
+
+## code link
+
+zenodo: https://zenodo.org/records/7245297
+
+## run
+```{r load_libraries, message=FALSE}
+# library(Seurat)
+```
+
+```{r load_snRNA_data}
+# rna_matrix <- Seurat::Read10X(
+#   data.dir = "../../inferCSN_data/science_data/rna",
+#   gene.column = 1)
+# saveRDS(
+#   rna_matrix,
+#   "../../inferCSN_data/science_data/rna_output/rna_matrix.rds")
+rna_matrix <- readRDS("../../inferCSN_data/science_data/rna_output/rna_matrix.rds")
+
+rna_metadata <- read.table(
+  file = "../../inferCSN_data/science_data/rna_metadata/meta.tsv",
+  sep = "\t",
+  header = TRUE,
+  row.names = 1)
+
+rna_umap <- read.table(
+  file = "../../inferCSN_data/science_data/rna_metadata/UMAP.coords.tsv.gz",
+  sep = "\t",
+  row.names = 1)
+```
+
+```{r load_snATAC_data}
+# atac_matrix <- Seurat::Read10X(
+#   data.dir = "../../inferCSN_data/science_data/rna",
+#   gene.column = 1)
+# saveRDS(
+#   atac_matrix,
+#   "../../inferCSN_data/science_data/atac_output/atac_matrix.rds")
+atac_matrix <- readRDS("../../inferCSN_data/science_data/atac_output/atac_matrix.rds")
+
+atac_metadata <- read.table(
+  file = "../../inferCSN_data/science_data/rna_metadata/meta.tsv",
+  sep = "\t",
+  header = TRUE,
+  row.names = 1)
+
+atac_umap <- read.table(
+  file = "../../inferCSN_data/science_data/rna_metadata/UMAP.coords.tsv.gz",
+  sep = "\t",
+  row.names = 1)
+```

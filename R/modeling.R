@@ -14,14 +14,15 @@
 #' @return Aggregated Seurat object.
 #' @export
 #'
-aggregate.data <- function(object,
-                           k_neigh = 50,
-                           atacbinary = TRUE,
-                           max_overlap = 0.8,
-                           reduction.name = NULL,
-                           size_factor_normalize = TRUE,
-                           seed = 123,
-                           verbose = TRUE) {
+aggregate.data <- function(
+    object,
+    k_neigh = 50,
+    atacbinary = TRUE,
+    max_overlap = 0.8,
+    reduction.name = NULL,
+    size_factor_normalize = TRUE,
+    seed = 123,
+    verbose = TRUE) {
   if (!is.null(reduction.name)) {
     cell_coord <- object@reductions[[reduction.name]]
   } else {
@@ -37,7 +38,6 @@ aggregate.data <- function(object,
     # } else {
     #   cell_coord <- object@reductions$umap@cell.embeddings
     # }
-
   }
 
   group <- as.character(Seurat::Idents(object))
@@ -59,13 +59,15 @@ aggregate.data <- function(object,
     subobject <- BiocGenerics::subset(object, idents = uniqe_group[i])
     sub_index <- which(group %in% uniqe_group[i])
     cell_coord_i <- cell_coord[sub_index, ]
-    sub_aggregated_data <- generate.aggregated.data(subobject,
-                                                    cell_coord_i,
-                                                    k_neigh,
-                                                    atacbinary,
-                                                    max_overlap,
-                                                    seed,
-                                                    verbose)
+    sub_aggregated_data <- generate.aggregated.data(
+      subobject,
+      cell_coord_i,
+      k_neigh,
+      atacbinary,
+      max_overlap,
+      seed,
+      verbose
+    )
 
     sub_cell_sample <- sub_aggregated_data$cell_sample
     if ("RNA" %in% names(object@assays)) {
@@ -150,7 +152,7 @@ generate.aggregated.data <- function(
     # Create a k-nearest neighbors map
     nn_map <- as.data.frame(
       FNN::knn.index(cell_coord, k = (k_neigh - 1))
-      )
+    )
     row.names(nn_map) <- row.names(cell_coord)
     nn_map$agg_cell <- 1:nrow(nn_map)
     good_choices <- 1:nrow(nn_map)
@@ -206,7 +208,6 @@ generate.aggregated.data <- function(
       atac_new <- atac_old %*% atac_mask
       atac_new <- as.matrix(atac_new)
     }
-
   } else {
     if ("RNA" %in% names(object@assays)) {
       rna_old <- as.matrix(object@assays$RNA$counts)

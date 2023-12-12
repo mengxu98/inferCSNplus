@@ -14,32 +14,37 @@ BugReports: https://github.com/mengxu98/inferCSN/issues
 Depends: 
     R (>= 3.3.0)
 Imports:
+    chromVAR,
+    cicero,
+    circlize,
     ComplexHeatmap,
     data.table,
     doParallel,
     dplyr,
     foreach,
+    FNN,
+    GenomicRanges,
     ggnetwork,
     ggplot2,
     ggraph,
     Matrix,
     methods,
+    motifmatchr,
     parallel,
     patchwork,
     progress,
     purrr,
     Rcpp,
+    slam,
+    Signac,
+    Seurat,
     stats,
     utils
 Suggests:
-    cicero,
-    circlize,
     gtools,
     igraph,
     precrec,
     pROC,
-    Signac,
-    Seurat,
     testthat (>= 3.0.0),
     tidygraph
 LinkingTo: 

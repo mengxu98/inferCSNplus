@@ -7,7 +7,12 @@
 #' @return TF-G dataframe
 #' @export
 #'
-generate_links_for_Cytoscape <- function(L_G_record, L_TF_record, P_L_G_record, P_L_TF_record, groups) {
+generate_links_for_Cytoscape <- function(
+    L_G_record,
+    L_TF_record,
+    P_L_G_record,
+    P_L_TF_record,
+    groups) {
   TF_G_C <- get_TF_G(L_G_record, L_TF_record, groups)
   P_TF_G_C <- get_TF_G(P_L_G_record, P_L_TF_record, groups)
   # take genes which has both distal TFs and proximal TFs
@@ -132,7 +137,6 @@ generate_CRE_Gene_links <- function(direct.net_result, markers) {
 }
 
 
-
 #' extract CREs of markers
 #' @param L_G_record a list of CRE-Gene relationships
 #' @param P_L_G_record a list of Promoter-Gene relationships
@@ -141,7 +145,7 @@ generate_CRE_Gene_links <- function(direct.net_result, markers) {
 #' @import motifmatchr
 #' @import GenomicRanges
 #' @export
-
+#'
 generate_CRE <- function(L_G_record, P_L_G_record, da_peaks_list) {
   # extract overlapped peaks between DA and CREs of focused markers
 
@@ -216,7 +220,7 @@ generate_CRE <- function(L_G_record, P_L_G_record, da_peaks_list) {
 #' @import motifmatchr
 #' @import GenomicRanges
 #' @export
-
+#'
 generate_peak_TF_links <- function(peaks_bed_list, species, genome, markers) {
   motifs <- getJasparMotifs(species)
   L_TF_record <- list()

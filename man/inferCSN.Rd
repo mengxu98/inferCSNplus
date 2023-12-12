@@ -3,7 +3,6 @@
 \name{inferCSN}
 \alias{inferCSN}
 \alias{inferCSN.default}
-\alias{inferCSN.matrix}
 \alias{inferCSN.data.frame}
 \alias{inferCSN.Seurat}
 \title{Inferring Cell-Specific Gene Regulatory Network}
@@ -11,23 +10,6 @@
 inferCSN(object, ...)
 
 \method{inferCSN}{default}(
-  object,
-  penalty = "L0",
-  algorithm = "CD",
-  crossValidation = FALSE,
-  seed = 1,
-  nFolds = 10,
-  kFolds = NULL,
-  rThreshold = 0,
-  regulators = NULL,
-  targets = NULL,
-  maxSuppSize = NULL,
-  verbose = FALSE,
-  cores = 1,
-  ...
-)
-
-\method{inferCSN}{matrix}(
   object,
   penalty = "L0",
   algorithm = "CD",
