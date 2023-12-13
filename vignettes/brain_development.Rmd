@@ -30,11 +30,14 @@ snatac-seq: <https://cells.ucsc.edu/?ds=pre-postnatal-cortex+all+atac>
 
 gene activity level: <https://cells.ucsc.edu/?ds=pre-postnatal-cortex+all+ga>
 
+h5ad and Seurat (V5) object: <https://cellxgene.cziscience.com/collections/bacccb91-066d-4453-b70e-59de0b4598cd>
+
 ## code link
 
-zenodo: https://zenodo.org/records/7245297
+zenodo: <https://zenodo.org/records/7245297>
 
 ## run
+
 ```{r load_libraries, message=FALSE}
 # library(Seurat)
 ```
@@ -79,4 +82,19 @@ atac_umap <- read.table(
   file = "../../inferCSN_data/science_data/rna_metadata/UMAP.coords.tsv.gz",
   sep = "\t",
   row.names = 1)
+```
+
+
+```{r download_from_cellxgene(5647MB), message=FALSE}
+if (!file.exists("../../inferCSN_data/science_data/seurat_v5.rds")) {
+  options(timeout = 3600)
+  download.file(
+    "https://datasets.cellxgene.cziscience.com/50671879-9cc9-4a91-944a-6dbcf1c67173.rds",
+    "../../inferCSN_data/science_data/seurat_v5.rds")
+}
+seurat_object <- readRDS("../../inferCSN_data/science_data/seurat_v5.rds")
+```
+
+```{r}
+Seurat::UMAPPlot(seurat_object)
 ```
