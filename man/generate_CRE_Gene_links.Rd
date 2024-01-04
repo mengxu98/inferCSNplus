@@ -4,12 +4,12 @@
 \alias{generate_CRE_Gene_links}
 \title{extract CREs-gene relations of markers}
 \usage{
-generate_CRE_Gene_links(direct.net_result, markers)
+generate_CRE_Gene_links(weight_table, markers, filter = FALSE)
 }
 \arguments{
-\item{direct.net_result}{dataframe of the result of inferCSN}
+\item{weight_table}{dataframe of the result of inferCSN}
 
-\item{markers}{two column dataframe data with marker genes and group information}
+\item{markers}{two column dataframe data with marker genes and cluster information}
 }
 \description{
 extract CREs-gene relations of markers

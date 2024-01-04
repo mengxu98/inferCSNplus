@@ -7,13 +7,13 @@
 generate_peak_TF_links(peaks_bed_list, species, genome, markers)
 }
 \arguments{
-\item{peaks_bed_list}{A list of peaks bed file of each group}
+\item{peaks_bed_list}{A list of peaks bed file of each cluster}
 
 \item{species}{Species used to detect TF}
 
 \item{genome}{For example: BSgenome.Hsapiens.UCSC.hg19}
 
-\item{markers}{two column dataframe data with marker genes and group information}
+\item{markers}{two column dataframe data with marker genes and cluster information}
 }
 \description{
 Identify TFs enriched in CREs of focus markers

@@ -3,17 +3,16 @@
 #' Function to generate aggregated inputs for inferCSN. \code{aggregate.data}
 #'
 #' @param object Seurat object.
-#' @param k_neigh Number of cells to be aggregated per group.
+#' @param k_neigh Number of cells to be aggregated per cluster.
 #' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
-#' @param max_overlap The maximum overlapping ratio of two groups.
+#' @param max_overlap The maximum overlapping ratio of two clusters.
 #' @param reduction.name The reduction name of extracting the cell coordinates used for aggregating.
 #' @param size_factor_normalize Logical, should accessibility values be normalized by size factor
 #' @param verbose Logical, should warning and info messages be printed?
 #' @param seed Random seed
-#' @import Seurat
-#' @return Aggregated Seurat object.
-#' @export
 #'
+#' @return Seurat object with aggregated data
+#' @export
 aggregate.data <- function(
     object,
     k_neigh = 50,
@@ -33,15 +32,10 @@ aggregate.data <- function(
         cell_coord <- object@reductions[["umap"]]@cell.embeddings
       }
     }
-    # if ("RNA" %in% names(object@assays)) {
-    #   cell_coord <- object@reductions$wnn.umap@cell.embeddings
-    # } else {
-    #   cell_coord <- object@reductions$umap@cell.embeddings
-    # }
   }
 
-  group <- as.character(Seurat::Idents(object))
-  uniqe_group <- unique(group)
+  cluster <- as.character(Seurat::Idents(object))
+  uniqe_cluster <- unique(cluster)
   if ("RNA" %in% names(object@assays)) {
     rna_new <- matrix(0, nrow = nrow(object@assays$RNA$counts), ncol = 1)
   }
@@ -49,15 +43,14 @@ aggregate.data <- function(
     atac_new <- matrix(0, nrow = nrow(object@assays$ATAC@counts), ncol = 1)
   }
 
-
   cell_sample <- matrix(0, nrow = 1, ncol = k_neigh)
 
-  for (i in seq_along(uniqe_group)) {
+  for (i in seq_along(uniqe_cluster)) {
     if (verbose) {
-      message("Aggregating cluster: ", uniqe_group[i])
+      message("Aggregating cluster: ", uniqe_cluster[i])
     }
-    subobject <- BiocGenerics::subset(object, idents = uniqe_group[i])
-    sub_index <- which(group %in% uniqe_group[i])
+    subobject <- BiocGenerics::subset(object, idents = uniqe_cluster[i])
+    sub_index <- which(cluster %in% uniqe_cluster[i])
     cell_coord_i <- cell_coord[sub_index, ]
     sub_aggregated_data <- generate.aggregated.data(
       subobject,
@@ -125,13 +118,13 @@ aggregate.data <- function(
 #'
 #' Function to generate aggregated inputs of a cetrain cluster. \code{generate.aggregated.data}
 #' takes as input sparse data. This function will aggregate binary accessibility scores (or gene expression)
-#' per cell cluster, if they do not overlap any existing group with more than 50% cells.
+#' per cell cluster, if they do not overlap any existing cluster with more than 50% cells.
 #'
 #' @param object Seurat object.
 #' @param cell_coord similarity matrix or dimiension reductions.
-#' @param k_neigh Number of cells to aggregate per group.
+#' @param k_neigh Number of cells to aggregate per cluster.
 #' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
-#' @param max_overlap The maximum overlapping ratio of two groups.
+#' @param max_overlap The maximum overlapping ratio of two clusters.
 #' @param seed Random seed
 #' @param verbose Logical, should warning and info messages be printed?
 #' @importFrom FNN knn.index
@@ -168,7 +161,7 @@ generate.aggregated.data <- function(
     good_choices <- good_choices[good_choices != good_choices[choice]]
 
     it <- 0
-    ## Slow (contain calculating of overlapping between cell groups)
+    ## Slow (contain calculating of overlapping between cell clusters)
     while (length(good_choices) > 0 & it < nrow(cell_coord) / ((1 - max_overlap) * k_neigh)) {
       it <- it + 1
       choice <- sample(1:length(good_choices), size = 1, replace = FALSE)
@@ -176,7 +169,7 @@ generate.aggregated.data <- function(
       good_choices <- good_choices[good_choices != good_choices[choice]]
       cell_sample <- nn_map[new_chosen, ]
 
-      # calculate overlapping between cell groups
+      # calculate overlapping between cell clusters
       combs <- data.frame(1:(nrow(cell_sample) - 1), nrow(cell_sample))
       shared <- apply(combs, 1, function(x) { # Slow
         (k_neigh * 2) - length(unique(as.vector(as.matrix(cell_sample[x, ]))))
@@ -186,7 +179,7 @@ generate.aggregated.data <- function(
       }
     }
 
-    # aggregating both scRNA-seq and scATAC-seq counts of cells within one group
+    # Aggregating both scRNA-seq and scATAC-seq counts of cells within one cluster
     if ("RNA" %in% names(object@assays)) {
       rna_old <- as.matrix(object@assays$RNA$counts)
 
@@ -198,7 +191,7 @@ generate.aggregated.data <- function(
 
     if ("ATAC" %in% names(object@assays)) {
       atac_old <- object@assays$ATAC@counts
-      # binarize
+
       if (atacbinary) {
         atac_old <- atac_old > 0
       }
@@ -216,7 +209,7 @@ generate.aggregated.data <- function(
     }
     if ("ATAC" %in% names(object@assays)) {
       atac_old <- object@assays$ATAC@counts
-      # binarize
+
       if (atacbinary) {
         atac_old <- atac_old > 0
       }
@@ -236,7 +229,6 @@ generate.aggregated.data <- function(
   new_data$cell_sample <- cell_sample
   return(new_data)
 }
-
 
 #' Function to calculate the size factor for the single-cell data
 #'
@@ -299,7 +291,6 @@ isSparseMatrix <- function(x) {
   class(x) %in% c("dgCMatrix", "dgTMatrix")
 }
 
-
 #' Estimate size factors for each column, given a sparseMatrix from the Matrix package
 #' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
 #' @param locfunc The location function used to find the representive value
@@ -310,10 +301,11 @@ isSparseMatrix <- function(x) {
 #' @import slam
 #' @importFrom stats median
 #' @export
-estimateSizeFactorsForSparseMatrix <- function(counts,
-                                               locfunc = median,
-                                               round_exprs = TRUE,
-                                               method = "mean-geometric-mean-total") {
+estimateSizeFactorsForSparseMatrix <- function(
+    counts,
+    locfunc = median,
+    round_exprs = TRUE,
+    method = "mean-geometric-mean-total") {
   CM <- counts
   if (round_exprs) {
     CM <- round(CM)
@@ -362,10 +354,10 @@ estimateSizeFactorsForSparseMatrix <- function(counts,
   }
 
   sfs[is.na(sfs)] <- 1
-  sfs
+  return(sfs)
 }
 
-#' Estimate size factors dense matrix
+#' @title Estimate size factors dense matrix
 #' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
 #' @param locfunc The location function used to find the representive value
 #' @param round_exprs A logic flag to determine whether or not the expression value should be rounded
@@ -373,7 +365,11 @@ estimateSizeFactorsForSparseMatrix <- function(counts,
 #' "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".
 #' @importFrom stats median
 #' @export
-estimateSizeFactorsForDenseMatrix <- function(counts, locfunc = median, round_exprs = TRUE, method = "mean-geometric-mean-total") {
+estimateSizeFactorsForDenseMatrix <- function(
+    counts,
+    locfunc = median,
+    round_exprs = TRUE,
+    method = "mean-geometric-mean-total") {
   CM <- counts
   if (round_exprs) {
     CM <- round(CM)
@@ -392,7 +388,6 @@ estimateSizeFactorsForDenseMatrix <- function(counts, locfunc = median, round_ex
       norm_cnts <- weights * (log(cnts) - log_medians)
       norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
       norm_cnts <- norm_cnts[is.finite(norm_cnts)]
-      # print (head(norm_cnts))
       exp(mean(norm_cnts))
     })
   } else if (method == "median-geometric-mean") {
@@ -419,9 +414,8 @@ estimateSizeFactorsForDenseMatrix <- function(counts, locfunc = median, round_ex
   }
 
   sfs[is.na(sfs)] <- 1
-  sfs
+  return(sfs)
 }
-
 
 #' Find the most commonly occuring relative expression value in each cell
 #'
@@ -435,10 +429,8 @@ estimateSizeFactorsForDenseMatrix <- function(counts, locfunc = median, round_ex
 #' values with each row and column representing genes/isoforms and cells,
 #' respectively. Row and column names should be included.
 #' Expression values should not be log-transformed.
-#' @param relative_expr_thresh Relative expression values below this threshold
-#' are considered zero.
-#' @return an vector of most abundant relative_expr value corresponding to the
-#' RPC 1.
+#' @param relative_expr_thresh Relative expression values below this threshold are considered zero.
+#' @return an vector of most abundant relative_expr value corresponding to the RPC 1.
 #' @details This function estimates the most abundant relative expression value
 #' (t^*) using a gaussian kernel density function. It can also optionally
 #' output the t^* based on a two gaussian mixture model
@@ -449,9 +441,17 @@ estimateSizeFactorsForDenseMatrix <- function(counts, locfunc = median, round_ex
 #' HSMM_fpkm_matrix <- exprs(HSMM)
 #' t_estimate <- estimate_t(HSMM_fpkm_matrix)
 #' }
-estimate_t <- function(relative_expr_matrix, relative_expr_thresh = 0.1) {
+estimate_t <- function(
+    relative_expr_matrix,
+    relative_expr_thresh = 0.1) {
   # apply each column
-  unlist(apply(relative_expr_matrix, 2, function(relative_expr) 10^mean(dmode(log10(relative_expr[relative_expr > relative_expr_thresh]))))) # avoid multiple output
+  unlist(
+    apply(
+      relative_expr_matrix, 2, function(relative_expr) {
+        10^mean(dmode(log10(relative_expr[relative_expr > relative_expr_thresh])))
+      }
+    )
+  ) # avoid multiple output
 }
 
 

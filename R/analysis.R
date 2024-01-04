@@ -3,18 +3,17 @@
 #' @param L_TF_record A list of CRE-TF
 #' @param P_L_G_record A list of CRE-gene about promoters
 #' @param P_L_TF_record A list of CRE-TF about promoters
-#' @param groups cell type information
+#' @param clusters cell type information
 #' @return TF-G dataframe
 #' @export
-#'
 generate_links_for_Cytoscape <- function(
     L_G_record,
     L_TF_record,
     P_L_G_record,
     P_L_TF_record,
-    groups) {
-  TF_G_C <- get_TF_G(L_G_record, L_TF_record, groups)
-  P_TF_G_C <- get_TF_G(P_L_G_record, P_L_TF_record, groups)
+    clusters) {
+  TF_G_C <- get_TF_G(L_G_record, L_TF_record, clusters)
+  P_TF_G_C <- get_TF_G(P_L_G_record, P_L_TF_record, clusters)
   # take genes which has both distal TFs and proximal TFs
   intgenes <- intersect(TF_G_C$Gene, P_TF_G_C$Gene)
   TF_G_C <- TF_G_C[which(TF_G_C$Gene %in% intgenes), , drop = FALSE]
@@ -30,8 +29,9 @@ generate_links_for_Cytoscape <- function(
 #' @param markers Dataframe with marker and cell type information
 #' @return Node character dataframe
 #' @export
-
-generate_node_for_Cytoscape <- function(network_links, markers) {
+generate_node_for_Cytoscape <- function(
+    network_links,
+    markers) {
   ### Node
   G <- unique(network_links$Gene)
   T <- unique(network_links$TF)
@@ -41,34 +41,34 @@ generate_node_for_Cytoscape <- function(network_links, markers) {
   Nodes <- Nodes[unik]
   label_type <- label_type[unik]
 
-  colnames(markers) <- c("gene", "group")
-  names <- unique(markers$group)
+  colnames(markers) <- c("gene", "cluster")
+  names <- unique(markers$cluster)
 
   ### used to note cell type specific information
   DE_flag <- matrix(0, nrow = length(Nodes), ncol = length(names))
   for (i in 1:length(names)) {
-    marker1 <- markers[markers$group == names[i], ]
+    marker1 <- markers[markers$cluster == names[i], ]
     marker_gene <- as.character(marker1$gene)
     id <- which(Nodes %in% marker_gene)
     DE_flag[id, i] <- 1
   }
-  group_type <- rep(NA, length(Nodes))
+  cluster_type <- rep(NA, length(Nodes))
   for (i in 1:length(Nodes)) {
     id <- which(DE_flag[i, ] == 1)
     name_i <- names[id[1]]
     if (length(id) == 1) {
-      group_type[i] <- name_i
+      cluster_type[i] <- name_i
     } else if (length(id) == 2) {
-      group_type[i] <- paste0(name_i, "_", names[id[2]])
+      cluster_type[i] <- paste0(name_i, "_", names[id[2]])
     } else {
       for (j in 2:(length(id) - 1)) {
         name_i <- paste0(name_i, "_", names[id[j]])
       }
-      group_type[i] <- paste0(name_i, "_", names[id[length(id)]])
+      cluster_type[i] <- paste0(name_i, "_", names[id[length(id)]])
     }
   }
-  Node_character <- cbind(label_type, group_type)
-  colnames(Node_character) <- c("function_type", "group")
+  Node_character <- cbind(label_type, cluster_type)
+  colnames(Node_character) <- c("function_type", "cluster")
   rownames(Node_character) <- Nodes
   return(Node_character)
 }
@@ -76,11 +76,12 @@ generate_node_for_Cytoscape <- function(network_links, markers) {
 #' Obtain TF and Gene relationships
 #' @param L_G_record A list of CRE-gene
 #' @param L_TF_record A list of CRE-TF
-#' @param groups cluster information
+#' @param clusters cluster information
 #' @return TF-G dataframe
-#'
-
-get_TF_G <- function(L_G_record, L_TF_record, groups) {
+get_TF_G <- function(
+    L_G_record,
+    L_TF_record,
+    clusters) {
   L_TF_G_record <- list()
   TF_G_C_record <- list()
   for (i in 1:length(L_TF_record)) {
@@ -102,32 +103,41 @@ get_TF_G <- function(L_G_record, L_TF_record, groups) {
     # head(TF_G)
     unik <- !duplicated(TF_G)
     TF_G <- TF_G[unik, ]
-    TF_G_C_record[[i]] <- data.frame(TF = TF_G$TF, Gene = TF_G$gene, Cell_type = groups[i])
+    TF_G_C_record[[i]] <- data.frame(
+      TF = TF_G$TF,
+      Gene = TF_G$gene,
+      Cell_type = clusters[i]
+    )
   }
   TF_G_C <- do.call(rbind, TF_G_C_record)
   unik <- !duplicated(TF_G_C)
   TF_G_C <- TF_G_C[unik, ]
 }
 
-
 #' extract CREs-gene relations of markers
-#' @param direct.net_result dataframe of the result of inferCSN
-#' @param markers two column dataframe data with marker genes and group information
+#' @param weight_table dataframe of the result of inferCSN
+#' @param markers two column dataframe data with marker genes and cluster information
 #' @export
-
-generate_CRE_Gene_links <- function(direct.net_result, markers) {
+generate_CRE_Gene_links <- function(
+    weight_table,
+    markers,
+    filter = FALSE) {
   # loci_gene corresponding relationship
-  direct.net_result_CRE <- direct.net_result[which(direct.net_result$function_type == "HC"), , drop = FALSE]
+  if (filter) {
+    weight_table <- weight_table[which(weight_table$function_type == "HC"), , drop = FALSE]
+  }
+  weight_table_CRE <- weight_table
+
   L_G_record <- list()
   P_L_G_record <- list() # promoter-gene
-  uniqgroups <- unique(markers$group)
-  for (i in 1:length(uniqgroups)) {
-    marker1 <- markers[markers$group == uniqgroups[i], ]
+  uniq_clusters <- unique(markers$cluster)
+  for (i in 1:length(uniq_clusters)) {
+    marker1 <- markers[markers$cluster == uniq_clusters[i], ]
     marker_gene <- as.character(marker1$gene)
-    effctive_id <- which(direct.net_result_CRE$gene %in% marker_gene)
-    L_G_i <- data.frame(loci = direct.net_result_CRE$Peak2[effctive_id], gene = direct.net_result_CRE$gene[effctive_id])
+    effctive_id <- which(weight_table_CRE$gene %in% marker_gene)
+    L_G_i <- data.frame(loci = weight_table_CRE$target[effctive_id], gene = weight_table_CRE$gene[effctive_id])
     L_G_record[[i]] <- L_G_i[!duplicated(L_G_i), , drop = FALSE]
-    P_L_G_i <- data.frame(loci = direct.net_result_CRE$Peak1[effctive_id], gene = direct.net_result_CRE$gene[effctive_id])
+    P_L_G_i <- data.frame(loci = weight_table_CRE$regulator[effctive_id], gene = weight_table_CRE$gene[effctive_id])
     P_L_G_record[[i]] <- P_L_G_i[!duplicated(P_L_G_i), , drop = FALSE]
   }
   CRE_Gene <- list()
@@ -136,19 +146,19 @@ generate_CRE_Gene_links <- function(direct.net_result, markers) {
   return(CRE_Gene)
 }
 
-
 #' extract CREs of markers
 #' @param L_G_record a list of CRE-Gene relationships
 #' @param P_L_G_record a list of Promoter-Gene relationships
-#' @param da_peaks_list a list of DA of each group
+#' @param da_peaks_list a list of DA of each cluster
 #' @import chromVAR
 #' @import motifmatchr
 #' @import GenomicRanges
 #' @export
-#'
-generate_CRE <- function(L_G_record, P_L_G_record, da_peaks_list) {
+generate_CRE <- function(
+    L_G_record,
+    P_L_G_record,
+    da_peaks_list = NULL) {
   # extract overlapped peaks between DA and CREs of focused markers
-
   peaks_bed_record <- list() # peaks used to identify TFs bounded to
   P_peaks_bed_record <- list()
 
@@ -185,7 +195,7 @@ generate_CRE <- function(L_G_record, P_L_G_record, da_peaks_list) {
       peaks_bed$R.start <- as.numeric(peaks_bed$R.start)
       peaks_bed$R.end <- as.numeric(peaks_bed$R.end)
       peaks_bed_record[[i]] <- peaks_bed
-      ### promoters
+      # promoters
       P_L_G_record_i <- P_L_G_record[[i]]
       P_L_G_record_i <- P_L_G_record_i[which(P_L_G_record_i$gene %in% overlap_gene), ]
       P_L_G_record_new[[i]] <- P_L_G_record_i
@@ -211,17 +221,23 @@ generate_CRE <- function(L_G_record, P_L_G_record, da_peaks_list) {
   return(CREs)
 }
 
-#' Identify TFs enriched in CREs of focus markers
-#' @param peaks_bed_list A list of peaks bed file of each group
+#' @title Identify TFs enriched in CREs of focus markers
+#'
+#' @param peaks_bed_list A list of peaks bed file of each cluster
 #' @param species Species used to detect TF
 #' @param genome For example: BSgenome.Hsapiens.UCSC.hg19
-#' @param markers two column dataframe data with marker genes and group information
+#' @param markers two column dataframe data with marker genes and cluster information
+#'
 #' @import chromVAR
 #' @import motifmatchr
 #' @import GenomicRanges
-#' @export
 #'
-generate_peak_TF_links <- function(peaks_bed_list, species, genome, markers) {
+#' @export
+generate_peak_TF_links <- function(
+    peaks_bed_list,
+    species,
+    genome,
+    markers) {
   motifs <- getJasparMotifs(species)
   L_TF_record <- list()
   for (i in 1:length(peaks_bed_list)) {
@@ -251,4 +267,65 @@ generate_peak_TF_links <- function(peaks_bed_list, species, genome, markers) {
     }
   }
   return(L_TF_record)
+}
+
+#' @title final.network
+#'
+#' @param object Seurat object with network results after run 'inferCSN()'
+#' @param cluster Selected celltype(s)
+#'
+#' @return network
+#' @export
+final.network <- function(
+    object,
+    cluster) {
+  if ("weight_table_atac" %in% names(Seurat::Misc(object))) {
+    weight_table <- Seurat::Misc(object, slot = "weight_table_atac")
+  }
+  weight_table <- as.data.frame(weight_table)
+
+  if ("all_markers_list" %in% names(Seurat::Misc(object))) {
+    all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
+  }
+  all_markers_list <- as.data.frame(all_markers_list)
+
+  focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
+
+  # CRE-gene connections
+  CREs_Gene <- generate_CRE_Gene_links(
+    weight_table,
+    markers = focused_markers
+  )
+  # Find focused CREs which is overlapped with DA
+  CREs <- generate_CRE(
+    L_G_record = CREs_Gene$distal,
+    P_L_G_record = CREs_Gene$promoter
+  )
+
+  # detect TFs for distal CREs
+  library(BSgenome.Hsapiens.UCSC.hg38)
+  L_TF_record <- generate_peak_TF_links(
+    peaks_bed_list = CREs$distal,
+    species = "Homo sapiens",
+    genome = BSgenome.Hsapiens.UCSC.hg38,
+    markers = focused_markers
+  )
+
+  # detect TFs for Promoters
+  P_L_TF_record <- generate_peak_TF_links(
+    peaks_bed_list = CREs$promoter,
+    species = "Homo sapiens",
+    genome = BSgenome.Hsapiens.UCSC.hg38,
+    markers = focused_markers
+  )
+
+  network_links <- generate_links_for_Cytoscape(
+    L_G_record = CREs_Gene$distal,
+    L_TF_record,
+    P_L_G_record = CREs_Gene$promoter,
+    P_L_TF_record,
+    cluster
+  )
+
+  return(network_links)
 }

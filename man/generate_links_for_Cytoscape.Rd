@@ -9,7 +9,7 @@ generate_links_for_Cytoscape(
   L_TF_record,
   P_L_G_record,
   P_L_TF_record,
-  groups
+  clusters
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ generate_links_for_Cytoscape(
 
 \item{P_L_TF_record}{A list of CRE-TF about promoters}
 
-\item{groups}{cell type information}
+\item{clusters}{cell type information}
 }
 \value{
 TF-G dataframe

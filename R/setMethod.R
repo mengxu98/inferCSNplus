@@ -83,7 +83,7 @@ inferCSN.default <- function(
       width = 80
     )
 
-    weightDT <- purrr::map_dfr(targets, function(x) {
+    weight_table <- purrr::map_dfr(targets, function(x) {
       if (verbose) pb$tick()
       sub.inferCSN(
         regulatorsMatrix = regulators_matrix,
@@ -105,7 +105,7 @@ inferCSN.default <- function(
     if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
     target <- NULL
     "%dopar%" <- foreach::"%dopar%"
-    weightDT <- foreach::foreach(
+    weight_table <- foreach::foreach(
       target = targets,
       .export = c("sub.inferCSN", "sparse.regression")
     ) %dopar% {
@@ -124,14 +124,14 @@ inferCSN.default <- function(
         verbose = verbose
       )
     }
-    weightDT <- data.table::rbindlist(weightDT)
-    attr(weightDT, ".internal.selfref") <- NULL
+    weight_table <- data.table::rbindlist(weight_table)
+    attr(weight_table, ".internal.selfref") <- NULL
     doParallel::stopImplicitCluster()
   }
 
-  weightDT <- weightDT[order(abs(as.numeric(weightDT$weight)), decreasing = TRUE), ]
+  weight_table <- weight_table[order(abs(as.numeric(weight_table$weight)), decreasing = TRUE), ]
   if (verbose) message("Run done.")
-  return(weightDT)
+  return(weight_table)
 }
 
 #' @export
@@ -175,8 +175,24 @@ inferCSN.data.frame <- function(
   )
 }
 
+#' @param aggregate aggregate
+#' @param peakcalling peakcalling
+#' @param macs2.path macs2.path
+#' @param fragments fragments
+#' @param k_neigh k_neigh
+#' @param atacbinary atacbinary
+#' @param max_overlap atacbinary
+#' @param reduction.name atacbinary
+#' @param size_factor_normalize atacbinary
+#' @param genome_info atacbinary
+#' @param HC_cutoff atacbinary
+#' @param LC_cutoff atacbinary
+#' @param rescued atacbinary
+#' @param ... atacbinary
+#'
 #' @export
 #' @method inferCSN Seurat
+#' @import Seurat
 #'
 #' @rdname inferCSN
 #'
@@ -203,13 +219,13 @@ inferCSN.Seurat <- function(
     max_overlap = 0.8,
     reduction.name = NULL,
     size_factor_normalize = FALSE,
-    genome.info,
-    early_stop = FALSE, # crossvaliation + sample?
+    genome_info = NULL,
     HC_cutoff = NULL,
     LC_cutoff = NULL,
-    rescued = FALSE,
+    rescued = TRUE,
     ...) {
-  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
+  if (verbose) message(paste("Running start for <", class(object)[1], "object >."))
+  object$cluster <- Seurat::Idents(object)
 
   # # step 0. Peak calling
   # if (("ATAC" %in% names(object@assays)) && peakcalling) {
@@ -238,126 +254,178 @@ inferCSN.Seurat <- function(
   #     message("Peak calling finished")
   #   }
   # }
+  object_all <- object
+  weight_table_final_list <- list()
+  clusters <- unique(object$cluster)
+  for (c in seq_along(clusters)) {
+    cluster <- clusters[c]
+    if (verbose) message(paste0("Running for: ", cluster, "."))
+    object <- subset(object_all, cluster == cluster[1])
 
-  # TODO: here indicate following analysis use the aggregated data,
-  #   we should give a choice for users that they could decide whether aggregate data.
-  if (aggregate) {
-    # step 1. Aggregation
-    if (verbose) {
-      message("Generating aggregated data")
-    }
-    if ("aggregated_data" %in% names(Seurat::Misc(object))) {
-      agg_data <- Seurat::Misc(object, slot = "aggregated_data")
+    if (aggregate) {
+      if ("aggregated_data" %in% names(Seurat::Misc(object))) {
+        agg_data <- Seurat::Misc(object, slot = "aggregated_data")
+      } else {
+        if (verbose) {
+          message("--Because 'aggregate = TRUE', and there is no aggregated data in seurat object.")
+          message("--Generating aggregated data, and using 'names(Seurat::Misc(object))' to check it.")
+        }
+        agg_data <- aggregate.data(
+          object,
+          k_neigh = k_neigh,
+          atacbinary = atacbinary,
+          max_overlap = max_overlap,
+          reduction.name = NULL,
+          size_factor_normalize = size_factor_normalize
+        )
+        Seurat::Misc(object, slot = "aggregated_data") <- agg_data
+      }
+
+      if ("RNA" %in% names(agg_data)) {
+        data_rna <- as.matrix(agg_data$RNA)
+      }
+
+      if ("ATAC" %in% names(agg_data)) {
+        data_atac <- as.matrix(agg_data$ATAC)
+      }
     } else {
-      agg_data <- aggregate.data(
-        object,
-        k_neigh = k_neigh,
-        atacbinary = atacbinary,
-        max_overlap = max_overlap,
-        reduction.name = NULL,
-        size_factor_normalize = size_factor_normalize
-      )
-      Seurat::Misc(object, slot = "aggregated_data") <- agg_data
+      if ("RNA" %in% names(object@assays)) {
+        data_rna <- matrix(0, nrow = nrow(object@assays$RNA$counts), ncol = 1)
+      }
+      if ("ATAC" %in% names(object@assays)) {
+        data_atac <- matrix(0, nrow = nrow(object@assays$ATAC@counts), ncol = 1)
+      }
     }
 
     if ("RNA" %in% names(agg_data)) {
-      data_rna <- as.matrix(agg_data$RNA)
+      Seurat::DefaultAssay(object) <- "RNA"
+      if (is.null(targets)) {
+        targets <- Seurat::VariableFeatures(object = object)
+      }
+      weight_table_rna <- inferCSN(
+        t(data_rna),
+        penalty = penalty,
+        algorithm = algorithm,
+        crossValidation = crossValidation,
+        seed = seed,
+        nFolds = nFolds,
+        kFolds = kFolds,
+        rThreshold = rThreshold,
+        regulators = targets,
+        targets = targets,
+        maxSuppSize = maxSuppSize,
+        verbose = verbose,
+        cores = cores
+      )
+
+      weight_table_rna <- weight_table_rna[order(
+        abs(as.numeric(weight_table_rna$weight)), decreasing = TRUE
+        ), ]
+      Misc(object, slot = "weight_table_rna") <- weight_table_rna
     }
 
-    if ("ATAC" %in% names(agg_data)) {
-      data_atac <- as.matrix(agg_data$ATAC)
-    }
-  } else {
-    if ("RNA" %in% names(object@assays)) {
-      data_rna <- matrix(0, nrow = nrow(object@assays$RNA$counts), ncol = 1)
-    }
+    # data_atac <- peaks.filter(data_atac)
     if ("ATAC" %in% names(object@assays)) {
-      data_atac <- matrix(0, nrow = nrow(object@assays$ATAC@counts), ncol = 1)
+      rownames(data_atac) <- gsub("-", "_", rownames(data_atac))
+
+      if (is.null(genome_info)) {
+        if (verbose) {
+          message("--No genome file or information provided, set to default value: hg38.")
+        }
+        genome_info <- "hg38"
+      }
+      if (is.character(genome_info)) {
+        if (genome_info == "hg38") {
+          genome_info <- data("promoter_regions_hg38")
+          genome_info <- promoter_regions_hg38
+        } else if (genome_info == "hg19") {
+          genome_info <- data("promoter_regions_hg19")
+          genome_info <- promoter_regions_hg19
+        } else {
+          if (verbose) {
+            stop("Please set genome_info = 'hg19'' or 'hg38', or provide a file for other species.")
+          }
+        }
+      }
+
+      if (is.null(targets)) {
+        # Obtain candidate regions of focus target genes
+        if ("RNA" %in% names(object@assays)) {
+          Seurat::DefaultAssay(object) <- "RNA"
+          targets <- Seurat::VariableFeatures(object = object)
+          targets <- lapply(targets, function(x) strsplit(x, "[.]")[[1]][1])
+          targets <- unique(unlist(targets))
+          targets <- genome_info$genes[which(genome_info$genes %in% targets)]
+          genome_info.used <- genome_info[which(genome_info$genes %in% targets), ]
+        } else {
+          genome_info.used <- genome_info
+        }
+      } else {
+        targets <- lapply(targets, function(x) strsplit(x, "[.]")[[1]][1])
+        targets <- unique(unlist(targets))
+        targets <- genome_info$genes[which(genome_info$genes %in% targets)]
+        genome_info.used <- genome_info[which(genome_info$genes %in% targets), ]
+      }
+
+      targets <- genome_info.used$genes
+      chr <- genome_info.used$Chrom
+      starts <- genome_info.used$Starts
+      ends <- genome_info.used$Ends
+
+      weight_table_atac <- .inferCSN.atac(
+        peak_matrix = data_atac,
+        penalty = penalty,
+        algorithm = algorithm,
+        crossValidation = crossValidation,
+        seed = seed,
+        nFolds = nFolds,
+        kFolds = kFolds,
+        rThreshold = rThreshold,
+        regulators = targets,
+        targets = targets,
+        maxSuppSize = maxSuppSize,
+        verbose = verbose,
+        cores = cores,
+        chr,
+        starts,
+        ends,
+        HC_cutoff = HC_cutoff,
+        LC_cutoff = LC_cutoff,
+        rescued = rescued
+      )
+
+      weight_table_atac <- weight_table_atac[order(abs(as.numeric(weight_table_atac$weight)), decreasing = TRUE), ]
+      Seurat::Misc(object, slot = "weight_table_atac") <- weight_table_atac
+      weight_table_atac_sub <- final.network(object, cluster = clusters[c])
+      names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
     }
-  }
-
-  data_atac <- peaks.filter(data_atac)
-
-  if (is.null(targets)) {
-    # TODO: here code only could used to select targets for RNA, how to use for ATAC
-    targets <- rownames(data_rna)
-    targets <- na.omit(object@assays$RNA@meta.data$var.features)
-  }
-
-  ###
-  if ("ATAC" %in% names(object@assays)) {
-    rownames(data_atac) <- gsub("-", "_", rownames(data_atac))
-
-    # Obtain candidate regions of focus markers
-    genes <- lapply(genome.info$genes, function(x) strsplit(x, "[|]")[[1]][1])
-    genes <- lapply(genes, function(x) strsplit(x, "[.]")[[1]][1])
-    genes <- unlist(genes)
-    genome.info$genes <- genes
-    unik <- !duplicated(genes)
-    genome.info <- genome.info[unik, ]
-
-    if (is.null(targets)) {
-      # TODO: here code only could used to select targets for RNA, how to use for ATAC
-      targets <- genome.info$genes
+    if ("RNA" %in% names(object@assays)) {
+      weight_table_final <- merge(
+        weight_table_atac_sub,
+        weight_table_rna,
+        by = c("regulator", "target"),
+        all.x = TRUE
+      )
+      weight_table_final <- na.omit(weight_table_final)[, 1:5]
+      weight_table_final$weight <- weight_table_final$weight / sum(abs(weight_table_final$weight))
+      weight_table_final <- weight_table_final[order(abs(as.numeric(weight_table_final$weight)), decreasing = TRUE), ]
     }
-
-    targets <- lapply(targets, function(x) strsplit(x, "[.]")[[1]][1])
-    targets <- unique(unlist(targets))
-    targets <- genome.info$genes[which(genome.info$genes %in% targets)]
-
-    genome.info.used <- genome.info[which(genome.info$genes %in% targets), ]
-    chr <- genome.info.used$Chrom
-    starts <- genome.info.used$Starts
-    ends <- genome.info.used$Ends
+    weight_table_final_list[[c]] <- weight_table_final
+    if (verbose) message(paste0("Run done for: ", cluster, "."))
   }
 
-  if ("RNA" %in% names(agg_data)) {
-    weight_network_rna <- inferCSN(
-      matrix = t(data_rna),
-      penalty = penalty,
-      algorithm = algorithm,
-      crossValidation = crossValidation,
-      seed = seed,
-      nFolds = nFolds,
-      kFolds = kFolds,
-      rThreshold = rThreshold,
-      regulators = targets,
-      targets = targets,
-      maxSuppSize = maxSuppSize,
-      verbose = verbose,
-      cores = cores,
-      ...
-    )
-  }
-
-  if ("ATAC" %in% names(agg_data)) {
-    weight_network_atac <- .inferCSN.atac(
-      matrix = data_atac,
-      penalty = penalty,
-      algorithm = algorithm,
-      crossValidation = crossValidation,
-      seed = seed,
-      nFolds = nFolds,
-      kFolds = kFolds,
-      rThreshold = rThreshold,
-      regulators = targets,
-      targets = targets,
-      maxSuppSize = maxSuppSize,
-      verbose = verbose,
-      cores = cores,
-      chr,
-      starts,
-      ...
-    )
-  }
-  weightDT <- weight_network_atac
-  weightDT <- weightDT[order(abs(as.numeric(weightDT$weight)), decreasing = TRUE), ]
+  names(weight_table_final_list) <- clusters
+  object <- object_all
+  Seurat::Misc(object, slot = "weight_table") <- weight_table_final_list
+  # save result
   if (verbose) message("Run done.")
-  return(weightDT)
+
+  # return(weight_table)
+  return(object)
 }
 
 .inferCSN.atac <- function(
-    matrix,
+    peak_matrix,
     penalty = "L0",
     algorithm = "CD",
     crossValidation = FALSE,
@@ -372,8 +440,14 @@ inferCSN.Seurat <- function(
     cores = 1,
     chr,
     starts,
+    ends,
+    HC_cutoff = NULL,
+    LC_cutoff = NULL,
+    rescued = TRUE,
     ...) {
-  matrix <- as.matrix(matrix)
+  matrix <- as.matrix(peak_matrix)
+  rm(peak_matrix)
+  peaks <- rownames(matrix)
 
   if (!is.null(regulators)) {
     regulators_matrix <- matrix[, intersect(colnames(matrix), regulators)]
@@ -386,8 +460,6 @@ inferCSN.Seurat <- function(
   } else {
     targetsMatrix <- matrix
   }
-
-  targets <- rownames(matrix)
 
   cores <- min(
     (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
@@ -404,64 +476,12 @@ inferCSN.Seurat <- function(
     )
 
     peaks <- rownames(matrix)
-    TXs <- list()
-    TYs <- list()
-    weightDT <- purrr::map_dfr(
-      seq_along(targets), function(i) {
-        if (verbose) pb$tick()
+    enhancers_matrix_list <- list()
+    promoters_matrix_list <- list()
+    weight_list <- list()
+    for (i in seq_along(targets)) {
+      if (verbose) pb$tick()
 
-        p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
-        p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
-        promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-        enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
-        enhancers <- setdiff(enhancers, promoters)
-
-        if (length(promoters) > 0 && length(enhancers) > 1) {
-          id1 <- na.omit(match(promoters, peaks))
-          id2 <- na.omit(match(enhancers, peaks))
-          X <- matrix[setdiff(id2, id1), ]
-          TXs[[i]] <- X
-          Y <- matrix[id1, ]
-          if (length(id1) > 1) {
-            Y <- colSums(Y)
-          }
-          Y <- t(as.matrix(Y))
-          rownames(Y) <- peaks[id1[1]] # Only use the first?
-          TYs[[i]] <- Y
-          if (ncol(X) == 1) {
-            X <- t(X)
-          }
-          Y <- as.matrix(Y)
-          target <- rownames(Y)
-          regulators_matrix <- t(matrix)
-          targetsMatrix <- t(matrix)
-          sub.inferCSN(
-            regulatorsMatrix = regulators_matrix,
-            targetsMatrix = targetsMatrix,
-            target = target,
-            crossValidation = crossValidation,
-            seed = seed,
-            penalty = penalty,
-            algorithm = algorithm,
-            nFolds = nFolds,
-            kFolds = kFolds,
-            rThreshold = rThreshold,
-            maxSuppSize = maxSuppSize,
-            verbose = verbose
-          )
-        }
-      }
-    )
-  } else {
-    doParallel::registerDoParallel(cores = cores)
-    if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
-
-    "%dopar%" <- foreach::"%dopar%"
-    i <- NULL
-    weightDT <- foreach::foreach(
-      i = seq_along(targets),
-      .export = c("sub.inferCSN", "sparse.regression")
-    ) %dopar% {
       p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
       p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
       promoters <- cicero::find_overlapping_coordinates(peaks, p1)
@@ -472,24 +492,23 @@ inferCSN.Seurat <- function(
         id1 <- na.omit(match(promoters, peaks))
         id2 <- na.omit(match(enhancers, peaks))
         X <- matrix[setdiff(id2, id1), ]
-        TXs[[i]] <- X
+        enhancers_matrix_list[[i]] <- X
         Y <- matrix[id1, ]
         if (length(id1) > 1) {
           Y <- colSums(Y)
         }
         Y <- t(as.matrix(Y))
-        rownames(Y) <- peaks[id1[1]] # Only use the first?
-        TYs[[i]] <- Y
+        rownames(Y) <- peaks[id1[1]] # Only use the first one?
+        promoters_matrix_list[[i]] <- Y
         if (ncol(X) == 1) {
           X <- t(X)
         }
         Y <- as.matrix(Y)
         target <- rownames(Y)
         regulators_matrix <- t(matrix)
-        targetsMatrix <- t(matrix)
-        sub.inferCSN(
-          regulatorsMatrix = regulators_matrix,
-          targetsMatrix = targetsMatrix,
+        weight_list[[i]] <- sub.inferCSN(
+          regulatorsMatrix = t(X),
+          targetsMatrix = t(matrix),
           target = target,
           crossValidation = crossValidation,
           seed = seed,
@@ -503,12 +522,127 @@ inferCSN.Seurat <- function(
         )
       }
     }
-    weightDT <- data.table::rbindlist(weightDT)
-    attr(weightDT, ".internal.selfref") <- NULL
+  } else {
+    i <- NULL
+
+    doParallel::registerDoParallel(cores = cores)
+    if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
+
+    "%dopar%" <- foreach::"%dopar%"
+    weight_list <- foreach::foreach(
+      i = seq_along(targets),
+      .export = c("sub.inferCSN", "sparse.regression")
+    ) %dopar% {
+      p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
+      p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
+      promoters <- cicero::find_overlapping_coordinates(peaks, p1)
+      enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
+      enhancers <- setdiff(enhancers, promoters)
+
+      if (length(promoters) > 0 && length(enhancers) > 1) {
+        id1 <- na.omit(match(promoters, peaks))
+        id2 <- na.omit(match(enhancers, peaks))
+        X <- matrix[setdiff(id2, id1), ]
+        enhancers_matrix_list[[i]] <- X
+        Y <- matrix[id1, ]
+        if (length(id1) > 1) {
+          Y <- colSums(Y)
+        }
+        Y <- t(as.matrix(Y))
+        rownames(Y) <- peaks[id1[1]] # Only use the first?
+        promoters_matrix_list[[i]] <- Y
+        if (ncol(X) == 1) {
+          X <- t(X)
+        }
+        Y <- as.matrix(Y)
+        target <- rownames(Y)
+        regulators_matrix <- t(matrix)
+        targetsMatrix <- t(matrix)
+        sub.inferCSN(
+          regulatorsMatrix = X,
+          targetsMatrix = Y,
+          target = target,
+          crossValidation = crossValidation,
+          seed = seed,
+          penalty = penalty,
+          algorithm = algorithm,
+          nFolds = nFolds,
+          kFolds = kFolds,
+          rThreshold = rThreshold,
+          maxSuppSize = maxSuppSize,
+          verbose = verbose
+        )
+      }
+    }
     doParallel::stopImplicitCluster()
   }
 
-  weightDT <- weightDT[order(abs(as.numeric(weightDT$weight)), decreasing = TRUE), ]
-  if (verbose) message("Run done.")
-  return(weightDT)
+  weight_table <- purrr::list_rbind(weight_list)
+  weight_table <- weight_table[order(abs(as.numeric(weight_table$weight)), decreasing = TRUE), ]
+  # colnames(weight_table) <- c("Peak1", "Peak2", "weight")
+  # weight_table <- do.call(rbind, weight_list)
+
+  # variable selection
+  if (is.null(HC_cutoff)) {
+    HC_cutoff <- max(stats::quantile(weight_table$weight, 0.50), 0.001)
+  }
+  if (is.null(LC_cutoff)) {
+    LC_cutoff <- min(0.001, stats::quantile(weight_table$weight, 0.25))
+  }
+
+  for (i in 1:length(weight_list)) {
+    if (!is.null(weight_list[[i]])) {
+      weight_table_h <- weight_list[[i]]
+      Imp_value <- weight_table_h[, 3]
+      index1 <- which(Imp_value > HC_cutoff) # HC
+      index2 <- intersect(which(Imp_value > LC_cutoff), which(Imp_value <= HC_cutoff)) # MC
+      index3 <- which(Imp_value <= LC_cutoff) # LC
+
+      # do data frame: gene, starts, end, peak1, peak2,weight,function_type
+      function_type <- rep(NA, length(Imp_value))
+      function_type[index1] <- "HC"
+      function_type[index2] <- "MC"
+      function_type[index3] <- "LC"
+
+      # rescue highly correlated CREs
+      if (rescued) {
+        if (i <= length(enhancers_matrix_list)) {
+          X <- enhancers_matrix_list[[i]]
+          Y <- promoters_matrix_list[[i]]
+          CPi <- abs(cor(t(X)))
+          for (p in 1:nrow(CPi)) {
+            CPi[p, p] <- 0
+          }
+          # focus on HC rows
+          hic_index <- which(rownames(X) %in% weight_table_h[, 2][index1])
+          other_index <- which(rownames(X) %in% weight_table_h[, 2][-index1])
+          CPi_sub <- CPi[hic_index, other_index, drop = FALSE]
+          flag_matrix <- matrix(0, nrow = nrow(CPi_sub), ncol = ncol(CPi_sub))
+          flag_matrix[which(CPi_sub > 0.25)] <- 1
+          correlated_index <- which(colSums(flag_matrix) > 0)
+          if (!is.null(correlated_index)) {
+            function_type[weight_table_h$Peak2 %in% rownames(X)[other_index[correlated_index]]] <- "HC"
+          }
+        }
+      }
+      weight_list[[i]] <- cbind(
+        data.frame(
+          gene = targets[i],
+          Chr = chr[i],
+          Starts = starts[i],
+          Ends = ends[i]
+        ),
+        cbind(
+          weight_table_h,
+          function_type = function_type
+        )
+      )
+    }
+  }
+  weight_table <- do.call(rbind, weight_list)
+  weight_table$Starts <- as.numeric(weight_table$Starts)
+  weight_table$Ends <- as.numeric(weight_table$Ends)
+  weight_table$weight <- abs(as.numeric(weight_table$weight))
+
+  return(weight_table)
 }

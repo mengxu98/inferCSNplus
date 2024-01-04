@@ -12,12 +12,10 @@ values with each row and column representing genes/isoforms and cells,
 respectively. Row and column names should be included.
 Expression values should not be log-transformed.}
 
-\item{relative_expr_thresh}{Relative expression values below this threshold
-are considered zero.}
+\item{relative_expr_thresh}{Relative expression values below this threshold are considered zero.}
 }
 \value{
-an vector of most abundant relative_expr value corresponding to the
-RPC 1.
+an vector of most abundant relative_expr value corresponding to the RPC 1.
 }
 \description{
 Converting relative expression values to mRNA copies per cell requires

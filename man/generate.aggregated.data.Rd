@@ -19,11 +19,11 @@ generate.aggregated.data(
 
 \item{cell_coord}{similarity matrix or dimiension reductions.}
 
-\item{k_neigh}{Number of cells to aggregate per group.}
+\item{k_neigh}{Number of cells to aggregate per cluster.}
 
 \item{atacbinary}{Logical, whether the aggregated scATAC-seq data need binary}
 
-\item{max_overlap}{The maximum overlapping ratio of two groups.}
+\item{max_overlap}{The maximum overlapping ratio of two clusters.}
 
 \item{seed}{Random seed}
 
@@ -35,5 +35,5 @@ Aggregated data.
 \description{
 Function to generate aggregated inputs of a cetrain cluster. \code{generate.aggregated.data}
 takes as input sparse data. This function will aggregate binary accessibility scores (or gene expression)
-per cell cluster, if they do not overlap any existing group with more than 50% cells.
+per cell cluster, if they do not overlap any existing cluster with more than 50% cells.
 }

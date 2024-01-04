@@ -66,18 +66,17 @@ inferCSN(object, ...)
   max_overlap = 0.8,
   reduction.name = NULL,
   size_factor_normalize = FALSE,
-  genome.info,
-  early_stop = FALSE,
+  genome_info = NULL,
   HC_cutoff = NULL,
   LC_cutoff = NULL,
-  rescued = FALSE,
+  rescued = TRUE,
   ...
 )
 }
 \arguments{
 \item{object}{An expression matrix, cells by genes}
 
-\item{...}{Arguments for other methods}
+\item{...}{atacbinary}
 
 \item{penalty}{The type of regularization.
 This can take either one of the following choices: "L0" and "L0L2".
@@ -108,6 +107,32 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 \item{verbose}{Print detailed information.}
 
 \item{cores}{CPU cores.}
+
+\item{aggregate}{aggregate}
+
+\item{peakcalling}{peakcalling}
+
+\item{macs2.path}{macs2.path}
+
+\item{fragments}{fragments}
+
+\item{k_neigh}{k_neigh}
+
+\item{atacbinary}{atacbinary}
+
+\item{max_overlap}{atacbinary}
+
+\item{reduction.name}{atacbinary}
+
+\item{size_factor_normalize}{atacbinary}
+
+\item{genome_info}{atacbinary}
+
+\item{HC_cutoff}{atacbinary}
+
+\item{LC_cutoff}{atacbinary}
+
+\item{rescued}{atacbinary}
 }
 \value{
 A data table of gene-gene regulatory relationship

@@ -1,33 +1,48 @@
-# library(DIRECTNET)
+---
+title: "Untitled"
+output: html_document
+date: "2023-12-25"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_libraries, message=FALSE}
+# library(Seurat)
+library(magrittr)
 library(Seurat)
 library(Signac)
 library(EnsDb.Hsapiens.v86)
-library(patchwork)
-library(dplyr)
 library(ggplot2)
-options(stringsAsFactors = FALSE)
-options(timeout = 1000)
+library(cowplot)
+```
 
-dataset <- "A549"
-input_path <- paste0("../inferCSN_data/", dataset, "/data/")
-output_path <- paste0("../inferCSN_data/", dataset, "/output/")
-figures_path <- paste0("../inferCSN_data/", dataset, "/figures/")
+```{r read_data}
+# https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE207334
 
-rna.counts <- read.table(file = paste0(input_path, "A549_RNA_count.txt"))
-atac.counts <- read.table(file = paste0(input_path, "A549_ATAC_count.txt"))
-label <- read.table(paste0(input_path, "A549_time.txt"), sep = "\t")
+rna_matrix <- Matrix::readMM("../../inferCSN_data/GSE207334_science/GSE207334_Multiome_rna_counts.mtx.gz")
+rna_genes <- read.table("../../inferCSN_data/GSE207334_science/GSE207334_Multiome_rna_genes.txt.gz")
+rownames(rna_matrix) <- rna_genes$V1
 
-names(label) <- c("Cells", "time")
-meta.data <- as.character(label$time)
-meta.data <- as.data.frame(meta.data)
-rownames(meta.data) <- as.character(label$Cells)
-colnames(meta.data) <- "celltype"
+atac_matrix <- Matrix::readMM("../../inferCSN_data/GSE207334_science/GSE207334_Multiome_atac_counts.mtx.gz")
+atac_peaks <- read.table("../../inferCSN_data/GSE207334_science/GSE207334_Multiome_atac_peaks.txt.gz")
+rownames(atac_matrix) <- atac_peaks$V1
 
-markers <- read.table(file = paste0(input_path, "A549_DE_genes.txt"), header = TRUE, sep = "\t") # identified by Wilcox rank test
-markers$gene <- as.character(markers$gene)
-markers$group <- as.character(markers$group)
+meta_data <- read.table("../../inferCSN_data/GSE207334_science/GSE207334_Multiome_cell_meta.txt.gz", header = TRUE, row.names = 1)
 
-genome.info <- read.table(file = paste0(input_path, "hg19.promoter.regions.txt"))
+colnames(rna_matrix) <- rownames(meta_data) # ???
+colnames(atac_matrix) <- rownames(meta_data) # ???
+```
+
+
+```{r}
+seurat_object <- Seurat::CreateSeuratObject(
+  counts = rna_matrix,
+  assay = "RNA",
+  meta.data = meta_data)
+
+genome.info <- read.table(file = paste0("../../inferCSN_data/hg38.promoter.regions.txt"))
 
 names(genome.info) <- c("Chrom","Starts","Ends","genes")
 genes <- lapply(genome.info$genes, function(x) strsplit(x,"[|]")[[1]][1])
@@ -37,89 +52,87 @@ genome.info$genes <- genes
 unik <- !duplicated(genes)# filter out different transcript
 genome.info <- genome.info[unik,]
 
-
-
-peak <- rownames(atac.counts)
-peak1 <- strsplit(peak,"-")
-peaks <- matrix(0, nrow = length(peak),ncol = 1)
+peak <- rownames(atac_matrix)
+peak1 <- strsplit(peak, "-")
+peaks <- matrix(0, nrow = length(peak), ncol = 1)
 for (i in 1:length(peaks)) {
-  peaks[i] <- paste0("chr",peak1[[i]][1],":",peak1[[i]][2],"-",peak1[[i]][3])
+  peaks[i] <- paste0(peak1[[i]][1],":",peak1[[i]][2],"-",peak1[[i]][3])
 }
-rownames(atac.counts) <- as.vector(peaks)
-
-
-# part I: Set up a Seurat object
-combined <- CreateSeuratObject(counts = rna.counts, meta.data = meta.data)
+rownames(atac_matrix) <- as.vector(peaks)
 
 # Now add in the ATAC-seq data
 # we'll only use peaks in standard chromosomes
-grange.counts <- Signac::StringToGRanges(rownames(atac.counts), sep = c(":", "-"))
+grange.counts <- Signac::StringToGRanges(rownames(atac_matrix), sep = c(":", "-"))
 grange.use <- Signac::seqnames(grange.counts) %in% GenomeInfoDb::standardChromosomes(grange.counts)
-atac.counts <- atac.counts[as.vector(grange.use), ]
+atac_matrix <- atac_matrix[as.vector(grange.use), ]
 annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
 GenomeInfoDb::seqlevelsStyle(annotations) <- 'UCSC'
-genome.name <- "hg19"
+genome.name <- "hg38"
 genome(annotations) <- genome.name
 
 chrom_assay <- Signac::CreateChromatinAssay(
-  counts = atac.counts,
+  counts = atac_matrix,
   sep = c(":", "-"),
   genome = genome.name,
   min.cells = 0,
-  annotation = annotations
-)
-combined[["ATAC"]] <- chrom_assay
+  annotation = annotations)
 
+# chrom_assay <- Seurat::CreateSeuratObject(
+#   counts = atac_matrix,
+#   meta.data = meta_data,
+#   assay = "ATAC")
+
+seurat_object[["ATAC"]] <- chrom_assay
+```
+
+```{r}
+
+```
+
+```{r}
 # RNA analysis
-DefaultAssay(combined) <- "RNA"
-combined <- NormalizeData(object = combined,
-                          normalization.method = "LogNormalize",
-                          scale.factor = 10000)
+DefaultAssay(seurat_object) <- "RNA"
+# load both modalities
+# seurat_object[["RNA"]] <- as(seurat_object[["RNA"]], Class = "Assay5")
+# repeat QC steps performed in the WNN vignette
 
-#####
-# Detection of variable genes across the single cells
-combined <- FindVariableFeatures(object = combined)
-features.rna <- markers$gene
-combined@assays$RNA@var.features <- features.rna #Seurat 4 error
-# combined@assays[["RNA"]]@meta.data[["var.features.rank"]] <- features.rna # Seurat 5
-combined <- Seurat::FindMarkers(object = combined)
-#####
+# Perform standard analysis of each modality independently RNA analysis
+seurat_object <- NormalizeData(seurat_object)
+seurat_object <- FindVariableFeatures(seurat_object)
+seurat_object <- ScaleData(seurat_object)
+seurat_object <- RunPCA(seurat_object)
+seurat_object <- RunUMAP(seurat_object, dims = 1:30)
 
-##### New
-all.genes <- rownames(combined)
-combined <- ScaleData(combined, features = all.genes)
-combined <- RunPCA(combined, features = VariableFeatures(object = combined))
-#####
-
-combined <- ScaleData(object = combined)
-combined <- RunPCA(combined, pc.genes = combined@var.genes, pcs.compute = 40, do.print = FALSE)
-combined <- RunUMAP(combined, dims = 1:40)
+# seurat_object <- Seurat::FindMarkers(object = seurat_object)
+# Error in FindMarkers.Seurat(object = seurat_object) : 
+#   At least 1 ident must be specified in `ident.1`
 
 # ATAC analysis
 # We exclude the first dimension as this is typically correlated with sequencing depth
-DefaultAssay(combined) <- "ATAC"
-combined <- Signac::RunTFIDF(combined)
-combined <- Signac::FindTopFeatures(combined, min.cutoff = 'q0')
-combined <- Signac::RunSVD(combined)
-combined <- RunUMAP(combined, reduction = 'lsi', dims = 2:50, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
+DefaultAssay(seurat_object) <- "ATAC"
+seurat_object <- Signac::RunTFIDF(seurat_object)
+seurat_object <- Signac::FindTopFeatures(seurat_object, min.cutoff = 'q0')
+seurat_object <- Signac::RunSVD(seurat_object)
+seurat_object <- RunUMAP(seurat_object, reduction = 'lsi', dims = 2:50, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
 
 #
-combined <- FindMultiModalNeighbors(combined, reduction.list = list("pca", "lsi"), dims.list = list(1:50, 2:50))
-combined <- RunUMAP(combined, nn.name = "weighted.nn", reduction.name = "wnn.umap", reduction.key = "wnnUMAP_")
+seurat_object <- FindMultiModalNeighbors(seurat_object, reduction.list = list("pca", "lsi"), dims.list = list(1:50, 2:50))
+seurat_object <- RunUMAP(seurat_object, nn.name = "weighted.nn", reduction.name = "wnn.umap", reduction.key = "wnnUMAP_")
 
 
-Idents(combined) <- combined$celltype
+Idents(seurat_object) <- seurat_object$subclass
 
+library(DIRECTNET)
 # Part II: Infer CREs using DIRECT-NET
 # Infer links for focused markers
-combined <- Run_DIRECT_NET(combined,
+seurat_object <- Run_DIRECT_NET(seurat_object,
                            k_neigh = 50,
                            atacbinary = TRUE,
                            max_overlap = 0.5,
                            size_factor_normalize = TRUE,
                            genome.info = genome.info,
-                           focus_markers = c("PYGB","NR3C1"))
-direct.net_result <- Misc(combined, slot = 'direct.net')
+                           focus_markers = c("FOXP2","IBA1"))
+direct.net_result <- Misc(seurat_object, slot = 'direct.net')
 direct.net_result <- as.data.frame(do.call(cbind,direct.net_result))
 # Part III: Visualize the links
 temp <- tempfile()
@@ -131,18 +144,18 @@ gene_anno$chromosome <- paste0("chr", gene_anno$seqid)
 gene_anno$gene <- gene_anno$gene_id
 gene_anno$transcript <- gene_anno$transcript_id
 gene_anno$symbol <- gene_anno$gene_name
-Plot_connections(direct.net_result, gene_anno, marker = "PYGB", cutoff = 0.5)
+Plot_connections(direct.net_result, gene_anno, marker = "FOXP2", cutoff = 0.5)
 
 # Part IV: Construct regulatory networks
 # Identify differential accessiable peaks
 ### identify differential accessiable peaks (DA)
-DefaultAssay(combined) <- 'ATAC'
+DefaultAssay(seurat_object) <- 'ATAC'
 groups <- unique(markers$group)
 da_peaks_list <- list()
 for (i in 1:length(groups)) {
   print(i)
   da_peaks <- FindMarkers(
-    object = combined,
+    object = seurat_object,
     min.pct = 0.05,
     logfc.threshold = 0.1,
     ident.1 = groups[i],
@@ -172,3 +185,5 @@ P_L_TF_record <- generate_peak_TF_links(peaks_bed_list = Focused_CREs$promoter, 
 network_links <- generate_links_for_Cytoscape(L_G_record = CREs_Gene$distal, L_TF_record, P_L_G_record = CREs_Gene$promoter, P_L_TF_record,groups)
 # Ouput Node attribute
 Node_attribute <- generate_node_for_Cytoscape(network_links,markers)
+
+```

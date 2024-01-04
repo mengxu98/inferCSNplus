@@ -4,14 +4,14 @@
 \alias{get_TF_G}
 \title{Obtain TF and Gene relationships}
 \usage{
-get_TF_G(L_G_record, L_TF_record, groups)
+get_TF_G(L_G_record, L_TF_record, clusters)
 }
 \arguments{
 \item{L_G_record}{A list of CRE-gene}
 
 \item{L_TF_record}{A list of CRE-TF}
 
-\item{groups}{cluster information}
+\item{clusters}{cluster information}
 }
 \value{
 TF-G dataframe

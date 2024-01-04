@@ -1,48 +1,64 @@
-normalize.object <- function(object) {
+#' @title normalize.seurat.object
+#'
+#' @param object Seurat object
+#'
+#' @return Normalized seurat object
+#' @export
+#'
+normalize.seurat.object <- function(object) {
   if (class(object) != "Seurat") {
     stop("Pleasure input an Seurat object")
   }
-  if (all(c("RNA", "ATAC") %in% names(object@assays))) {
-    # RNA analysis
-    DefaultAssay(combined) <- "RNA"
-    combined <- NormalizeData(object = combined,
-                              normalization.method = "LogNormalize",
-                              scale.factor = 10000)
 
-    #####
-    # Detection of variable genes across the single cells
-    combined <- FindVariableFeatures(object = combined)
-    features.rna <- markers$gene
-    combined@assays$RNA@var.features <- features.rna #Seurat 4 error
-    # combined@assays[["RNA"]]@meta.data[["var.features.rank"]] <- features.rna # Seurat 5
-    combined <- Seurat::FindMarkers(object = combined)
-    #####
-
-    ##### New
-    all.genes <- rownames(combined)
-    combined <- ScaleData(combined, features = all.genes)
-    combined <- RunPCA(combined, features = VariableFeatures(object = combined))
-    #####
-    combined <- ScaleData(object = combined)
-    combined <- RunPCA(combined, pc.genes = combined@var.genes, pcs.compute = 40, do.print = FALSE)
-    combined <- RunUMAP(combined, dims = 1:40)
-
-    # ATAC analysis
-    # We exclude the first dimension as this is typically correlated with sequencing depth
-    DefaultAssay(combined) <- "ATAC"
-    combined <- Signac::RunTFIDF(combined)
-    #> Performing TF-IDF normalization
-    combined <- Signac::FindTopFeatures(combined, min.cutoff = 'q0')
-    combined <- Signac::RunSVD(combined)
-    combined <- RunUMAP(combined, reduction = 'lsi', dims = 2:50, reduction.name = "umap.atac", reduction.key = "atacUMAP_")
-
-    #
-    combined <- FindMultiModalNeighbors(combined, reduction.list = list("pca", "lsi"), dims.list = list(1:50, 2:50))
-    combined <- RunUMAP(combined, nn.name = "weighted.nn", reduction.name = "wnn.umap", reduction.key = "wnnUMAP_")
-
-
-    Idents(combined) <- combined$celltype
-
+  if ("ATAC" %in% names(object@assays)) {
+    DefaultAssay(object) <- "ATAC"
+    object <- Signac::RunTFIDF(object)
+    object <- Signac::FindTopFeatures(
+      object,
+      min.cutoff = "q0"
+    )
+    object <- Signac::RunSVD(object)
+    object <- RunUMAP(
+      object,
+      reduction = 'lsi',
+      dims = 2:50,
+      reduction.name = "umap.atac",
+      reduction.key = "atacUMAP_"
+    )
   }
 
+  if ("RNA" %in% names(object@assays)) {
+    DefaultAssay(object) <- "RNA"
+    object <- NormalizeData(
+      object = object,
+      normalization.method = "LogNormalize",
+      scale.factor = 10000
+    )
+    object <- ScaleData(object = object)
+    object <- RunPCA(
+      object,
+      features = VariableFeatures(object = object),
+      pc.genes = object@var.genes,
+      pcs.compute = 40,
+      do.print = FALSE
+    )
+    object <- RunUMAP(object, dims = 1:40)
+    all_markers_list <- Seurat::FindAllMarkers(object)
+    all_markers_list <- all_markers_list[all_markers_list$p_val_adj <= 0.05, ]
+    all_markers_list <- all_markers_list[all_markers_list$avg_log2FC >= 1, ]
+    Seurat::Misc(object, slot = "all_markers_list") <- all_markers_list
+  }
+
+  if (all(c("RNA", "ATAC") %in% names(object@assays))) {
+    object <- FindMultiModalNeighbors(
+      object,
+      reduction.list = list("pca", "lsi"),
+      dims.list = list(1:50, 2:50))
+    object <- RunUMAP(
+      object,
+      nn.name = "weighted.nn",
+      reduction.name = "wnn.umap",
+      reduction.key = "wnnUMAP_"
+    )
+  }
 }

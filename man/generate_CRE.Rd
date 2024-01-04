@@ -4,14 +4,14 @@
 \alias{generate_CRE}
 \title{extract CREs of markers}
 \usage{
-generate_CRE(L_G_record, P_L_G_record, da_peaks_list)
+generate_CRE(L_G_record, P_L_G_record, da_peaks_list = NULL)
 }
 \arguments{
 \item{L_G_record}{a list of CRE-Gene relationships}
 
 \item{P_L_G_record}{a list of Promoter-Gene relationships}
 
-\item{da_peaks_list}{a list of DA of each group}
+\item{da_peaks_list}{a list of DA of each cluster}
 }
 \description{
 extract CREs of markers

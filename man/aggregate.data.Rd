@@ -18,11 +18,11 @@ aggregate.data(
 \arguments{
 \item{object}{Seurat object.}
 
-\item{k_neigh}{Number of cells to be aggregated per group.}
+\item{k_neigh}{Number of cells to be aggregated per cluster.}
 
 \item{atacbinary}{Logical, whether the aggregated scATAC-seq data need binary}
 
-\item{max_overlap}{The maximum overlapping ratio of two groups.}
+\item{max_overlap}{The maximum overlapping ratio of two clusters.}
 
 \item{reduction.name}{The reduction name of extracting the cell coordinates used for aggregating.}
 
@@ -33,7 +33,7 @@ aggregate.data(
 \item{verbose}{Logical, should warning and info messages be printed?}
 }
 \value{
-Aggregated Seurat object.
+Seurat object with aggregated data
 }
 \description{
 Function to generate aggregated inputs for inferCSN. \code{aggregate.data}
