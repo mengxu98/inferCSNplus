@@ -97,3 +97,7 @@ R_matrix_center_sparse <- function(mat, X_normalized, intercept) {
     .Call('_inferCSN_R_matrix_center_sparse', PACKAGE = 'inferCSN', mat, X_normalized, intercept)
 }
 
+table_to_matrix <- function(weight_table) {
+    .Call('_inferCSN_table_to_matrix', PACKAGE = 'inferCSN', weight_table)
+}
+

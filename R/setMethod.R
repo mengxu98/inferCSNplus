@@ -5,14 +5,14 @@
 #' @param algorithm The type of algorithm used to minimize the objective function.
 #' Currently "CD" and "CDPSI" are supported.
 #' The CDPSI algorithm may yield better results, but it also increases running time.
-#' @param crossValidation Check whether cross validation is used.
-#' @param nFolds The number of folds for cross-validation.
+#' @param cross_validation Check whether cross validation is used.
+#' @param n_folds The number of folds for cross-validation.
 #' @param seed The seed used in randomly shuffling the data for cross-validation.
-#' @param kFolds The number of folds for sample split.
-#' @param rThreshold rThreshold.
+#' @param k_folds The number of folds for sample split.
+#' @param r_threshold r_threshold.
 #' @param regulators Regulator genes.
 #' @param targets Target genes.
-#' @param maxSuppSize The number of non-zore coef, this value will affect the final performance.
+#' @param regulators_num The number of non-zore coef, this value will affect the final performance.
 #' The maximum support size at which to terminate the regularization path.
 #' Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as L0 regularization typically selects a small portion of non-zeros.
 #' @param verbose Print detailed information.
@@ -27,14 +27,14 @@ inferCSN.default <- function(
     object,
     penalty = "L0",
     algorithm = "CD",
-    crossValidation = FALSE,
+    cross_validation = FALSE,
     seed = 1,
-    nFolds = 10,
-    kFolds = NULL,
-    rThreshold = 0,
+    n_folds = 10,
+    k_folds = NULL,
+    r_threshold = 0,
     regulators = NULL,
     targets = NULL,
-    maxSuppSize = NULL,
+    regulators_num = NULL,
     verbose = FALSE,
     cores = 1,
     ...) {
@@ -45,14 +45,14 @@ inferCSN.default <- function(
     matrix = matrix,
     penalty = penalty,
     algorithm = algorithm,
-    crossValidation = crossValidation,
+    cross_validation = cross_validation,
     seed = seed,
-    nFolds = nFolds,
-    kFolds = kFolds,
-    rThreshold = rThreshold,
+    n_folds = n_folds,
+    k_folds = k_folds,
+    r_threshold = r_threshold,
     regulators = regulators,
     targets = targets,
-    maxSuppSize = maxSuppSize,
+    regulators_num = regulators_num,
     verbose = verbose,
     cores = cores
   )
@@ -64,11 +64,11 @@ inferCSN.default <- function(
   }
 
   if (!is.null(targets)) {
-    targetsMatrix <- matrix[, intersect(colnames(matrix), targets)]
+    targets_matrix <- matrix[, intersect(colnames(matrix), targets)]
   } else {
-    targetsMatrix <- matrix
+    targets_matrix <- matrix
   }
-  targets <- colnames(targetsMatrix)
+  targets <- colnames(targets_matrix)
   rm(matrix)
 
   cores <- min((parallel::detectCores(logical = FALSE) - 1), cores, length(targets))
@@ -86,17 +86,17 @@ inferCSN.default <- function(
     weight_table <- purrr::map_dfr(targets, function(x) {
       if (verbose) pb$tick()
       sub.inferCSN(
-        regulatorsMatrix = regulators_matrix,
-        targetsMatrix = targetsMatrix,
+        regulators_matrix = regulators_matrix,
+        targets_matrix = targets_matrix,
         target = x,
-        crossValidation = crossValidation,
+        cross_validation = cross_validation,
         seed = seed,
         penalty = penalty,
         algorithm = algorithm,
-        nFolds = nFolds,
-        kFolds = kFolds,
-        rThreshold = rThreshold,
-        maxSuppSize = maxSuppSize,
+        n_folds = n_folds,
+        k_folds = k_folds,
+        r_threshold = r_threshold,
+        regulators_num = regulators_num,
         verbose = verbose
       )
     })
@@ -105,27 +105,26 @@ inferCSN.default <- function(
     if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
     target <- NULL
     "%dopar%" <- foreach::"%dopar%"
-    weight_table <- foreach::foreach(
+    weight_list <- foreach::foreach(
       target = targets,
       .export = c("sub.inferCSN", "sparse.regression")
     ) %dopar% {
       sub.inferCSN(
-        regulatorsMatrix = regulators_matrix,
-        targetsMatrix = targetsMatrix,
+        regulators_matrix = regulators_matrix,
+        targets_matrix = targets_matrix,
         target = target,
-        crossValidation = crossValidation,
+        cross_validation = cross_validation,
         seed = seed,
         penalty = penalty,
         algorithm = algorithm,
-        nFolds = nFolds,
-        kFolds = kFolds,
-        rThreshold = rThreshold,
-        maxSuppSize = maxSuppSize,
+        n_folds = n_folds,
+        k_folds = k_folds,
+        r_threshold = r_threshold,
+        regulators_num = regulators_num,
         verbose = verbose
       )
     }
-    weight_table <- data.table::rbindlist(weight_table)
-    attr(weight_table, ".internal.selfref") <- NULL
+    weight_table <- purrr::list_rbind(weight_list)
     doParallel::stopImplicitCluster()
   }
 
@@ -143,32 +142,32 @@ inferCSN.data.frame <- function(
     object,
     penalty = "L0",
     algorithm = "CD",
-    crossValidation = FALSE,
+    cross_validation = FALSE,
     seed = 1,
-    nFolds = 10,
-    kFolds = NULL,
-    rThreshold = 0,
+    n_folds = 10,
+    k_folds = NULL,
+    r_threshold = 0,
     regulators = NULL,
     targets = NULL,
-    maxSuppSize = NULL,
+    regulators_num = NULL,
     verbose = FALSE,
     cores = 1,
     ...) {
   if (verbose) message(paste("Running start for <", class(object)[1], ">."))
-  if (verbose) warning("Converting the class type of input data from <data.frame> to <matrix>.")
+  if (verbose) message("Converting the class type of input data from <data.frame> to <matrix>.")
   matrix <- as.matrix(object)
   inferCSN(
     matrix,
     penalty = penalty,
     algorithm = algorithm,
-    crossValidation = crossValidation,
+    cross_validation = cross_validation,
     seed = seed,
-    nFolds = nFolds,
-    kFolds = kFolds,
-    rThreshold = rThreshold,
+    n_folds = n_folds,
+    k_folds = k_folds,
+    r_threshold = r_threshold,
     regulators = regulators,
     targets = targets,
-    maxSuppSize = maxSuppSize,
+    regulators_num = regulators_num,
     verbose = verbose,
     cores = cores,
     ...
@@ -179,35 +178,36 @@ inferCSN.data.frame <- function(
 #' @param peakcalling peakcalling
 #' @param macs2.path macs2.path
 #' @param fragments fragments
-#' @param k_neigh k_neigh
-#' @param atacbinary atacbinary
-#' @param max_overlap atacbinary
-#' @param reduction.name atacbinary
-#' @param size_factor_normalize atacbinary
+#' @param k_neigh Number of cells to be aggregated per cluster.
+#' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
+#' @param max_overlap The maximum overlapping ratio of two clusters.
+#' @param reduction_name The reduction name of extracting the cell coordinates used for aggregating.
+#' @param size_factor_normalize Logical, should accessibility values be normalized by size factor
 #' @param genome_info atacbinary
-#' @param HC_cutoff atacbinary
-#' @param LC_cutoff atacbinary
+#' @param high_corr_cutoff atacbinary
+#' @param low_corr_cutoff atacbinary
 #' @param rescued atacbinary
 #' @param ... atacbinary
 #'
 #' @export
 #' @method inferCSN Seurat
 #' @import Seurat
+#' @importFrom stats cor na.omit
+#' @importFrom utils data
 #'
 #' @rdname inferCSN
-#'
 inferCSN.Seurat <- function(
     object,
     penalty = "L0",
     algorithm = "CD",
-    crossValidation = FALSE,
+    cross_validation = FALSE,
     seed = 1,
-    nFolds = 10,
-    kFolds = NULL,
-    rThreshold = 0,
+    n_folds = 10,
+    k_folds = NULL,
+    r_threshold = 0,
     regulators = NULL,
     targets = NULL,
-    maxSuppSize = NULL,
+    regulators_num = NULL,
     verbose = FALSE,
     cores = 1,
     aggregate = TRUE,
@@ -217,11 +217,11 @@ inferCSN.Seurat <- function(
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
-    reduction.name = NULL,
+    reduction_name = NULL,
     size_factor_normalize = FALSE,
     genome_info = NULL,
-    HC_cutoff = NULL,
-    LC_cutoff = NULL,
+    high_corr_cutoff = NULL,
+    low_corr_cutoff = NULL,
     rescued = TRUE,
     ...) {
   if (verbose) message(paste("Running start for <", class(object)[1], "object >."))
@@ -254,28 +254,25 @@ inferCSN.Seurat <- function(
   #     message("Peak calling finished")
   #   }
   # }
-  object_all <- object
+
+  object_raw <- object
+  clusters <- as.character(unique(object$cluster))
   weight_table_final_list <- list()
-  clusters <- unique(object$cluster)
   for (c in seq_along(clusters)) {
     cluster <- clusters[c]
-    if (verbose) message(paste0("Running for: ", cluster, "."))
-    object <- subset(object_all, cluster == cluster[1])
+    if (verbose) message(paste0("Running for cluster: ", cluster, "."))
+    object <- BiocGenerics::subset(object_raw, cluster == cluster[1])
 
     if (aggregate) {
       if ("aggregated_data" %in% names(Seurat::Misc(object))) {
         agg_data <- Seurat::Misc(object, slot = "aggregated_data")
       } else {
-        if (verbose) {
-          message("--Because 'aggregate = TRUE', and there is no aggregated data in seurat object.")
-          message("--Generating aggregated data, and using 'names(Seurat::Misc(object))' to check it.")
-        }
         agg_data <- aggregate.data(
           object,
           k_neigh = k_neigh,
           atacbinary = atacbinary,
           max_overlap = max_overlap,
-          reduction.name = NULL,
+          reduction_name = NULL,
           size_factor_normalize = size_factor_normalize
         )
         Seurat::Misc(object, slot = "aggregated_data") <- agg_data
@@ -290,37 +287,51 @@ inferCSN.Seurat <- function(
       }
     } else {
       if ("RNA" %in% names(object@assays)) {
-        data_rna <- matrix(0, nrow = nrow(object@assays$RNA$counts), ncol = 1)
+        data_rna <- matrix(
+          0,
+          nrow = nrow(object@assays$RNA$counts),
+          ncol = 1
+        )
       }
       if ("ATAC" %in% names(object@assays)) {
-        data_atac <- matrix(0, nrow = nrow(object@assays$ATAC@counts), ncol = 1)
+        data_atac <- matrix(
+          0,
+          nrow = nrow(object@assays$ATAC@counts),
+          ncol = 1
+        )
       }
     }
 
     if ("RNA" %in% names(agg_data)) {
       Seurat::DefaultAssay(object) <- "RNA"
       if (is.null(targets)) {
-        targets <- Seurat::VariableFeatures(object = object)
+        # targets <- Seurat::VariableFeatures(object = object)
+        if ("all_markers_list" %in% names(Seurat::Misc(object))) {
+          all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
+        }
+        all_markers_list <- as.data.frame(all_markers_list)
+        focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
+        targets <- focused_markers$gene
       }
       weight_table_rna <- inferCSN(
         t(data_rna),
         penalty = penalty,
         algorithm = algorithm,
-        crossValidation = crossValidation,
+        cross_validation = cross_validation,
         seed = seed,
-        nFolds = nFolds,
-        kFolds = kFolds,
-        rThreshold = rThreshold,
+        n_folds = n_folds,
+        k_folds = k_folds,
+        r_threshold = r_threshold,
         regulators = targets,
         targets = targets,
-        maxSuppSize = maxSuppSize,
+        regulators_num = regulators_num,
         verbose = verbose,
         cores = cores
       )
 
       weight_table_rna <- weight_table_rna[order(
         abs(as.numeric(weight_table_rna$weight)), decreasing = TRUE
-        ), ]
+      ), ]
       Misc(object, slot = "weight_table_rna") <- weight_table_rna
     }
 
@@ -352,49 +363,58 @@ inferCSN.Seurat <- function(
         # Obtain candidate regions of focus target genes
         if ("RNA" %in% names(object@assays)) {
           Seurat::DefaultAssay(object) <- "RNA"
-          targets <- Seurat::VariableFeatures(object = object)
+          # targets <- Seurat::VariableFeatures(object = object)
+          if ("all_markers_list" %in% names(Seurat::Misc(object))) {
+            all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
+          }
+          all_markers_list <- as.data.frame(all_markers_list)
+          focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
+          targets <- focused_markers$gene
+
           targets <- lapply(targets, function(x) strsplit(x, "[.]")[[1]][1])
           targets <- unique(unlist(targets))
           targets <- genome_info$genes[which(genome_info$genes %in% targets)]
-          genome_info.used <- genome_info[which(genome_info$genes %in% targets), ]
+          genome_info_used <- genome_info[which(genome_info$genes %in% targets), ]
         } else {
-          genome_info.used <- genome_info
+          genome_info_used <- genome_info
         }
       } else {
         targets <- lapply(targets, function(x) strsplit(x, "[.]")[[1]][1])
         targets <- unique(unlist(targets))
         targets <- genome_info$genes[which(genome_info$genes %in% targets)]
-        genome_info.used <- genome_info[which(genome_info$genes %in% targets), ]
+        genome_info_used <- genome_info[which(genome_info$genes %in% targets), ]
       }
 
-      targets <- genome_info.used$genes
-      chr <- genome_info.used$Chrom
-      starts <- genome_info.used$Starts
-      ends <- genome_info.used$Ends
+      targets <- genome_info_used$genes
+      chr <- genome_info_used$Chrom
+      starts <- genome_info_used$Starts
+      ends <- genome_info_used$Ends
 
       weight_table_atac <- .inferCSN.atac(
         peak_matrix = data_atac,
         penalty = penalty,
         algorithm = algorithm,
-        crossValidation = crossValidation,
+        cross_validation = cross_validation,
         seed = seed,
-        nFolds = nFolds,
-        kFolds = kFolds,
-        rThreshold = rThreshold,
+        n_folds = n_folds,
+        k_folds = k_folds,
+        r_threshold = r_threshold,
         regulators = targets,
         targets = targets,
-        maxSuppSize = maxSuppSize,
+        regulators_num = regulators_num,
         verbose = verbose,
         cores = cores,
         chr,
         starts,
         ends,
-        HC_cutoff = HC_cutoff,
-        LC_cutoff = LC_cutoff,
+        high_corr_cutoff = high_corr_cutoff,
+        low_corr_cutoff = low_corr_cutoff,
         rescued = rescued
       )
 
-      weight_table_atac <- weight_table_atac[order(abs(as.numeric(weight_table_atac$weight)), decreasing = TRUE), ]
+      weight_table_atac <- weight_table_atac[order(
+        abs(as.numeric(weight_table_atac$weight)), decreasing = TRUE
+      ), ]
       Seurat::Misc(object, slot = "weight_table_atac") <- weight_table_atac
       weight_table_atac_sub <- final.network(object, cluster = clusters[c])
       names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
@@ -411,38 +431,38 @@ inferCSN.Seurat <- function(
       weight_table_final <- weight_table_final[order(abs(as.numeric(weight_table_final$weight)), decreasing = TRUE), ]
     }
     weight_table_final_list[[c]] <- weight_table_final
-    if (verbose) message(paste0("Run done for: ", cluster, "."))
+    if (verbose) message(paste0("Run done for cluster: ", cluster, "."))
   }
 
   names(weight_table_final_list) <- clusters
-  object <- object_all
-  Seurat::Misc(object, slot = "weight_table") <- weight_table_final_list
+
   # save result
+  Seurat::Misc(object_raw, slot = "weight_table") <- weight_table_final_list
+
   if (verbose) message("Run done.")
 
-  # return(weight_table)
-  return(object)
+  return(object_raw)
 }
 
 .inferCSN.atac <- function(
     peak_matrix,
     penalty = "L0",
     algorithm = "CD",
-    crossValidation = FALSE,
+    cross_validation = FALSE,
     seed = 1,
-    nFolds = 10,
-    kFolds = NULL,
-    rThreshold = 0,
+    n_folds = 10,
+    k_folds = NULL,
+    r_threshold = 0,
     regulators = NULL,
     targets = NULL,
-    maxSuppSize = NULL,
+    regulators_num = NULL,
     verbose = FALSE,
     cores = 1,
     chr,
     starts,
     ends,
-    HC_cutoff = NULL,
-    LC_cutoff = NULL,
+    high_corr_cutoff = NULL,
+    low_corr_cutoff = NULL,
     rescued = TRUE,
     ...) {
   matrix <- as.matrix(peak_matrix)
@@ -456,14 +476,18 @@ inferCSN.Seurat <- function(
   }
 
   if (!is.null(targets)) {
-    targetsMatrix <- matrix[, intersect(colnames(matrix), targets)]
+    targets_matrix <- matrix[, intersect(colnames(matrix), targets)]
   } else {
-    targetsMatrix <- matrix
+    targets_matrix <- matrix
   }
 
   cores <- min(
     (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
   )
+
+  enhancers_matrix_list <- list()
+  promoters_matrix_list <- list()
+  weight_list <- list()
   if (cores == 1) {
     if (verbose) message("Using 1 core.")
     # Format progress information
@@ -476,9 +500,7 @@ inferCSN.Seurat <- function(
     )
 
     peaks <- rownames(matrix)
-    enhancers_matrix_list <- list()
-    promoters_matrix_list <- list()
-    weight_list <- list()
+
     for (i in seq_along(targets)) {
       if (verbose) pb$tick()
 
@@ -498,7 +520,7 @@ inferCSN.Seurat <- function(
           Y <- colSums(Y)
         }
         Y <- t(as.matrix(Y))
-        rownames(Y) <- peaks[id1[1]] # Only use the first one?
+        rownames(Y) <- peaks[id1[1]]
         promoters_matrix_list[[i]] <- Y
         if (ncol(X) == 1) {
           X <- t(X)
@@ -507,17 +529,17 @@ inferCSN.Seurat <- function(
         target <- rownames(Y)
         regulators_matrix <- t(matrix)
         weight_list[[i]] <- sub.inferCSN(
-          regulatorsMatrix = t(X),
-          targetsMatrix = t(matrix),
+          regulators_matrix = t(X),
+          targets_matrix = t(matrix),
           target = target,
-          crossValidation = crossValidation,
+          cross_validation = cross_validation,
           seed = seed,
           penalty = penalty,
           algorithm = algorithm,
-          nFolds = nFolds,
-          kFolds = kFolds,
-          rThreshold = rThreshold,
-          maxSuppSize = maxSuppSize,
+          n_folds = n_folds,
+          k_folds = k_folds,
+          r_threshold = r_threshold,
+          regulators_num = regulators_num,
           verbose = verbose
         )
       }
@@ -549,7 +571,7 @@ inferCSN.Seurat <- function(
           Y <- colSums(Y)
         }
         Y <- t(as.matrix(Y))
-        rownames(Y) <- peaks[id1[1]] # Only use the first?
+        rownames(Y) <- peaks[id1[1]]
         promoters_matrix_list[[i]] <- Y
         if (ncol(X) == 1) {
           X <- t(X)
@@ -557,19 +579,19 @@ inferCSN.Seurat <- function(
         Y <- as.matrix(Y)
         target <- rownames(Y)
         regulators_matrix <- t(matrix)
-        targetsMatrix <- t(matrix)
+        targets_matrix <- t(matrix)
         sub.inferCSN(
-          regulatorsMatrix = X,
-          targetsMatrix = Y,
+          regulators_matrix = X,
+          targets_matrix = Y,
           target = target,
-          crossValidation = crossValidation,
+          cross_validation = cross_validation,
           seed = seed,
           penalty = penalty,
           algorithm = algorithm,
-          nFolds = nFolds,
-          kFolds = kFolds,
-          rThreshold = rThreshold,
-          maxSuppSize = maxSuppSize,
+          n_folds = n_folds,
+          k_folds = k_folds,
+          r_threshold = r_threshold,
+          regulators_num = regulators_num,
           verbose = verbose
         )
       }
@@ -580,29 +602,28 @@ inferCSN.Seurat <- function(
   weight_table <- purrr::list_rbind(weight_list)
   weight_table <- weight_table[order(abs(as.numeric(weight_table$weight)), decreasing = TRUE), ]
   # colnames(weight_table) <- c("Peak1", "Peak2", "weight")
-  # weight_table <- do.call(rbind, weight_list)
 
   # variable selection
-  if (is.null(HC_cutoff)) {
-    HC_cutoff <- max(stats::quantile(weight_table$weight, 0.50), 0.001)
+  if (is.null(high_corr_cutoff)) {
+    high_corr_cutoff <- max(stats::quantile(weight_table$weight, 0.50), 0.001)
   }
-  if (is.null(LC_cutoff)) {
-    LC_cutoff <- min(0.001, stats::quantile(weight_table$weight, 0.25))
+  if (is.null(low_corr_cutoff)) {
+    low_corr_cutoff <- min(0.001, stats::quantile(weight_table$weight, 0.25))
   }
 
   for (i in 1:length(weight_list)) {
     if (!is.null(weight_list[[i]])) {
       weight_table_h <- weight_list[[i]]
-      Imp_value <- weight_table_h[, 3]
-      index1 <- which(Imp_value > HC_cutoff) # HC
-      index2 <- intersect(which(Imp_value > LC_cutoff), which(Imp_value <= HC_cutoff)) # MC
-      index3 <- which(Imp_value <= LC_cutoff) # LC
+      coefficients <- weight_table_h[, 3]
+      index1 <- which(coefficients > high_corr_cutoff)
+      index2 <- intersect(which(coefficients > low_corr_cutoff), which(coefficients <= high_corr_cutoff))
+      index3 <- which(coefficients <= low_corr_cutoff)
 
       # do data frame: gene, starts, end, peak1, peak2,weight,function_type
-      function_type <- rep(NA, length(Imp_value))
-      function_type[index1] <- "HC"
-      function_type[index2] <- "MC"
-      function_type[index3] <- "LC"
+      function_type <- rep(NA, length(coefficients))
+      function_type[index1] <- "high_corr"
+      function_type[index2] <- "medain_corr"
+      function_type[index3] <- "low_corr"
 
       # rescue highly correlated CREs
       if (rescued) {
@@ -613,7 +634,7 @@ inferCSN.Seurat <- function(
           for (p in 1:nrow(CPi)) {
             CPi[p, p] <- 0
           }
-          # focus on HC rows
+          # focus on high_corr rows
           hic_index <- which(rownames(X) %in% weight_table_h[, 2][index1])
           other_index <- which(rownames(X) %in% weight_table_h[, 2][-index1])
           CPi_sub <- CPi[hic_index, other_index, drop = FALSE]
@@ -621,7 +642,7 @@ inferCSN.Seurat <- function(
           flag_matrix[which(CPi_sub > 0.25)] <- 1
           correlated_index <- which(colSums(flag_matrix) > 0)
           if (!is.null(correlated_index)) {
-            function_type[weight_table_h$Peak2 %in% rownames(X)[other_index[correlated_index]]] <- "HC"
+            function_type[weight_table_h$Peak2 %in% rownames(X)[other_index[correlated_index]]] <- "high_corr"
           }
         }
       }
@@ -639,7 +660,7 @@ inferCSN.Seurat <- function(
       )
     }
   }
-  weight_table <- do.call(rbind, weight_list)
+  weight_table <- purrr::list_rbind(weight_list)
   weight_table$Starts <- as.numeric(weight_table$Starts)
   weight_table$Ends <- as.numeric(weight_table$Ends)
   weight_table$weight <- abs(as.numeric(weight_table$weight))

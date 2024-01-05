@@ -7,7 +7,6 @@ utils::globalVariables(c(
   "Interaction",
   "name",
   "regulator",
-  "target",
   "degree",
   "edges",
   "curvetype"
@@ -15,35 +14,37 @@ utils::globalVariables(c(
 
 #' @title Check input parameters
 #'
+#' @param matrix An expression matrix, cells by genes
 #' @inheritParams inferCSN
 #'
 #' @return No return value, called for check input parameters
 #' @export
 #'
-check.parameters <- function(
-    matrix,
-    penalty,
-    algorithm,
-    crossValidation,
-    seed,
-    nFolds,
-    kFolds,
-    rThreshold,
-    regulators,
-    targets,
-    maxSuppSize,
-    verbose,
-    cores) {
+check.parameters <- function(matrix,
+                             penalty,
+                             algorithm,
+                             cross_validation,
+                             seed,
+                             n_folds,
+                             k_folds,
+                             r_threshold,
+                             regulators,
+                             targets,
+                             regulators_num,
+                             verbose,
+                             cores) {
   if (verbose) message("Checking input parameters.")
 
-  matrixErrorMessage <- paste0("Parameter matrix must be a two-dimensional matrix,
-                               where each column corresponds to a gene and each row corresponds to a sample/cell.")
+  error_message <- paste0(
+    "Parameter matrix must be a two-dimensional matrix,
+    where each column corresponds to a gene and each row corresponds to a sample/cell."
+  )
   if (!is.matrix(matrix) && !is.array(matrix)) {
-    stop(matrixErrorMessage)
+    stop(error_message)
   }
 
   if (length(dim(matrix)) != 2) {
-    stop(matrixErrorMessage)
+    stop(error_message)
   }
 
   if (is.null(colnames(matrix))) {
@@ -71,9 +72,9 @@ check.parameters <- function(
     warning("Supplied seed is not a valid integer, initialize 'seed' to 1.")
   }
 
-  if (!is.null(kFolds)) {
-    if (!(kFolds > 0 && kFolds < 10)) {
-      stop("Please set 'kFolds' value between: (0, 10).")
+  if (!is.null(k_folds)) {
+    if (!(k_folds > 0 && k_folds < 10)) {
+      stop("Please set 'k_folds' value between: (0, 10).")
     }
   }
 
@@ -144,31 +145,46 @@ check.parameters <- function(
   if (verbose) message("All parameters check done.")
 
   if (verbose) message("Using '", penalty, "' penalty.")
-  if (verbose & crossValidation) message("Using cross validation.")
+  if (verbose && cross_validation) message("Using cross validation.")
+}
+
+#' @title Switch weight table
+#'
+#' @param weight_table The weight data table of network
+#'
+#' @return Format weight matrix
+#' @export
+table.to.matrix <- function(
+    weight_table) {
+  .Call(
+    "_inferCSN_table_to_matrix",
+    PACKAGE = "inferCSN",
+    weight_table
+  )
 }
 
 #' @title Format weight table
 #'
-#' @param weightDT The weight data table of network
+#' @param weight_table The weight data table of network
 #' @param regulators Regulators list
 #'
 #' @return Format weight table
 #' @export
-#'
-net.format <- function(weightDT,
-                       regulators = NULL) {
-  colnames(weightDT) <- c("regulator", "target", "weight")
-  weightDT$weight <- as.numeric(weightDT$weight)
-  weightDT <- dplyr::filter(weightDT, weight != 0)
+net.format <- function(
+    weight_table,
+    regulators = NULL) {
+  colnames(weight_table) <- c("regulator", "target", "weight")
+  weight_table$weight <- as.numeric(weight_table$weight)
+  weight_table <- dplyr::filter(weight_table, weight != 0)
   if (!is.null(regulators)) {
-    weightDT <- purrr::map_dfr(regulators, function(x) {
-      dplyr::filter(weightDT, regulator == x)
+    weight_table <- purrr::map_dfr(regulators, function(x) {
+      dplyr::filter(weight_table, regulator == x)
     })
   }
-  weightDT$Interaction <- "Activation"
-  weightDT$Interaction[weightDT$weight < 0] <- "Repression"
-  weightDT$weight <- abs(weightDT$weight)
-  return(weightDT)
+  weight_table$Interaction <- "Activation"
+  weight_table$Interaction[weight_table$weight < 0] <- "Repression"
+  weight_table$weight <- abs(weight_table$weight)
+  return(weight_table)
 }
 
 #' @title Extracts a specific solution in the regularization path
@@ -183,11 +199,12 @@ net.format <- function(weightDT,
 #'
 #' @return Return the specific solution
 #' @export
-#'
-coef.inferCSN <- function(object,
-                          lambda = NULL,
-                          gamma = NULL,
-                          supportSize = NULL, ...) {
+coef.inferCSN <- function(
+    object,
+    lambda = NULL,
+    gamma = NULL,
+    supportSize = NULL,
+    ...) {
   if (!is.null(supportSize) && !is.null(lambda)) {
     stop("If 'supportSize' is provided to 'coef' only 'gamma' can also be provided.")
   }

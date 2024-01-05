@@ -14,22 +14,17 @@ BugReports: https://github.com/mengxu98/inferCSN/issues
 Depends: 
     R (>= 3.3.0)
 Imports:
-    chromVAR,
-    cicero,
     circlize,
     ComplexHeatmap,
-    data.table,
     doParallel,
     dplyr,
     foreach,
     FNN,
-    GenomicRanges,
     ggnetwork,
     ggplot2,
     ggraph,
     Matrix,
     methods,
-    motifmatchr,
     parallel,
     patchwork,
     progress,
@@ -41,12 +36,20 @@ Imports:
     stats,
     utils
 Suggests:
+    BSgenome.Hsapiens.UCSC.hg38,
+    cicero,
+    chromVAR,
+    GenomicRanges,
     gtools,
+    motifmatchr,
     igraph,
+    IRanges,
     precrec,
     pROC,
     testthat (>= 3.0.0),
     tidygraph
+Bioc:
+    BiocGeneric
 LinkingTo: 
     Rcpp,
     RcppArmadillo

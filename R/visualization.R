@@ -7,9 +7,10 @@
 #' CREs are links with importance scores higher than cutoff
 #' @param upstream the number of distance upstream to TSS
 #' @param downstream the number of distance downstream to TSS
+#'
 #' @return ggplot2 object
 #' @export
-plot.connections <- function(
+connections.plot <- function(
     weight_table,
     gene_anno = NULL,
     marker,

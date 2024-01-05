@@ -10,7 +10,7 @@ generate.aggregated.data(
   k_neigh = 50,
   atacbinary = TRUE,
   max_overlap = 0.8,
-  seed = 123,
+  seed = 1,
   verbose = TRUE
 )
 }

@@ -17,21 +17,17 @@
 #'
 #' @examples
 #' library(inferCSN)
-#' data("exampleMatrix")
-#' weightDT <- inferCSN(exampleMatrix, verbose = TRUE)
+#' data("example_matrix")
+#' weightDT <- inferCSN(example_matrix, verbose = TRUE)
 #' head(weightDT)
 #'
-#' weightDT <- inferCSN(exampleMatrix, verbose = TRUE, cores = 2)
+#' weightDT <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
 #' head(weightDT)
-#'
 setGeneric("inferCSN",
            signature = "object",
            function(object, ...) {
              UseMethod(generic = "inferCSN", object = object)
            })
-# inferCSN <- function(object, ...) {
-#   UseMethod(generic = "inferCSN", object = object)
-# }
 
 #' peaks.filter
 #'

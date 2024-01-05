@@ -13,14 +13,14 @@ inferCSN(object, ...)
   object,
   penalty = "L0",
   algorithm = "CD",
-  crossValidation = FALSE,
+  cross_validation = FALSE,
   seed = 1,
-  nFolds = 10,
-  kFolds = NULL,
-  rThreshold = 0,
+  n_folds = 10,
+  k_folds = NULL,
+  r_threshold = 0,
   regulators = NULL,
   targets = NULL,
-  maxSuppSize = NULL,
+  regulators_num = NULL,
   verbose = FALSE,
   cores = 1,
   ...
@@ -30,14 +30,14 @@ inferCSN(object, ...)
   object,
   penalty = "L0",
   algorithm = "CD",
-  crossValidation = FALSE,
+  cross_validation = FALSE,
   seed = 1,
-  nFolds = 10,
-  kFolds = NULL,
-  rThreshold = 0,
+  n_folds = 10,
+  k_folds = NULL,
+  r_threshold = 0,
   regulators = NULL,
   targets = NULL,
-  maxSuppSize = NULL,
+  regulators_num = NULL,
   verbose = FALSE,
   cores = 1,
   ...
@@ -47,14 +47,14 @@ inferCSN(object, ...)
   object,
   penalty = "L0",
   algorithm = "CD",
-  crossValidation = FALSE,
+  cross_validation = FALSE,
   seed = 1,
-  nFolds = 10,
-  kFolds = NULL,
-  rThreshold = 0,
+  n_folds = 10,
+  k_folds = NULL,
+  r_threshold = 0,
   regulators = NULL,
   targets = NULL,
-  maxSuppSize = NULL,
+  regulators_num = NULL,
   verbose = FALSE,
   cores = 1,
   aggregate = TRUE,
@@ -64,11 +64,11 @@ inferCSN(object, ...)
   k_neigh = 50,
   atacbinary = TRUE,
   max_overlap = 0.8,
-  reduction.name = NULL,
+  reduction_name = NULL,
   size_factor_normalize = FALSE,
   genome_info = NULL,
-  HC_cutoff = NULL,
-  LC_cutoff = NULL,
+  high_corr_cutoff = NULL,
+  low_corr_cutoff = NULL,
   rescued = TRUE,
   ...
 )
@@ -86,21 +86,21 @@ For high-dimensional and sparse data, such as single-cell sequencing data, "L0L2
 Currently "CD" and "CDPSI" are supported.
 The CDPSI algorithm may yield better results, but it also increases running time.}
 
-\item{crossValidation}{Check whether cross validation is used.}
+\item{cross_validation}{Check whether cross validation is used.}
 
 \item{seed}{The seed used in randomly shuffling the data for cross-validation.}
 
-\item{nFolds}{The number of folds for cross-validation.}
+\item{n_folds}{The number of folds for cross-validation.}
 
-\item{kFolds}{The number of folds for sample split.}
+\item{k_folds}{The number of folds for sample split.}
 
-\item{rThreshold}{rThreshold.}
+\item{r_threshold}{r_threshold.}
 
 \item{regulators}{Regulator genes.}
 
 \item{targets}{Target genes.}
 
-\item{maxSuppSize}{The number of non-zore coef, this value will affect the final performance.
+\item{regulators_num}{The number of non-zore coef, this value will affect the final performance.
 The maximum support size at which to terminate the regularization path.
 Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as L0 regularization typically selects a small portion of non-zeros.}
 
@@ -116,21 +116,21 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{fragments}{fragments}
 
-\item{k_neigh}{k_neigh}
+\item{k_neigh}{Number of cells to be aggregated per cluster.}
 
-\item{atacbinary}{atacbinary}
+\item{atacbinary}{Logical, whether the aggregated scATAC-seq data need binary}
 
-\item{max_overlap}{atacbinary}
+\item{max_overlap}{The maximum overlapping ratio of two clusters.}
 
-\item{reduction.name}{atacbinary}
+\item{reduction_name}{The reduction name of extracting the cell coordinates used for aggregating.}
 
-\item{size_factor_normalize}{atacbinary}
+\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor}
 
 \item{genome_info}{atacbinary}
 
-\item{HC_cutoff}{atacbinary}
+\item{high_corr_cutoff}{atacbinary}
 
-\item{LC_cutoff}{atacbinary}
+\item{low_corr_cutoff}{atacbinary}
 
 \item{rescued}{atacbinary}
 }
@@ -142,11 +142,10 @@ Inferring Cell-Specific Gene Regulatory Network
 }
 \examples{
 library(inferCSN)
-data("exampleMatrix")
-weightDT <- inferCSN(exampleMatrix, verbose = TRUE)
+data("example_matrix")
+weightDT <- inferCSN(example_matrix, verbose = TRUE)
 head(weightDT)
 
-weightDT <- inferCSN(exampleMatrix, verbose = TRUE, cores = 2)
+weightDT <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
 head(weightDT)
-
 }

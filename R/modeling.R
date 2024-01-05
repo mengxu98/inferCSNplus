@@ -1,15 +1,9 @@
 #' Create aggregated data for inferCSN
 #'
+#' @description
 #' Function to generate aggregated inputs for inferCSN. \code{aggregate.data}
 #'
-#' @param object Seurat object.
-#' @param k_neigh Number of cells to be aggregated per cluster.
-#' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
-#' @param max_overlap The maximum overlapping ratio of two clusters.
-#' @param reduction.name The reduction name of extracting the cell coordinates used for aggregating.
-#' @param size_factor_normalize Logical, should accessibility values be normalized by size factor
-#' @param verbose Logical, should warning and info messages be printed?
-#' @param seed Random seed
+#' @inheritParams inferCSN
 #'
 #' @return Seurat object with aggregated data
 #' @export
@@ -18,12 +12,16 @@ aggregate.data <- function(
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
-    reduction.name = NULL,
+    reduction_name = NULL,
     size_factor_normalize = TRUE,
     seed = 123,
-    verbose = TRUE) {
-  if (!is.null(reduction.name)) {
-    cell_coord <- object@reductions[[reduction.name]]
+    verbose = FALSE) {
+  if (verbose) {
+    message("---Because 'aggregate = TRUE', and there is no aggregated data in seurat object.")
+    message("---Generating aggregated data, and using 'names(Seurat::Misc(object))' to check it.")
+  }
+  if (!is.null(reduction_name)) {
+    cell_coord <- object@reductions[[reduction_name]]
   } else {
     if (all(c("RNA", "ATAC") %in% names(object@assays))) {
       cell_coord <- object@reductions$wnn.umap@cell.embeddings
@@ -47,7 +45,7 @@ aggregate.data <- function(
 
   for (i in seq_along(uniqe_cluster)) {
     if (verbose) {
-      message("Aggregating cluster: ", uniqe_cluster[i])
+      message("Aggregating data for cluster: ", uniqe_cluster[i])
     }
     subobject <- BiocGenerics::subset(object, idents = uniqe_cluster[i])
     sub_index <- which(cluster %in% uniqe_cluster[i])
@@ -71,7 +69,10 @@ aggregate.data <- function(
     }
     if (ncol(sub_cell_sample) < k_neigh) {
       sub_cell_sample_new <- as.matrix(sub_cell_sample)
-      sub_cell_sample_new <- cbind(sub_cell_sample_new, matrix(0, nrow = 1, ncol = k_neigh - ncol(sub_cell_sample_new)))
+      sub_cell_sample_new <- cbind(
+        sub_cell_sample_new,
+        matrix(0, nrow = 1, ncol = k_neigh - ncol(sub_cell_sample_new))
+      )
     } else {
       sub_cell_sample_new <- apply(sub_cell_sample, 2, function(x) {
         sub_index[x] # for each column return original index
@@ -89,30 +90,26 @@ aggregate.data <- function(
     cell_sample <- cell_sample[-1, ]
   }
 
-  ######### normalization
-
+  # Normalization
   if (size_factor_normalize) {
     if ("RNA" %in% names(object@assays)) {
-      rna_new <- t(t(log(rna_new + 1)) / estimateSizeFactorsForMatrix(rna_new))
+      rna_new <- t(t(log(rna_new + 1)) / estimate.size.factors(rna_new))
     }
     if ("ATAC" %in% names(object@assays)) {
-      atac_new <- t(t(log(atac_new + 1)) / estimateSizeFactorsForMatrix(atac_new))
+      atac_new <- t(t(log(atac_new + 1)) / estimate.size.factors(atac_new))
     }
   }
   new_data <- list()
   if ("RNA" %in% names(object@assays)) {
-    # new_data$rna <- rna_new
     new_data$RNA <- rna_new
   }
   if ("ATAC" %in% names(object@assays)) {
-    # new_data$atac <- atac_new
     new_data$ATAC <- atac_new
   }
 
   new_data$cell_sample <- cell_sample
   return(new_data)
 }
-
 
 #' Create aggregated data for a certain cluster
 #'
@@ -127,19 +124,16 @@ aggregate.data <- function(
 #' @param max_overlap The maximum overlapping ratio of two clusters.
 #' @param seed Random seed
 #' @param verbose Logical, should warning and info messages be printed?
-#' @importFrom FNN knn.index
-#' @import Matrix
 #'
 #' @return Aggregated data.
 #' @export
-#'
 generate.aggregated.data <- function(
     object,
     cell_coord,
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
-    seed = 123,
+    seed = 1,
     verbose = TRUE) {
   if (nrow(cell_coord) > k_neigh) {
     # Create a k-nearest neighbors map
@@ -150,10 +144,6 @@ generate.aggregated.data <- function(
     nn_map$agg_cell <- 1:nrow(nn_map)
     good_choices <- 1:nrow(nn_map)
 
-    if (verbose) {
-      message("Sample cells randomly.")
-    }
-
     # Sample cells randomly
     set.seed(seed)
     choice <- sample(1:length(good_choices), size = 1, replace = FALSE)
@@ -161,7 +151,7 @@ generate.aggregated.data <- function(
     good_choices <- good_choices[good_choices != good_choices[choice]]
 
     it <- 0
-    ## Slow (contain calculating of overlapping between cell clusters)
+    # Slow (contain calculating of overlapping between cell clusters)
     while (length(good_choices) > 0 & it < nrow(cell_coord) / ((1 - max_overlap) * k_neigh)) {
       it <- it + 1
       choice <- sample(1:length(good_choices), size = 1, replace = FALSE)
@@ -183,7 +173,12 @@ generate.aggregated.data <- function(
     if ("RNA" %in% names(object@assays)) {
       rna_old <- as.matrix(object@assays$RNA$counts)
 
-      rna_mask <- sapply(seq_len(nrow(cell_sample)), function(x) seq_len(ncol(rna_old)) %in% cell_sample[x, , drop = FALSE])
+      rna_mask <- sapply(
+        seq_len(nrow(cell_sample)), function(x) {
+          seq_len(ncol(rna_old)) %in% cell_sample[x, , drop = FALSE]
+        }
+      )
+
       rna_mask <- Matrix::Matrix(rna_mask)
       rna_new <- rna_old %*% rna_mask
       rna_new <- as.matrix(rna_new)
@@ -196,7 +191,12 @@ generate.aggregated.data <- function(
         atac_old <- atac_old > 0
       }
 
-      atac_mask <- sapply(seq_len(nrow(cell_sample)), function(x) seq_len(ncol(atac_old)) %in% cell_sample[x, , drop = FALSE])
+      atac_mask <- sapply(
+        seq_len(nrow(cell_sample)), function(x) {
+          seq_len(ncol(atac_old)) %in% cell_sample[x, , drop = FALSE]
+        }
+      )
+
       atac_mask <- Matrix::Matrix(atac_mask)
       atac_new <- atac_old %*% atac_mask
       atac_new <- as.matrix(atac_new)
@@ -210,9 +210,8 @@ generate.aggregated.data <- function(
     if ("ATAC" %in% names(object@assays)) {
       atac_old <- object@assays$ATAC@counts
 
-      if (atacbinary) {
-        atac_old <- atac_old > 0
-      }
+      if (atacbinary) atac_old <- atac_old > 0
+
       atac_new <- rowSums(atac_old)
       atac_new <- as.matrix(atac_new)
     }
@@ -227,6 +226,7 @@ generate.aggregated.data <- function(
     new_data$ATAC <- atac_new
   }
   new_data$cell_sample <- cell_sample
+
   return(new_data)
 }
 
@@ -242,34 +242,43 @@ generate.aggregated.data <- function(
 #' @import slam
 #' @import Matrix
 #' @export
-estimateSizeFactorsForMatrix <- function(counts,
-                                         locfunc = median,
-                                         round_exprs = TRUE,
-                                         method = "mean-geometric-mean-total") {
-  # library("slam")
-  if (isSparseMatrix(counts)[1]) {
-    estimateSizeFactorsForSparseMatrix(counts, locfunc = locfunc, round_exprs = round_exprs, method = method)
+estimate.size.factors <- function(
+    counts,
+    locfunc = median,
+    round_exprs = TRUE,
+    method = "mean-geometric-mean-total") {
+  if (is.sparse(counts)[1]) {
+    estimate.size.factors.sparse(
+      counts,
+      locfunc = locfunc,
+      round_exprs = round_exprs,
+      method = method
+    )
   } else {
-    estimateSizeFactorsForDenseMatrix(counts, locfunc = locfunc, round_exprs = round_exprs, method = method)
+    estimate.size.factors.dense(
+      counts,
+      locfunc = locfunc,
+      round_exprs = round_exprs,
+      method = method
+    )
   }
 }
 
 #' Convert a slam matrix to a sparseMatrix
-#' @param simpleTripletMatrix A slam matrix
-#' @import slam
+#' @param slam_matrix A slam matrix
 #' @export
-asSparseMatrix <- function(simpleTripletMatrix) {
-  retVal <- sparseMatrix(
-    i = simpleTripletMatrix[["i"]],
-    j = simpleTripletMatrix[["j"]],
-    x = simpleTripletMatrix[["v"]],
+as.sparse <- function(slam_matrix) {
+  retVal <- Matrix::sparseMatrix(
+    i = slam_matrix[["i"]],
+    j = slam_matrix[["j"]],
+    x = slam_matrix[["v"]],
     dims = c(
-      simpleTripletMatrix[["nrow"]],
-      simpleTripletMatrix[["ncol"]]
+      slam_matrix[["nrow"]],
+      slam_matrix[["ncol"]]
     )
   )
-  if (!is.null(simpleTripletMatrix[["dimnames"]])) {
-    dimnames(retVal) <- simpleTripletMatrix[["dimnames"]]
+  if (!is.null(slam_matrix[["dimnames"]])) {
+    dimnames(retVal) <- slam_matrix[["dimnames"]]
   }
   return(retVal)
 }
@@ -278,78 +287,85 @@ asSparseMatrix <- function(simpleTripletMatrix) {
 #' @param sp_mat The matrix for the aggregated single cell data
 #' @import slam
 #' @export
-asSlamMatrix <- function(sp_mat) {
+as.slam.matrix <- function(sp_mat) {
   sp <- Matrix::summary(sp_mat)
-  simple_triplet_matrix(sp[, "i"], sp[, "j"], sp[, "x"], ncol = ncol(sp_mat), nrow = nrow(sp_mat), dimnames = dimnames(sp_mat))
+  slam::simple_triplet_matrix(sp[, "i"], sp[, "j"], sp[, "x"], ncol = ncol(sp_mat), nrow = nrow(sp_mat), dimnames = dimnames(sp_mat))
 }
 
-#' Convert a sparseMatrix from Matrix package to a slam matrix
-#' @param x The sparseMatrix data
-#' @import Matrix
+#' is.sparse
+#' @param x Data
 #' @export
-isSparseMatrix <- function(x) {
-  class(x) %in% c("dgCMatrix", "dgTMatrix")
+is.sparse <- function(x) {
+  class(x) %in% c("dgcountsatrix", "dgTMatrix")
 }
 
 #' Estimate size factors for each column, given a sparseMatrix from the Matrix package
+#'
 #' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
 #' @param locfunc The location function used to find the representive value
 #' @param round_exprs A logic flag to determine whether or not the expression value should be rounded
 #' @param method A character to specify the size factor calculation appraoches. It can be either "mean-geometric-mean-total" (default),
 #' "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".
 #'
-#' @import slam
 #' @importFrom stats median
+#'
 #' @export
-estimateSizeFactorsForSparseMatrix <- function(
+estimate.size.factors.sparse <- function(
     counts,
     locfunc = median,
     round_exprs = TRUE,
     method = "mean-geometric-mean-total") {
-  CM <- counts
   if (round_exprs) {
-    CM <- round(CM)
+    counts <- round(counts)
   }
-  CM <- asSlamMatrix(CM)
+  counts <- as.slam.matrix(counts)
 
   if (method == "weighted-median") {
-    log_medians <- rowapply_simple_triplet_matrix(CM, function(cell_expr) {
-      log(locfunc(cell_expr))
-    })
+    log_medians <- slam::rowapply_simple_triplet_matrix(
+      counts, function(cell_expr) {
+        log(locfunc(cell_expr))
+      }
+    )
 
-    weights <- rowapply_simple_triplet_matrix(CM, function(cell_expr) {
-      num_pos <- sum(cell_expr > 0)
-      num_pos / length(cell_expr)
-    })
+    weights <- slam::rowapply_simple_triplet_matrix(
+      counts, function(cell_expr) {
+        num_pos <- sum(cell_expr > 0)
+        num_pos / length(cell_expr)
+      }
+    )
 
-    sfs <- colapply_simple_triplet_matrix(CM, function(cnts) {
-      norm_cnts <- weights * (log(cnts) - log_medians)
-      norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
-      norm_cnts <- norm_cnts[is.finite(norm_cnts)]
-      # print (head(norm_cnts))
-      exp(mean(norm_cnts))
-    })
+    sfs <- slam::colapply_simple_triplet_matrix(
+      counts, function(cnts) {
+        norm_cnts <- weights * (log(cnts) - log_medians)
+        norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
+        norm_cnts <- norm_cnts[is.finite(norm_cnts)]
+        exp(mean(norm_cnts))
+      }
+    )
   } else if (method == "median-geometric-mean") {
-    log_geo_means <- rowapply_simple_triplet_matrix(CM, function(x) {
-      mean(log(CM))
-    })
+    log_geo_means <- slam::rowapply_simple_triplet_matrix(
+      counts, function(x) {
+        mean(log(counts))
+      }
+    )
 
-    sfs <- colapply_simple_triplet_matrix(CM, function(cnts) {
-      norm_cnts <- log(cnts) - log_geo_means
-      norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
-      norm_cnts <- norm_cnts[is.finite(norm_cnts)]
-      # print (head(norm_cnts))
-      exp(locfunc(norm_cnts))
-    })
+    sfs <- slam::colapply_simple_triplet_matrix(
+      counts, function(cnts) {
+        norm_cnts <- log(cnts) - log_geo_means
+        norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
+        norm_cnts <- norm_cnts[is.finite(norm_cnts)]
+        exp(locfunc(norm_cnts))
+      }
+    )
   } else if (method == "median") {
     stop("Error: method 'median' not yet supported for sparse matrices")
   } else if (method == "mode") {
     stop("Error: method 'mode' not yet supported for sparse matrices")
   } else if (method == "geometric-mean-total") {
-    cell_total <- col_sums(CM)
+    cell_total <- slam::col_sums(counts)
     sfs <- log(cell_total) / mean(log(cell_total))
   } else if (method == "mean-geometric-mean-total") {
-    cell_total <- col_sums(CM)
+    cell_total <- slam::col_sums(counts)
     sfs <- cell_total / exp(mean(log(cell_total)))
   }
 
@@ -357,59 +373,68 @@ estimateSizeFactorsForSparseMatrix <- function(
   return(sfs)
 }
 
-#' @title Estimate size factors dense matrix
+#' Estimate size factors dense matrix
+#'
 #' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
 #' @param locfunc The location function used to find the representive value
 #' @param round_exprs A logic flag to determine whether or not the expression value should be rounded
 #' @param method A character to specify the size factor calculation appraoches. It can be either "mean-geometric-mean-total" (default),
 #' "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".
 #' @importFrom stats median
+#'
 #' @export
-estimateSizeFactorsForDenseMatrix <- function(
+estimate.size.factors.dense <- function(
     counts,
     locfunc = median,
     round_exprs = TRUE,
     method = "mean-geometric-mean-total") {
-  CM <- counts
+  counts <- counts
   if (round_exprs) {
-    CM <- round(CM)
+    counts <- round(counts)
   }
   if (method == "weighted-median") {
-    log_medians <- apply(CM, 1, function(cell_expr) {
-      log(locfunc(cell_expr))
-    })
+    log_medians <- apply(
+      counts, 1, function(cell_expr) {
+        log(locfunc(cell_expr))
+      }
+    )
 
-    weights <- apply(CM, 1, function(cell_expr) {
-      num_pos <- sum(cell_expr > 0)
-      num_pos / length(cell_expr)
-    })
+    weights <- apply(
+      counts, 1, function(cell_expr) {
+        num_pos <- sum(cell_expr > 0)
+        num_pos / length(cell_expr)
+      }
+    )
 
-    sfs <- apply(CM, 2, function(cnts) {
-      norm_cnts <- weights * (log(cnts) - log_medians)
-      norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
-      norm_cnts <- norm_cnts[is.finite(norm_cnts)]
-      exp(mean(norm_cnts))
-    })
+    sfs <- apply(
+      counts, 2, function(cnts) {
+        norm_cnts <- weights * (log(cnts) - log_medians)
+        norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
+        norm_cnts <- norm_cnts[is.finite(norm_cnts)]
+        exp(mean(norm_cnts))
+      }
+    )
   } else if (method == "median-geometric-mean") {
-    log_geo_means <- rowMeans(log(CM))
+    log_geo_means <- rowMeans(log(counts))
 
-    sfs <- apply(CM, 2, function(cnts) {
-      norm_cnts <- log(cnts) - log_geo_means
-      norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
-      norm_cnts <- norm_cnts[is.finite(norm_cnts)]
-      # print (head(norm_cnts))
-      exp(locfunc(norm_cnts))
-    })
+    sfs <- apply(
+      counts, 2, function(cnts) {
+        norm_cnts <- log(cnts) - log_geo_means
+        norm_cnts <- norm_cnts[is.nan(norm_cnts) == FALSE]
+        norm_cnts <- norm_cnts[is.finite(norm_cnts)]
+        exp(locfunc(norm_cnts))
+      }
+    )
   } else if (method == "median") {
-    row_median <- apply(CM, 1, median)
-    sfs <- apply(Matrix::t(Matrix::t(CM) - row_median), 2, median)
+    row_median <- apply(counts, 1, median)
+    sfs <- apply(Matrix::t(Matrix::t(counts) - row_median), 2, median)
   } else if (method == "mode") {
-    sfs <- estimate_t(CM)
+    sfs <- estimate.t(counts)
   } else if (method == "geometric-mean-total") {
-    cell_total <- apply(CM, 2, sum)
+    cell_total <- apply(counts, 2, sum)
     sfs <- log(cell_total) / mean(log(cell_total))
   } else if (method == "mean-geometric-mean-total") {
-    cell_total <- apply(CM, 2, sum)
+    cell_total <- apply(counts, 2, sum)
     sfs <- cell_total / exp(mean(log(cell_total)))
   }
 
@@ -425,23 +450,19 @@ estimateSizeFactorsForDenseMatrix <- function(
 #' finds the most commonly occuring (log-transformed) relative expression value
 #' for each column in the provided expression matrix.
 #'
+#' @details This function estimates the most abundant relative expression value
+#' (t^*) using a gaussian kernel density function. It can also optionally
+#' output the t^* based on a two gaussian mixture model
+#' based on the smsn.mixture from mixsmsn package
+#'
 #' @param relative_expr_matrix a matrix of relative expression values for
 #' values with each row and column representing genes/isoforms and cells,
 #' respectively. Row and column names should be included.
 #' Expression values should not be log-transformed.
 #' @param relative_expr_thresh Relative expression values below this threshold are considered zero.
 #' @return an vector of most abundant relative_expr value corresponding to the RPC 1.
-#' @details This function estimates the most abundant relative expression value
-#' (t^*) using a gaussian kernel density function. It can also optionally
-#' output the t^* based on a two gaussian mixture model
-#' based on the smsn.mixture from mixsmsn package
 #' @export
-#' @examples
-#' \dontrun{
-#' HSMM_fpkm_matrix <- exprs(HSMM)
-#' t_estimate <- estimate_t(HSMM_fpkm_matrix)
-#' }
-estimate_t <- function(
+estimate.t <- function(
     relative_expr_matrix,
     relative_expr_thresh = 0.1) {
   # apply each column
@@ -453,7 +474,6 @@ estimate_t <- function(
     )
   ) # avoid multiple output
 }
-
 
 #' use gaussian kernel to calculate the mode of transcript counts
 #' @param x log tranformed relative expression
