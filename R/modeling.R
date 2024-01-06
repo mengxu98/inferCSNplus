@@ -47,7 +47,7 @@ aggregate.data <- function(
     if (verbose) {
       message("Aggregating data for cluster: ", uniqe_cluster[i])
     }
-    subobject <- BiocGenerics::subset(object, idents = uniqe_cluster[i])
+    subobject <- subset(object, idents = uniqe_cluster[i])
     sub_index <- which(cluster %in% uniqe_cluster[i])
     cell_coord_i <- cell_coord[sub_index, ]
     sub_aggregated_data <- generate.aggregated.data(

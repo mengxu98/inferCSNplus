@@ -1,44 +1,22 @@
-#' @param filter_value The value to filter peaks
+#' peaks.filter
+#' @param object matrix or seurat object
+#' @param filter_value filter_value
 #'
-#' @return filtered peaks matrix
 #' @export
 #'
-#' @rdname peaks.filter
-#'
-peaks.filter.default <- function(
+peaks.filter <- function(
     object,
     filter_value = 0.9) {
-  peaks_table <- Signac::FindTopFeatures(object)
-  peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
-  object <- object[rownames(peaks_table), ]
-  return(object)
-}
+  if (is(object, "Seurat")) {
+    DefaultAssay(object) <- "ATAC"
+    peaks_table <- Signac::FindTopFeatures(object@assays$ATAC$counts)
+    peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
+    object@assays$ATAC@counts <- object@assays$ATAC@counts[rownames(peaks_table), ]
+  } else {
+    peaks_table <- Signac::FindTopFeatures(object)
+    peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
+    object <- object[rownames(peaks_table), ]
+  }
 
-#' @export
-#'
-#' @rdname peaks.filter
-#' @method peaks.filter matrix
-#'
-peaks.filter.matrix <- function(
-    object,
-    filter_value = 0.9) {
-  peaks_table <- Signac::FindTopFeatures(object)
-  peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
-  object <- object[rownames(peaks_table), ]
-  return(object)
-}
-
-#' @export
-#'
-#' @rdname peaks.filter
-#' @method peaks.filter Seurat
-#'
-peaks.filter.Seurat <- function(
-    object,
-    filter_value = 0.9) {
-  DefaultAssay(object) <- "ATAC"
-  peaks_table <- Signac::FindTopFeatures(object@assays$ATAC$counts)
-  peaks_table <- peaks_table[peaks_table$percentile > filter_value, ]
-  object@assays$ATAC@counts <- object@assays$ATAC@counts[rownames(peaks_table), ]
   return(object)
 }

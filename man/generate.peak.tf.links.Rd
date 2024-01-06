@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{generate.peak.tf.links}
 \alias{generate.peak.tf.links}
-\title{Identify TFs enriched in CREs of focus markers}
+\title{Identify TFs enriched in cre of focus markers}
 \usage{
 generate.peak.tf.links(peaks_bed_list, species, genome, markers)
 }
@@ -16,5 +16,5 @@ generate.peak.tf.links(peaks_bed_list, species, genome, markers)
 \item{markers}{two column dataframe data with marker genes and cluster information}
 }
 \description{
-Identify TFs enriched in CREs of focus markers
+Identify TFs enriched in cre of focus markers
 }

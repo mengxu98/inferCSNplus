@@ -23,22 +23,13 @@
 #'
 #' weightDT <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
 #' head(weightDT)
+#'
+#' \dontrun{
+#' data("promoter_regions_hg38")
+#' weightDT <- inferCSN(seurat_object, enome_info <- promoter_regions_hg38)
+#' }
 setGeneric("inferCSN",
            signature = "object",
            function(object, ...) {
              UseMethod(generic = "inferCSN", object = object)
-           })
-
-#' peaks.filter
-#'
-#' @param object The object for inferCSN
-#' @param ... Arguments for other methods
-#'
-#' @return Returns a object
-#' @export
-#'
-setGeneric("peaks.filter",
-           signature = "object",
-           function(object, ...) {
-             UseMethod(generic = "peaks.filter", object = object)
            })

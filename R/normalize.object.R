@@ -6,7 +6,7 @@
 #' @export
 #'
 normalize.seurat.object <- function(object) {
-  if (class(object) != "Seurat") {
+  if (!is(object, "Seurat")) {
     stop("Pleasure input an Seurat object")
   }
 

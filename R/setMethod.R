@@ -39,7 +39,7 @@ inferCSN.default <- function(
     cores = 1,
     ...) {
   if (verbose) message(paste("Running start for <", class(object)[1], ">."))
-  matrix <- object
+  matrix <- object; rm(object)
   # Check input parameters
   check.parameters(
     matrix = matrix,
@@ -261,7 +261,7 @@ inferCSN.Seurat <- function(
   for (c in seq_along(clusters)) {
     cluster <- clusters[c]
     if (verbose) message(paste0("Running for cluster: ", cluster, "."))
-    object <- BiocGenerics::subset(object_raw, cluster == cluster[1])
+    object <- subset(object_raw, cluster == cluster[1])
 
     if (aggregate) {
       if ("aggregated_data" %in% names(Seurat::Misc(object))) {
@@ -340,23 +340,11 @@ inferCSN.Seurat <- function(
       rownames(data_atac) <- gsub("-", "_", rownames(data_atac))
 
       if (is.null(genome_info)) {
-        if (verbose) {
-          message("--No genome file or information provided, set to default value: hg38.")
-        }
-        genome_info <- "hg38"
-      }
-      if (is.character(genome_info)) {
-        if (genome_info == "hg38") {
-          genome_info <- data("promoter_regions_hg38")
-          genome_info <- promoter_regions_hg38
-        } else if (genome_info == "hg19") {
-          genome_info <- data("promoter_regions_hg19")
-          genome_info <- promoter_regions_hg19
-        } else {
-          if (verbose) {
-            stop("Please set genome_info = 'hg19'' or 'hg38', or provide a file for other species.")
-          }
-        }
+        stop("---No genome data provided.
+             Please run: data('promoter_regions_hg38') or data('promoter_regions_hg19'),
+             and: genome_info <- promoter_regions_hg38 or genome_info <- promoter_regions_hg19,
+             then set parameter: genome_info = genome_info,
+             or provide data by yourself.")
       }
 
       if (is.null(targets)) {
@@ -419,6 +407,7 @@ inferCSN.Seurat <- function(
       weight_table_atac_sub <- final.network(object, cluster = clusters[c])
       names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
     }
+
     if ("RNA" %in% names(object@assays)) {
       weight_table_final <- merge(
         weight_table_atac_sub,

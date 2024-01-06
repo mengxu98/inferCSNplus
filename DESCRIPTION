@@ -48,8 +48,6 @@ Suggests:
     pROC,
     testthat (>= 3.0.0),
     tidygraph
-Bioc:
-    BiocGeneric
 LinkingTo: 
     Rcpp,
     RcppArmadillo

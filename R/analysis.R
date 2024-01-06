@@ -117,7 +117,7 @@ get.tf.gene <- function(
   tf_gene_cre <- tf_gene_cre[unik, ]
 }
 
-#' Extract CREs-gene relations of markers
+#' Extract cre-gene relations of markers
 #'
 #' @param weight_table The result of \code{inferCSN()}
 #' @param markers A dataframe data with marker genes and cluster information,
@@ -125,7 +125,7 @@ get.tf.gene <- function(
 #' @param filter filter
 #'
 #' @export
-cre.gene.links <- function(
+generate.cre.gene.links <- function(
     weight_table,
     markers,
     filter = FALSE) {
@@ -136,7 +136,7 @@ cre.gene.links <- function(
 
   cre_gene_list <- list()
   promoter_cre_gene_list <- list() # promoter-gene
-  uniq_clusters <- unique(markers$cluster)
+  uniq_clusters <- as.character(unique(markers$cluster))
   for (i in 1:length(uniq_clusters)) {
     marker1 <- markers[markers$cluster == uniq_clusters[i], ]
     marker_gene <- as.character(marker1$gene)
@@ -152,17 +152,17 @@ cre.gene.links <- function(
   return(CRE_Gene)
 }
 
-#' extract CREs of markers
+#' extract cre of markers
 #' @param cre_gene_list a list of CRE-Gene relationships
 #' @param promoter_cre_gene_list a list of Promoter-Gene relationships
 #' @param da_peaks_list a list of DA of each cluster
 #'
 #' @export
-generate_CRE <- function(
+generate.cre <- function(
     cre_gene_list,
     promoter_cre_gene_list,
     da_peaks_list = NULL) {
-  # extract overlapped peaks between DA and CREs of focused markers
+  # extract overlapped peaks between DA and cre of focused markers
   peaks_bed_record <- list() # peaks used to identify TFs bounded to
   P_peaks_bed_record <- list()
 
@@ -217,15 +217,15 @@ generate_CRE <- function(
       P_peaks_bed_record[[i]] <- peaks_bed[!(duplicated(peaks_bed)), , drop = FALSE]
     }
   }
-  CREs <- list()
-  CREs$distal <- peaks_bed_record
-  CREs$promoter <- P_peaks_bed_record
-  CREs$cre_gene_list <- cre_gene_list_new
-  CREs$promoter_cre_gene_list <- promoter_cre_gene_list_new
-  return(CREs)
+  cre <- list()
+  cre$distal <- peaks_bed_record
+  cre$promoter <- P_peaks_bed_record
+  cre$cre_gene_list <- cre_gene_list_new
+  cre$promoter_cre_gene_list <- promoter_cre_gene_list_new
+  return(cre)
 }
 
-#' @title Identify TFs enriched in CREs of focus markers
+#' @title Identify TFs enriched in cre of focus markers
 #'
 #' @param peaks_bed_list A list of peaks bed file of each cluster
 #' @param species Species used to detect TF
@@ -300,19 +300,20 @@ final.network <- function(
   focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
 
   # CRE-gene connections
-  CREs_Gene <- cre.gene.links(
+  cre_gene <- generate.cre.gene.links(
     weight_table,
     markers = focused_markers
   )
-  # Find focused CREs which is overlapped with DA
-  CREs <- generate_CRE(
-    cre_gene_list = CREs_Gene$distal,
-    promoter_cre_gene_list = CREs_Gene$promoter
+
+  # Find focused cre which is overlapped with DA
+  cre <- generate.cre(
+    cre_gene_list = cre_gene$distal,
+    promoter_cre_gene_list = cre_gene$promoter
   )
 
-  # detect TFs for distal CREs
+  # detect TFs for distal cre
   cre_tf_list <- generate.peak.tf.links(
-    peaks_bed_list = CREs$distal,
+    peaks_bed_list = cre$distal,
     species = "Homo sapiens",
     genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
     markers = focused_markers
@@ -320,17 +321,17 @@ final.network <- function(
 
   # detect TFs for Promoters
   promoter_cre_tf_list <- generate.peak.tf.links(
-    peaks_bed_list = CREs$promoter,
+    peaks_bed_list = cre$promoter,
     species = "Homo sapiens",
     genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
     markers = focused_markers
   )
 
   network_links <- generate.links(
-    cre_gene_list = CREs_Gene$distal,
-    cre_tf_list,
-    promoter_cre_gene_list = CREs_Gene$promoter,
-    promoter_cre_tf_list,
+    cre_gene_list = cre_gene$distal,
+    cre_tf_list = cre_tf_list,
+    promoter_cre_gene_list = cre_gene$promoter,
+    promoter_cre_tf_list = promoter_cre_tf_list,
     cluster
   )
 

@@ -148,4 +148,9 @@ head(weightDT)
 
 weightDT <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
 head(weightDT)
+
+\dontrun{
+data("promoter_regions_hg38")
+weightDT <- inferCSN(seurat_object, enome_info <- promoter_regions_hg38)
+}
 }
