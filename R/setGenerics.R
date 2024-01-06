@@ -18,15 +18,15 @@
 #' @examples
 #' library(inferCSN)
 #' data("example_matrix")
-#' weightDT <- inferCSN(example_matrix, verbose = TRUE)
-#' head(weightDT)
+#' weight_table <- inferCSN(example_matrix, verbose = TRUE)
+#' head(weight_table)
 #'
-#' weightDT <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
-#' head(weightDT)
+#' weight_table <- inferCSN(example_matrix, verbose = TRUE, cores = 2)
+#' head(weight_table)
 #'
 #' \dontrun{
 #' data("promoter_regions_hg38")
-#' weightDT <- inferCSN(seurat_object, enome_info <- promoter_regions_hg38)
+#' seurat_object <- inferCSN(seurat_object, genome_info = promoter_regions_hg38)
 #' }
 setGeneric("inferCSN",
            signature = "object",
