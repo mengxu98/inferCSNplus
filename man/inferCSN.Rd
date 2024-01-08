@@ -60,7 +60,6 @@ inferCSN(object, ...)
   aggregate = TRUE,
   peakcalling = FALSE,
   macs2.path = NULL,
-  fragments = NULL,
   k_neigh = 50,
   atacbinary = TRUE,
   max_overlap = 0.8,
@@ -76,7 +75,7 @@ inferCSN(object, ...)
 \arguments{
 \item{object}{An expression matrix, cells by genes}
 
-\item{...}{atacbinary}
+\item{...}{other}
 
 \item{penalty}{The type of regularization.
 This can take either one of the following choices: "L0" and "L0L2".
@@ -113,8 +112,6 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 \item{peakcalling}{peakcalling}
 
 \item{macs2.path}{macs2.path}
-
-\item{fragments}{fragments}
 
 \item{k_neigh}{Number of cells to be aggregated per cluster.}
 

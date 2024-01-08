@@ -177,7 +177,6 @@ inferCSN.data.frame <- function(
 #' @param aggregate aggregate
 #' @param peakcalling peakcalling
 #' @param macs2.path macs2.path
-#' @param fragments fragments
 #' @param k_neigh Number of cells to be aggregated per cluster.
 #' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
 #' @param max_overlap The maximum overlapping ratio of two clusters.
@@ -187,7 +186,7 @@ inferCSN.data.frame <- function(
 #' @param high_corr_cutoff atacbinary
 #' @param low_corr_cutoff atacbinary
 #' @param rescued atacbinary
-#' @param ... atacbinary
+#' @param ... other
 #'
 #' @export
 #' @method inferCSN Seurat
@@ -213,7 +212,6 @@ inferCSN.Seurat <- function(
     aggregate = TRUE,
     peakcalling = FALSE,
     macs2.path = NULL,
-    fragments = NULL,
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
@@ -226,34 +224,6 @@ inferCSN.Seurat <- function(
     ...) {
   if (verbose) message(paste("Running start for <", class(object)[1], "object >."))
   object$cluster <- Seurat::Idents(object)
-
-  # # step 0. Peak calling
-  # if (("ATAC" %in% names(object@assays)) && peakcalling) {
-  #   if (verbose) {
-  #     message("Calling Peak")
-  #   }
-  #   object$cluster <- Seurat::Idents(object)
-  #   if (is.null(macs2.path)) {
-  #     message("Please give the path to macs2!") # https://macs3-project.github.io/MACS/
-  #   }
-  #   # DefaultAssay(combined) <- "ATAC"
-  #   peaks <- Signac::CallPeaks(
-  #     object = object,
-  #     group.by = "cluster"
-  #   )
-  #
-  #   if (is.null(fragments)) {
-  #     message("Please input fragments!")
-  #   }
-  #   new_atac_data <- Signac:::FeatureMatrix(
-  #     fragments = fragments, # fragments of original, we need to do aggregation
-  #     features = peaks
-  #   )
-  #   object@assays$ATAC@counts <- new_atac_data
-  #   if (verbose) {
-  #     message("Peak calling finished")
-  #   }
-  # }
 
   object_raw <- object
   clusters <- as.character(unique(object$cluster))
