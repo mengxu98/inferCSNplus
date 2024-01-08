@@ -243,7 +243,8 @@ inferCSN.Seurat <- function(
           atacbinary = atacbinary,
           max_overlap = max_overlap,
           reduction_name = NULL,
-          size_factor_normalize = size_factor_normalize
+          size_factor_normalize = size_factor_normalize,
+          verbose = verbose
         )
         Seurat::Misc(object, slot = "aggregated_data") <- agg_data
       }
@@ -424,6 +425,7 @@ inferCSN.Seurat <- function(
     low_corr_cutoff = NULL,
     rescued = TRUE,
     ...) {
+  cores = 1
   matrix <- as.matrix(peak_matrix)
   rm(peak_matrix)
   peaks <- rownames(matrix)
