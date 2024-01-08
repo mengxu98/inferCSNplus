@@ -237,7 +237,7 @@ inferCSN.Seurat <- function(
       if ("aggregated_data" %in% names(Seurat::Misc(object))) {
         agg_data <- Seurat::Misc(object, slot = "aggregated_data")
       } else {
-        agg_data <- aggregate(
+        agg_data <- aggregate.matrix(
           object,
           k_neigh = k_neigh,
           atacbinary = atacbinary,

@@ -1,13 +1,13 @@
 #' Create aggregated data for inferCSN
 #'
 #' @description
-#' Function to generate aggregated inputs for inferCSN. \code{aggregate}
+#' Function to generate aggregated inputs for inferCSN. \code{aggregate.matrix}
 #'
 #' @inheritParams inferCSN
 #'
 #' @return Seurat object with aggregated data
 #' @export
-aggregate <- function(
+aggregate.matrix <- function(
     object,
     k_neigh = 50,
     atacbinary = TRUE,
