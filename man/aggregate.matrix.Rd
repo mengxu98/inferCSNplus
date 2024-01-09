@@ -26,7 +26,7 @@
 
 \item{reduction_name}{The reduction name of extracting the cell coordinates used for aggregating.}
 
-\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor}
+\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor.}
 
 \item{seed}{The seed used in randomly shuffling the data for cross-validation.}
 

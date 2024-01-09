@@ -22,7 +22,6 @@
 #' @method inferCSN default
 #'
 #' @rdname inferCSN
-#'
 inferCSN.default <- function(
     object,
     penalty = "L0",
@@ -39,7 +38,8 @@ inferCSN.default <- function(
     cores = 1,
     ...) {
   if (verbose) message(paste("Running start for <", class(object)[1], ">."))
-  matrix <- object; rm(object)
+  matrix <- object
+  rm(object)
   # Check input parameters
   check.parameters(
     matrix = matrix,
@@ -71,7 +71,9 @@ inferCSN.default <- function(
   targets <- colnames(targets_matrix)
   rm(matrix)
 
-  cores <- min((parallel::detectCores(logical = FALSE) - 1), cores, length(targets))
+  cores <- min(
+    (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
+  )
   if (cores == 1) {
     if (verbose) message("Using 1 core.")
     # Format progress information
@@ -137,7 +139,6 @@ inferCSN.default <- function(
 #' @method inferCSN data.frame
 #'
 #' @rdname inferCSN
-#'
 inferCSN.data.frame <- function(
     object,
     penalty = "L0",
@@ -174,19 +175,17 @@ inferCSN.data.frame <- function(
   )
 }
 
-#' @param aggregate aggregate
-#' @param peakcalling peakcalling
-#' @param macs2.path macs2.path
+#' @param aggregate Logical, whether to aggregate the data.
 #' @param k_neigh Number of cells to be aggregated per cluster.
 #' @param atacbinary Logical, whether the aggregated scATAC-seq data need binary
 #' @param max_overlap The maximum overlapping ratio of two clusters.
 #' @param reduction_name The reduction name of extracting the cell coordinates used for aggregating.
-#' @param size_factor_normalize Logical, should accessibility values be normalized by size factor
-#' @param genome_info atacbinary
+#' @param size_factor_normalize Logical, should accessibility values be normalized by size factor.
+#' @param genome_info Genome information.
 #' @param high_corr_cutoff atacbinary
 #' @param low_corr_cutoff atacbinary
-#' @param rescued atacbinary
-#' @param ... other
+#' @param rescued Logical
+#' @param ... Additional arguments.
 #'
 #' @export
 #' @method inferCSN Seurat
@@ -211,7 +210,6 @@ inferCSN.Seurat <- function(
     cores = 1,
     aggregate = TRUE,
     peakcalling = FALSE,
-    macs2.path = NULL,
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
@@ -301,7 +299,8 @@ inferCSN.Seurat <- function(
       )
 
       weight_table_rna <- weight_table_rna[order(
-        abs(as.numeric(weight_table_rna$weight)), decreasing = TRUE
+        abs(as.numeric(weight_table_rna$weight)),
+        decreasing = TRUE
       ), ]
       Misc(object, slot = "weight_table_rna") <- weight_table_rna
     }
@@ -372,7 +371,8 @@ inferCSN.Seurat <- function(
       )
 
       weight_table_atac <- weight_table_atac[order(
-        abs(as.numeric(weight_table_atac$weight)), decreasing = TRUE
+        abs(as.numeric(weight_table_atac$weight)),
+        decreasing = TRUE
       ), ]
       Seurat::Misc(object, slot = "weight_table_atac") <- weight_table_atac
       weight_table_atac_sub <- final.network(object, cluster = clusters[c])
@@ -425,7 +425,7 @@ inferCSN.Seurat <- function(
     low_corr_cutoff = NULL,
     rescued = TRUE,
     ...) {
-  cores = 1
+  cores <- 1
   matrix <- as.matrix(peak_matrix)
   rm(peak_matrix)
   peaks <- rownames(matrix)

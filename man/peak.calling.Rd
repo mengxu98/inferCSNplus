@@ -4,16 +4,16 @@
 \alias{peak.calling}
 \title{peak.calling}
 \usage{
-peak.calling(object, fragments = NULL, macs2.path = NULL, verbose = FALSE)
+peak.calling(object, fragments = NULL, macs2_path = NULL, verbose = FALSE)
 }
 \arguments{
 \item{object}{An expression matrix, cells by genes}
 
 \item{fragments}{fragments}
 
-\item{macs2.path}{macs2.path}
-
 \item{verbose}{Print detailed information.}
+
+\item{macs2.path}{path to macs2}
 }
 \value{
 seurat object

@@ -59,7 +59,6 @@ inferCSN(object, ...)
   cores = 1,
   aggregate = TRUE,
   peakcalling = FALSE,
-  macs2.path = NULL,
   k_neigh = 50,
   atacbinary = TRUE,
   max_overlap = 0.8,
@@ -75,7 +74,7 @@ inferCSN(object, ...)
 \arguments{
 \item{object}{An expression matrix, cells by genes}
 
-\item{...}{other}
+\item{...}{Additional arguments.}
 
 \item{penalty}{The type of regularization.
 This can take either one of the following choices: "L0" and "L0L2".
@@ -107,11 +106,7 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{cores}{CPU cores.}
 
-\item{aggregate}{aggregate}
-
-\item{peakcalling}{peakcalling}
-
-\item{macs2.path}{macs2.path}
+\item{aggregate}{Logical, whether to aggregate the data.}
 
 \item{k_neigh}{Number of cells to be aggregated per cluster.}
 
@@ -121,15 +116,15 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{reduction_name}{The reduction name of extracting the cell coordinates used for aggregating.}
 
-\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor}
+\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor.}
 
-\item{genome_info}{atacbinary}
+\item{genome_info}{Genome information.}
 
 \item{high_corr_cutoff}{atacbinary}
 
 \item{low_corr_cutoff}{atacbinary}
 
-\item{rescued}{atacbinary}
+\item{rescued}{Logical}
 }
 \value{
 A data table of gene-gene regulatory relationship

@@ -29,7 +29,7 @@ void clamp_by_vector(arma::vec &B, const arma::vec& lows, const arma::vec& highs
 //     }
 // }
 
-arma::rowvec matrix_normalize(arma::sp_mat &mat_norm){
+arma::rowvec matrix_normalize(arma::sp_mat & mat_norm){
     auto p = mat_norm.n_cols;
     arma::rowvec scaleX = arma::zeros<arma::rowvec>(p); // will contain the l2norm of every col
 
@@ -61,7 +61,7 @@ arma::rowvec matrix_normalize(arma::sp_mat &mat_norm){
     return scaleX;
 }
 
-arma::rowvec matrix_normalize(arma::mat& mat_norm){
+arma::rowvec matrix_normalize(arma::mat & mat_norm){
 
     auto p = mat_norm.n_cols;
     arma::rowvec scaleX = arma::zeros<arma::rowvec>(p); // will contain the l2norm of every col
