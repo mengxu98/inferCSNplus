@@ -226,6 +226,8 @@ inferCSN.Seurat <- function(
   object_raw <- object
   clusters <- as.character(unique(object$cluster))
   weight_table_final_list <- list()
+  weight_table_rna_list <- list()
+  weight_table_atac_list <- list()
   for (c in seq_along(clusters)) {
     cluster <- clusters[c]
     if (verbose) message(paste0("Running for cluster: ", cluster, "."))
@@ -279,7 +281,9 @@ inferCSN.Seurat <- function(
           all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
         }
         all_markers_list <- as.data.frame(all_markers_list)
-        focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
+        focused_markers <- all_markers_list[which(
+          all_markers_list$cluster %in% cluster
+        ), , drop = FALSE]
         targets <- focused_markers$gene
       }
       weight_table_rna <- inferCSN(
@@ -302,10 +306,9 @@ inferCSN.Seurat <- function(
         abs(as.numeric(weight_table_rna$weight)),
         decreasing = TRUE
       ), ]
-      Misc(object, slot = "weight_table_rna") <- weight_table_rna
+      weight_table_rna_list[[c]] <- weight_table_rna
     }
 
-    # data_atac <- peaks.filter(data_atac)
     if ("ATAC" %in% names(object@assays)) {
       rownames(data_atac) <- gsub("-", "_", rownames(data_atac))
 
@@ -374,12 +377,12 @@ inferCSN.Seurat <- function(
         abs(as.numeric(weight_table_atac$weight)),
         decreasing = TRUE
       ), ]
-      Seurat::Misc(object, slot = "weight_table_atac") <- weight_table_atac
-      weight_table_atac_sub <- final.network(object, cluster = clusters[c])
+      weight_table_atac_list[[c]] <- weight_table_atac
+      weight_table_atac_sub <- extract.network(object, cluster = clusters[c])
       names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
     }
 
-    if ("RNA" %in% names(object@assays)) {
+    if (all(c("RNA", "ATAC") %in% names(object@assays))) {
       weight_table_final <- merge(
         weight_table_atac_sub,
         weight_table_rna,
@@ -389,15 +392,19 @@ inferCSN.Seurat <- function(
       weight_table_final <- na.omit(weight_table_final)[, 1:5]
       weight_table_final$weight <- weight_table_final$weight / sum(abs(weight_table_final$weight))
       weight_table_final <- weight_table_final[order(abs(as.numeric(weight_table_final$weight)), decreasing = TRUE), ]
+      weight_table_final_list[[c]] <- weight_table_final
     }
-    weight_table_final_list[[c]] <- weight_table_final
     if (verbose) message(paste0("Run done for cluster: ", cluster, "."))
   }
 
+  names(weight_table_rna_list) <- clusters
+  names(weight_table_atac_list) <- clusters
   names(weight_table_final_list) <- clusters
 
   # save result
-  Seurat::Misc(object_raw, slot = "weight_table") <- weight_table_final_list
+  Seurat::Misc(object_raw, slot = "weight_table_rna_list") <- weight_table_rna_list
+  Seurat::Misc(object_raw, slot = "weight_table_atac_list") <- weight_table_atac_list
+  Seurat::Misc(object_raw, slot = "weight_table_final_list") <- weight_table_final_list
 
   if (verbose) message("Run done.")
 

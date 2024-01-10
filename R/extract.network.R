@@ -1,4 +1,4 @@
-#' generate links
+#' extract links
 #' @param cre_gene_list A list of CRE-gene
 #' @param cre_tf_list A list of CRE-TF
 #' @param promoter_cre_gene_list A list of CRE-gene about promoters
@@ -7,7 +7,7 @@
 #'
 #' @return TF-G dataframe
 #' @export
-generate.links <- function(
+extract.links <- function(
     cre_gene_list,
     cre_tf_list,
     promoter_cre_gene_list,
@@ -27,12 +27,12 @@ generate.links <- function(
   return(tf_gene_cre_final)
 }
 
-#' generate Node character
-#' @param network_links Links obtained by generate.links
+#' extract Node character
+#' @param network_links Links obtained by extract.links
 #' @param markers Dataframe with marker and cluster information
 #' @return Node character dataframe
 #' @export
-generate.nodes <- function(
+extract.nodes <- function(
     network_links,
     markers) {
   ### Node
@@ -125,7 +125,7 @@ get.tf.gene <- function(
 #' @param filter filter
 #'
 #' @export
-generate.cre.gene.links <- function(
+extract.cre.gene.links <- function(
     weight_table,
     markers,
     filter = FALSE) {
@@ -158,7 +158,7 @@ generate.cre.gene.links <- function(
 #' @param da_peaks_list a list of DA of each cluster
 #'
 #' @export
-generate.cre <- function(
+extract.cre <- function(
     cre_gene_list,
     promoter_cre_gene_list,
     da_peaks_list = NULL) {
@@ -233,7 +233,7 @@ generate.cre <- function(
 #' @param markers two column dataframe data with marker genes and cluster information
 #'
 #' @export
-generate.peak.tf.links <- function(
+extract.peak.tf.links <- function(
     peaks_bed_list,
     species,
     genome,
@@ -277,14 +277,14 @@ generate.peak.tf.links <- function(
   return(cre_tf_list)
 }
 
-#' @title final.network
+#' @title extract.network
 #'
 #' @param object Seurat object with network results after run 'inferCSN()'
 #' @param cluster Selected celltype(s)
 #'
 #' @return network
 #' @export
-final.network <- function(
+extract.network <- function(
     object,
     cluster) {
   if ("weight_table_atac" %in% names(Seurat::Misc(object))) {
@@ -300,19 +300,19 @@ final.network <- function(
   focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
 
   # CRE-gene connections
-  cre_gene <- generate.cre.gene.links(
+  cre_gene <- extract.cre.gene.links(
     weight_table,
     markers = focused_markers
   )
 
   # Find focused cre which is overlapped with DA
-  cre <- generate.cre(
+  cre <- extract.cre(
     cre_gene_list = cre_gene$distal,
     promoter_cre_gene_list = cre_gene$promoter
   )
 
   # detect TFs for distal cre
-  cre_tf_list <- generate.peak.tf.links(
+  cre_tf_list <- extract.peak.tf.links(
     peaks_bed_list = cre$distal,
     species = "Homo sapiens",
     genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
@@ -320,14 +320,14 @@ final.network <- function(
   )
 
   # detect TFs for Promoters
-  promoter_cre_tf_list <- generate.peak.tf.links(
+  promoter_cre_tf_list <- extract.peak.tf.links(
     peaks_bed_list = cre$promoter,
     species = "Homo sapiens",
     genome = BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
     markers = focused_markers
   )
 
-  network_links <- generate.links(
+  network_links <- extract.links(
     cre_gene_list = cre_gene$distal,
     cre_tf_list = cre_tf_list,
     promoter_cre_gene_list = cre_gene$promoter,
