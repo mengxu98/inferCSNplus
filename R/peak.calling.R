@@ -1,6 +1,6 @@
 #' peak.calling
 #'
-#' @param macs2.path path to macs2
+#' @param macs2_path path to macs2
 #' @param fragments fragments
 #' @inheritParams inferCSN
 #'

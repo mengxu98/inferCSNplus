@@ -11,9 +11,9 @@ peak.calling(object, fragments = NULL, macs2_path = NULL, verbose = FALSE)
 
 \item{fragments}{fragments}
 
-\item{verbose}{Print detailed information.}
+\item{macs2_path}{path to macs2}
 
-\item{macs2.path}{path to macs2}
+\item{verbose}{Print detailed information.}
 }
 \value{
 seurat object

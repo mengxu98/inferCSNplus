@@ -209,7 +209,6 @@ inferCSN.Seurat <- function(
     verbose = FALSE,
     cores = 1,
     aggregate = TRUE,
-    peakcalling = FALSE,
     k_neigh = 50,
     atacbinary = TRUE,
     max_overlap = 0.8,
@@ -237,7 +236,7 @@ inferCSN.Seurat <- function(
       if ("aggregated_data" %in% names(Seurat::Misc(object))) {
         agg_data <- Seurat::Misc(object, slot = "aggregated_data")
       } else {
-        agg_data <- aggregate.matrix(
+        agg_data <- aggregating.data(
           object,
           k_neigh = k_neigh,
           atacbinary = atacbinary,

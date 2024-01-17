@@ -58,7 +58,6 @@ inferCSN(object, ...)
   verbose = FALSE,
   cores = 1,
   aggregate = TRUE,
-  peakcalling = FALSE,
   k_neigh = 50,
   atacbinary = TRUE,
   max_overlap = 0.8,

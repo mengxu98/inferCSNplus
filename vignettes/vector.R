@@ -71,7 +71,6 @@ vector.showValue <- function(OUT) {
 
 vector.calValue <- function(PCA) {
   OUT <- list()
-  PCA <- PCA
   PCA.RC <- apply(apply(PCA, 2, rank), 2, .normX)
   PCA.RC <- abs(PCA.RC - 0.5)
   VALUE <- apply(PCA.RC, 1, mean)
@@ -85,10 +84,7 @@ vector.calValue <- function(PCA) {
 
 
 vector.getValue <- function(OUT, PCA, SHOW = TRUE) {
-  OUT <- OUT
-  PCA <- PCA
-  SHOW <- SHOW
-  ############
+
   VALUE.OUT <- vector.calValue(PCA)
   ###############
   OUT$VALUE <- VALUE.OUT$VALUE
@@ -105,18 +101,20 @@ vector.getValue <- function(OUT, PCA, SHOW = TRUE) {
 
 
 
-vector.buildGrid <- function(VEC, N = 30, SHOW = TRUE, COL = "grey70") {
-  #############
+vector.buildGrid <- function(
+    VEC,
+    N = 30,
+    SHOW = TRUE,
+    COL = "grey70") {
+
   VEC.E <- VEC
-  COL <- COL
-  SHOW <- SHOW
   delta <- 0.000001
   N <- N
-  ##############
+
   if (SHOW == TRUE) {
     plot(VEC.E, col = COL, pch = 16, cex = 0.2)
   }
-  ###############
+
   X <- VEC[, 1]
   Y <- VEC[, 2]
 
