@@ -222,22 +222,23 @@ inferCSN.Seurat <- function(
   if (verbose) message(paste("Running start for <", class(object)[1], "object >."))
   object$cluster <- Seurat::Idents(object)
 
-  object_raw <- object
   clusters <- as.character(unique(object$cluster))
   weight_table_final_list <- list()
   weight_table_rna_list <- list()
   weight_table_atac_list <- list()
   for (c in seq_along(clusters)) {
     cluster <- clusters[c]
-    if (verbose) message(paste0("Running for cluster: ", cluster, "."))
-    object <- subset(object_raw, cluster == cluster[1])
+    if (verbose) {
+      message(paste0("Running for cluster: ", cluster, "."))
+    }
+    object_sub <- subset(object, cluster == cluster[1])
 
     if (aggregate) {
-      if ("aggregated_data" %in% names(Seurat::Misc(object))) {
-        agg_data <- Seurat::Misc(object, slot = "aggregated_data")
+      if ("aggregated_data" %in% names(Seurat::Misc(object_sub))) {
+        agg_data <- Seurat::Misc(object_sub, slot = "aggregated_data")
       } else {
         agg_data <- aggregating.data(
-          object,
+          object_sub,
           k_neigh = k_neigh,
           atacbinary = atacbinary,
           max_overlap = max_overlap,
@@ -245,7 +246,7 @@ inferCSN.Seurat <- function(
           size_factor_normalize = size_factor_normalize,
           verbose = verbose
         )
-        Seurat::Misc(object, slot = "aggregated_data") <- agg_data
+        Seurat::Misc(object_sub, slot = "aggregated_data") <- agg_data
       }
 
       if ("RNA" %in% names(agg_data)) {
@@ -256,28 +257,28 @@ inferCSN.Seurat <- function(
         data_atac <- as.matrix(agg_data$ATAC)
       }
     } else {
-      if ("RNA" %in% names(object@assays)) {
+      if ("RNA" %in% names(object_sub@assays)) {
         data_rna <- matrix(
           0,
-          nrow = nrow(object@assays$RNA$counts),
+          nrow = nrow(object_sub@assays$RNA$counts),
           ncol = 1
         )
       }
-      if ("ATAC" %in% names(object@assays)) {
+      if ("ATAC" %in% names(object_sub@assays)) {
         data_atac <- matrix(
           0,
-          nrow = nrow(object@assays$ATAC@counts),
+          nrow = nrow(object_sub@assays$ATAC@counts),
           ncol = 1
         )
       }
     }
 
     if ("RNA" %in% names(agg_data)) {
-      Seurat::DefaultAssay(object) <- "RNA"
+      Seurat::DefaultAssay(object_sub) <- "RNA"
       if (is.null(targets)) {
         # targets <- Seurat::VariableFeatures(object = object)
         if ("all_markers_list" %in% names(Seurat::Misc(object))) {
-          all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
+          all_markers_list <- Seurat::Misc(object_sub, slot = "all_markers_list")
         }
         all_markers_list <- as.data.frame(all_markers_list)
         focused_markers <- all_markers_list[which(
@@ -308,7 +309,7 @@ inferCSN.Seurat <- function(
       weight_table_rna_list[[c]] <- weight_table_rna
     }
 
-    if ("ATAC" %in% names(object@assays)) {
+    if ("ATAC" %in% names(object_sub@assays)) {
       rownames(data_atac) <- gsub("-", "_", rownames(data_atac))
 
       if (is.null(genome_info)) {
@@ -321,11 +322,11 @@ inferCSN.Seurat <- function(
 
       if (is.null(targets)) {
         # Obtain candidate regions of focus target genes
-        if ("RNA" %in% names(object@assays)) {
-          Seurat::DefaultAssay(object) <- "RNA"
-          # targets <- Seurat::VariableFeatures(object = object)
-          if ("all_markers_list" %in% names(Seurat::Misc(object))) {
-            all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
+        if ("RNA" %in% names(object_sub@assays)) {
+          Seurat::DefaultAssay(object_sub) <- "RNA"
+          # targets <- Seurat::VariableFeatures(object = object_sub)
+          if ("all_markers_list" %in% names(Seurat::Misc(object_sub))) {
+            all_markers_list <- Seurat::Misc(object_sub, slot = "all_markers_list")
           }
           all_markers_list <- as.data.frame(all_markers_list)
           focused_markers <- all_markers_list[which(all_markers_list$cluster %in% cluster), , drop = FALSE]
@@ -377,11 +378,11 @@ inferCSN.Seurat <- function(
         decreasing = TRUE
       ), ]
       weight_table_atac_list[[c]] <- weight_table_atac
-      weight_table_atac_sub <- extract.network(object, cluster = clusters[c])
+      weight_table_atac_sub <- extract.network(object_sub, cluster = clusters[c])
       names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
     }
 
-    if (all(c("RNA", "ATAC") %in% names(object@assays))) {
+    if (all(c("RNA", "ATAC") %in% names(object_sub@assays))) {
       weight_table_final <- merge(
         weight_table_atac_sub,
         weight_table_rna,

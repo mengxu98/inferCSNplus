@@ -2,7 +2,7 @@
 #'
 #' @useDynLib inferCSN
 #'
-#' @param object The object for inferCSN
+#' @param object The input object for \code{inferCSN}
 #' @param ... Arguments for other methods
 #'
 #' @import Matrix
@@ -32,4 +32,22 @@ setGeneric("inferCSN",
            signature = "object",
            function(object, ...) {
              UseMethod(generic = "inferCSN", object = object)
+           })
+
+#' Get embedding information
+#'
+#' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
+#' @param ... Arguments for other methods
+#'
+#' @return Embedding information
+#' @export
+#'
+#' @examples
+#' library(inferCSN)
+#' data("example_matrix")
+#' embedding_information <- get.embedding(example_matrix)
+setGeneric("get.embedding",
+           signature = "object",
+           function(object, ...) {
+             UseMethod(generic = "get.embedding", object = object)
            })

@@ -39,14 +39,20 @@ Suggests:
     cicero,
     chromVAR,
     GenomicRanges,
+    gatepoints,
     gtools,
+    gmodels,
+    grDevices,
     motifmatchr,
     igraph,
     IRanges,
     precrec,
     pROC,
+    scales,
+    stringr,
     testthat (>= 3.0.0),
-    tidygraph
+    tidygraph,
+    umap
 LinkingTo: 
     Rcpp,
     RcppArmadillo
