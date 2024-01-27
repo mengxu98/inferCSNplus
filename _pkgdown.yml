@@ -74,7 +74,6 @@ reference:
   - dynamic.networks
   - contrast.networks
   - network.heatmap
-  - connections.plot
 
 - subtitle: "Network evaluation"
 - contents:
@@ -104,6 +103,9 @@ reference:
   - predict.inferCSNCV
   - is.scalar
   - table.to.matrix
+  - peaks.split
+  - ranges.for.coords
+  - find.overlapping.coordinates
 
 - subtitle: "Example data"
 - contents:

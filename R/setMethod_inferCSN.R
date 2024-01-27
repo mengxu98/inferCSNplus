@@ -474,8 +474,8 @@ inferCSN.Seurat <- function(
 
       p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
       p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
-      promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-      enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
+      promoters <- find.overlapping.coordinates(peaks, p1)
+      enhancers <- find.overlapping.coordinates(peaks, p2)
       enhancers <- setdiff(enhancers, promoters)
 
       if (length(promoters) > 0 && length(enhancers) > 1) {
@@ -525,8 +525,8 @@ inferCSN.Seurat <- function(
     ) %dopar% {
       p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
       p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
-      promoters <- cicero::find_overlapping_coordinates(peaks, p1)
-      enhancers <- cicero::find_overlapping_coordinates(peaks, p2)
+      promoters <- find.overlapping.coordinates(peaks, p1)
+      enhancers <- find.overlapping.coordinates(peaks, p2)
       enhancers <- setdiff(enhancers, promoters)
 
       if (length(promoters) > 0 && length(enhancers) > 1) {

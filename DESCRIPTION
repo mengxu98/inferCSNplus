@@ -2,7 +2,7 @@ Type: Package
 Package: inferCSN
 Title: Inferring Cell-Specific Gene Regulatory Network
 Version: 1.0.0
-Date: 2024-1-11
+Date: 2024-1-27
 Authors@R: 
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054"))
 Maintainer: Meng Xu <mengxu98@qq.com>
@@ -36,8 +36,8 @@ Imports:
     stats,
     utils
 Suggests:
+    assertthat,
     BSgenome.Hsapiens.UCSC.hg38,
-    cicero,
     chromVAR,
     GenomicRanges,
     gatepoints,
@@ -49,6 +49,7 @@ Suggests:
     precrec,
     pROC,
     scales,
+    stringi,
     stringr,
     testthat (>= 3.0.0),
     tidygraph,
