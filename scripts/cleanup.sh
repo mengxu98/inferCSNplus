@@ -3,7 +3,8 @@
 # Check if 'renv.lock' file exists and remove it if it does
 if [ -f renv.lock ]; then
     echo "'renv.lock' file found. Removing..."
-    rm -f -- renv.lock
+    # rm -f -- renv.lock
+    mv renv.lock .github/pkg.lock
 else
     echo "'renv.lock' file not found. Skipping..."
 fi
