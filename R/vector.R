@@ -1,11 +1,10 @@
 #' vector.main
 #'
 #' @description
-#' Raw source code form: https://github.com/jumphone/Vector.
-#' Author: Feng Zhang
-#' Date: 11/25, 2019
-#' Paper: Unsupervised Inference of Developmental Directions for Single Cells Using VECTOR
-#' URL: https://doi.org/10.1016/j.celrep.2020.108069
+#' Raw source code form: \url{https://github.com/jumphone/Vector}.
+#' Author: Feng Zhang.
+#' Paper: Unsupervised Inference of Developmental Directions for Single Cells Using VECTOR,
+#' please reference: \url{https://doi.org/10.1016/j.celrep.2020.108069}.
 #'
 #' @param embedding_information The information of PCA and UMAP.
 #' @param plot Logical value.
@@ -24,7 +23,7 @@ vector.main <- function(
   PCA <- embedding_information[["PCA"]]
   VEC <- embedding_information[["UMAP"]]
 
-  par(mfrow = c(2, 3), mai = c(0.2, 0.2, 0.1, 0.1))
+  graphics::par(mfrow = c(2, 3), mai = c(0.2, 0.2, 0.1, 0.1))
 
   PCA <- vector.rankPCA(PCA)
 
@@ -54,10 +53,10 @@ vector.main <- function(
 
   # OUT$P.PS : Peseudotime Score (PS) of each cell
 
-  par(mfrow = c(1, 1), oma = c(0, 0, 0, 0))
+  graphics::par(mfrow = c(1, 1), oma = c(0, 0, 0, 0))
 
-  mtext("UMAP1", side = 1)
-  mtext("UMAP2", side = 2)
+  graphics::mtext("UMAP1", side = 1)
+  graphics::mtext("UMAP2", side = 2)
 
   return(OUT)
 }
@@ -103,7 +102,13 @@ vector.buildGrid <- function(
 
   if (SHOW == TRUE) {
     graphics::plot(VEC.E, col = COL, pch = 16, cex = 0.2, xlab = "", ylab = "", axes = FALSE, asp = 1)
-    graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+    graphics::rect(
+      graphics::par("usr")[1],
+      graphics::par("usr")[3],
+      graphics::par("usr")[2],
+      graphics::par("usr")[4],
+      col = NA,
+      border = "black")
   }
 
   X <- VEC[, 1]
@@ -180,10 +185,10 @@ vector.buildNet <- function(
       asp = 1
     )
     graphics::rect(
-      par("usr")[1],
-      par("usr")[3],
-      par("usr")[2],
-      par("usr")[4],
+      graphics::par("usr")[1],
+      graphics::par("usr")[3],
+      graphics::par("usr")[2],
+      graphics::par("usr")[4],
       col = NA,
       border = "black"
     )
@@ -358,7 +363,13 @@ vector.gridValue <- function(OUT, SHOW = TRUE) {
 
   if (SHOW == TRUE) {
     graphics::plot(OUT$VEC, col = "grey80", pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE, asp = 1)
-    graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+    graphics::rect(
+      graphics::par("usr")[1],
+      graphics::par("usr")[3],
+      graphics::par("usr")[2],
+      graphics::par("usr")[4],
+      col = NA,
+      border = "black")
     # graphics::points(OUT$CENTER_VEC,col=COL,pch=16)
     graphics::points(OUT$CENTER_VEC[USED, ], col = COL[USED], pch = 15, cex = 1.5)
   }
@@ -479,7 +490,13 @@ vector.autoCenter <- function(OUT, UP = 0.9, SHOW = TRUE) {
   if (SHOW == TRUE) {
     # plot(OUT$VEC, col=OUT$COL, pch=16, cex=0.5 )
     graphics::plot(OUT$VEC, col = OUT$ORIG.COL, pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE, asp = 1)
-    graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+    graphics::rect(
+      graphics::par("usr")[1],
+      graphics::par("usr")[3],
+      graphics::par("usr")[2],
+      graphics::par("usr")[4],
+      col = NA,
+      border = "black")
     graphics::text(CENTER_VEC[HIGH, 1], CENTER_VEC[HIGH, 2], labels = PCH, cex = 1, pos = 2)
     graphics::points(CENTER_VEC[HIGH, 1], CENTER_VEC[HIGH, 2], col = "black", pch = 16, cex = 1)
     graphics::points(CENTER_VEC[SUMMIT, 1], CENTER_VEC[SUMMIT, 2], col = "black", pch = 16, cex = 1.5)
@@ -548,7 +565,13 @@ vector.drawArrow <- function(
         ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one),
         xlab = "", ylab = "", axes = FALSE, asp = 1
       )
-      graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+      graphics::rect(
+        graphics::par("usr")[1],
+        graphics::par("usr")[3],
+        graphics::par("usr")[2],
+        graphics::par("usr")[4],
+        col = NA,
+        border = "black")
     } else {
       graphics::plot(
         ALL_VEC,
@@ -557,7 +580,13 @@ vector.drawArrow <- function(
         ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one), yaxt = "n", axes = F,
         xlab = "", ylab = "", axes = FALSE, asp = 1
       )
-      graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+      graphics::rect(
+        graphics::par("usr")[1],
+        graphics::par("usr")[3],
+        graphics::par("usr")[2],
+        graphics::par("usr")[4],
+        col = NA,
+        border = "black")
     }
   }
   N.SCORE <- .normX(SCORE)

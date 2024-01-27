@@ -41,7 +41,13 @@ vector.showValue <- function(OUT) {
   N.VALUE <- .normX(VALUE)
   COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
   graphics::plot(VEC, col = COL, pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE, asp = 1)
-  graphics::rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col = NA, border = "black")
+  graphics::rect(
+    graphics::par("usr")[1],
+    graphics::par("usr")[3],
+    graphics::par("usr")[2],
+    graphics::par("usr")[4],
+    col = NA,
+    border = "black")
   return(OUT)
 }
 

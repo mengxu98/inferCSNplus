@@ -7,15 +7,18 @@
 vector.main(embedding_information, plot = TRUE)
 }
 \arguments{
-\item{embedding_information}{embedding_information}
+\item{embedding_information}{The information of PCA and UMAP.}
 
-\item{plot}{plot}
+\item{plot}{Logical value.}
 }
 \value{
 vector_result
 }
 \description{
-vector.main
+Raw source code form: \url{https://github.com/jumphone/Vector}.
+Author: Feng Zhang.
+Paper: Unsupervised Inference of Developmental Directions for Single Cells Using VECTOR,
+please reference: \url{https://doi.org/10.1016/j.celrep.2020.108069}.
 }
 \examples{
 library(inferCSN)
