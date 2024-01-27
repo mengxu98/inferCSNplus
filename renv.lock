@@ -1959,6 +1959,16 @@
       ],
       "Hash": "451e5edf411987991ab6a5410c45011f"
     },
+    "docopt": {
+      "Package": "docopt",
+      "Version": "0.7.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "methods"
+      ],
+      "Hash": "e9eeef7931ee99ca0093f3f20b88e09b"
+    },
     "dotCall64": {
       "Package": "dotCall64",
       "Version": "1.1-1",
@@ -3582,6 +3592,26 @@
       ],
       "Hash": "1cba04a4e9414bdefc9dcaa99649a8dc"
     },
+    "qlcMatrix": {
+      "Package": "qlcMatrix",
+      "Version": "0.9.7",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "qlcMatrix",
+      "RemoteUsername": "cysouw",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "d919872f69b07b6cf892f725ed3d6e4569319206",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "docopt",
+        "methods",
+        "slam",
+        "sparsesvd"
+      ],
+      "Hash": "5abe549395d1da50de962ec184acff19"
+    },
     "ragg": {
       "Package": "ragg",
       "Version": "1.2.7",
@@ -4102,6 +4132,18 @@
         "methods"
       ],
       "Hash": "ffe1f9e95a4375530747b268f82b5086"
+    },
+    "sparsesvd": {
+      "Package": "sparsesvd",
+      "Version": "0.2-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "methods"
+      ],
+      "Hash": "5748ba7788e9a81a31f3dc9e0f09dca4"
     },
     "spatstat.data": {
       "Package": "spatstat.data",
