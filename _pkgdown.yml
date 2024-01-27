@@ -3,7 +3,7 @@ destination: docs
 toc:
   depth: 3
 
-url: https://mengxu98.github.io/inferCSN/
+url: https://mengxu98.github.io/inferCSNplus/
 
 template:
   package: mxtemplate
@@ -16,7 +16,7 @@ navbar:
   components:
     github:
       icon: fab fa-github fa-lg
-      href: https://github.com/mengxu98/inferCSN
+      href: https://github.com/mengxu98/inferCSNplus
 
     mengxu:
       icon: fas fa-home fa-lg
@@ -34,12 +34,47 @@ reference:
 - contents:
   - inferCSN-package
   - inferCSN
+  - extract.cre
+  - extract.cre.gene.links
+  - extract.links
+  - extract.network
+  - extract.nodes
+  - extract.peak.tf.links
+
+- subtitle: "vector functions"
+- contents:
+  - get.embedding
+  - vector.autoCenter
+  - vector.buildGrid
+  - vector.buildNet
+  - vector.drawArrow
+  - vector.getValue
+  - vector.gridValue
+  - vector.main
+  - vector.rankPCA
+
+- subtitle: "Data processing"
+- contents:
+  - peak.calling
+  - peaks.filter
+  - normalize.seurat.object
+  - generate.aggregated.data
+  - aggregating.data
+  - as.slam.matrix
+  - as.sparse
+  - estimate.size.factors
+  - estimate.size.factors.dense
+  - estimate.size.factors.sparse
+  - estimate.t
+  - is.scalar
+  - is.sparse
 
 - subtitle: "Network visualization"
 - contents:
   - dynamic.networks
   - contrast.networks
   - network.heatmap
+  - connections.plot
 
 - subtitle: "Network evaluation"
 - contents:
@@ -59,16 +94,20 @@ reference:
 - subtitle: "Utils functions"
 - contents:
   - check.parameters
-  - net.format
   - coef.inferCSN
   - coef.inferCSNCV
+  - net.format
+  - prepare.performance.data
   - print.inferCSN
   - print.inferCSNCV
   - predict.inferCSN
   - predict.inferCSNCV
   - is.scalar
+  - table.to.matrix
 
 - subtitle: "Example data"
 - contents:
-  - exampleMatrix
-  - exampleGroundTruth
+  - example_matrix
+  - example_ground_truth
+  - promoter_regions_hg19
+  - promoter_regions_hg38
