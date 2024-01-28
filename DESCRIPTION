@@ -36,7 +36,6 @@ Imports:
     stats,
     utils
 Suggests:
-    assertthat,
     BSgenome.Hsapiens.UCSC.hg38,
     chromVAR,
     GenomicRanges,
@@ -53,7 +52,7 @@ Suggests:
     stringr,
     testthat (>= 3.0.0),
     tidygraph,
-    umap
+    uwot
 LinkingTo: 
     Rcpp,
     RcppArmadillo

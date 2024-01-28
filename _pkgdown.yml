@@ -66,7 +66,6 @@ reference:
   - estimate.size.factors.dense
   - estimate.size.factors.sparse
   - estimate.t
-  - is.scalar
   - is.sparse
 
 - subtitle: "Network visualization"
@@ -106,6 +105,8 @@ reference:
   - peaks.split
   - ranges.for.coords
   - find.overlapping.coordinates
+  - get.tf.gene
+  - transcript.mode
 
 - subtitle: "Example data"
 - contents:
