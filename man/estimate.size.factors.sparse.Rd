@@ -12,13 +12,14 @@ estimate.size.factors.sparse(
 )
 }
 \arguments{
-\item{counts}{The matrix for the gene expression data, either read counts or FPKM values or transcript counts}
+\item{counts}{The matrix for the gene expression data, either read counts or FPKM values or transcript counts.}
 
-\item{locfunc}{The location function used to find the representive value}
+\item{locfunc}{The location function used to find the representive value.}
 
-\item{round_exprs}{A logic flag to determine whether or not the expression value should be rounded}
+\item{round_exprs}{A logic flag to determine whether or not the expression value should be rounded.}
 
-\item{method}{A character to specify the size factor calculation appraoches. It can be either "mean-geometric-mean-total" (default),
+\item{method}{A character to specify the size factor calculation appraoches.
+It can be either "mean-geometric-mean-total" (default),
 "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".}
 }
 \description{

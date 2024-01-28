@@ -24,7 +24,7 @@ peaks.split <- function(inp) {
 #' This function from:\url{https://github.com/cole-trapnell-lab/cicero-release/blob/master/R/utils.R#L90}
 #'
 #' @param coord_strings A list of coordinate strings (in the form "chr1:500000-1000000").
-#' @param with_names logical - should meta data include coordinate string (field coord_string)?
+#' @param with_names logical, should meta data include coordinate string (field coord_string)?
 #' @param meta_data_df A data frame with any meta data columns you want
 #'   included with the ranges. Must be in the same order as coord_strings.
 #'
@@ -40,33 +40,41 @@ peaks.split <- function(inp) {
 #'
 #' @examples
 #' ran1 <- ranges.for.coords("chr1:2039-30239", with_names = TRUE)
-#' ran2 <- ranges.for.coords(c("chr1:2049-203902", "chrX:489249-1389389"),
+#' ran1
+#'
+#' ran2 <- ranges.for.coords(
+#'   c("chr1:2049-203902", "chrX:489249-1389389"),
 #'   meta_data_df = data.frame(dat = c("1", "X"))
 #' )
-#' ran3 <- ranges.for.coords(c("chr1:2049-203902", "chrX:489249-1389389"),
+#' ran2
+#'
+#' ran3 <- ranges.for.coords(
+#'   c("chr1:2049-203902", "chrX:489249-1389389"),
 #'   with_names = TRUE,
 #'   meta_data_df = data.frame(
 #'     dat = c("1", "X"),
 #'     stringsAsFactors = FALSE
 #'   )
 #' )
+#' ran3
 ranges.for.coords <- function(
     coord_strings,
     meta_data_df = NULL,
     with_names = FALSE) {
-  assertthat::assert_that(is.logical(with_names))
   if (!is.null(meta_data_df)) {
-    assertthat::assert_that(is.data.frame(meta_data_df))
-    assertthat::assert_that(
-      assertthat::are_equal(length(coord_strings), nrow(meta_data_df))
-    )
+    if (length(coord_strings) != nrow(meta_data_df)) {
+      stop("Please ensure the length of 'coord_strings' and 'meta_data_df' must be equal.")
+    }
   }
 
   coord_strings <- gsub(",", "", coord_strings)
   coord_cols <- peaks.split(coord_strings)
   gr <- GenomicRanges::GRanges(
     coord_cols[, 1],
-    ranges = IRanges::IRanges(as.numeric(coord_cols[, 2]), as.numeric(coord_cols[, 3])),
+    ranges = IRanges::IRanges(
+      as.numeric(coord_cols[, 2]),
+      as.numeric(coord_cols[, 3])
+    ),
     mcols = meta_data_df
   )
   if (!is.null(meta_data_df)) {
@@ -86,8 +94,7 @@ ranges.for.coords <- function(
 #' @description
 #' This function from:\url{https://github.com/cole-trapnell-lab/cicero-release/blob/master/R/utils.R#L438}
 #'
-#' @param coord_list A list of coordinates to be searched for overlap in the
-#'   form chr_100_2000.
+#' @param coord_list A list of coordinates to be searched for overlap in the form chr_100_2000.
 #' @param coord The coordinates that you want to find in the form chr1_100_2000.
 #' @param maxgap The maximum distance in base pairs between coord and the
 #'  coord_list that should count as overlapping. Default is 0.
@@ -97,9 +104,11 @@ ranges.for.coords <- function(
 #'
 #' @examples
 #' test_coords <- c(
-#'   "chr18_10025_10225", "chr18_10603_11103",
+#'   "chr18_10025_10225",
+#'   "chr18_10603_11103",
 #'   "chr18_11604_13986",
-#'   "chr18_157883_158536", "chr18_217477_218555",
+#'   "chr18_157883_158536",
+#'   "chr18_217477_218555",
 #'   "chr18_245734_246234"
 #' )
 #' find.overlapping.coordinates(test_coords, "chr18:10,100-1246234")
@@ -121,13 +130,16 @@ find.overlapping.coordinates <- function(
   } else {
     ol1 <- lapply(coord, function(x) {
       y <- suppressWarnings(
-        unlist(as.list(
-          GenomicRanges::findOverlaps(ranges.for.coords(x),
-            cons_gr,
-            maxgap = maxgap,
-            select = "all"
+        unlist(
+          as.list(
+            GenomicRanges::findOverlaps(
+              ranges.for.coords(x),
+              cons_gr,
+              maxgap = maxgap,
+              select = "all"
+            )
           )
-        ))
+        )
       )
       if (length(y) == 0) {
         return(NA)

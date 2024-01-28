@@ -402,13 +402,13 @@ inferCSN.Seurat <- function(
   names(weight_table_final_list) <- clusters
 
   # save result
-  Seurat::Misc(object_raw, slot = "weight_table_rna_list") <- weight_table_rna_list
-  Seurat::Misc(object_raw, slot = "weight_table_atac_list") <- weight_table_atac_list
-  Seurat::Misc(object_raw, slot = "weight_table_final_list") <- weight_table_final_list
+  Seurat::Misc(object, slot = "weight_table_rna_list") <- weight_table_rna_list
+  Seurat::Misc(object, slot = "weight_table_atac_list") <- weight_table_atac_list
+  Seurat::Misc(object, slot = "weight_table_final_list") <- weight_table_final_list
 
   if (verbose) message("Run done.")
 
-  return(object_raw)
+  return(object)
 }
 
 .inferCSN.atac <- function(

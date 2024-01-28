@@ -289,7 +289,13 @@ as.sparse <- function(slam_matrix) {
 #' @export
 as.slam.matrix <- function(sp_mat) {
   sp <- Matrix::summary(sp_mat)
-  slam::simple_triplet_matrix(sp[, "i"], sp[, "j"], sp[, "x"], ncol = ncol(sp_mat), nrow = nrow(sp_mat), dimnames = dimnames(sp_mat))
+  slam::simple_triplet_matrix(
+    sp[, "i"],
+    sp[, "j"],
+    sp[, "x"],
+    ncol = ncol(sp_mat),
+    nrow = nrow(sp_mat),
+    dimnames = dimnames(sp_mat))
 }
 
 #' is.sparse
@@ -301,10 +307,11 @@ is.sparse <- function(x) {
 
 #' Estimate size factors for each column, given a sparseMatrix from the Matrix package
 #'
-#' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
-#' @param locfunc The location function used to find the representive value
-#' @param round_exprs A logic flag to determine whether or not the expression value should be rounded
-#' @param method A character to specify the size factor calculation appraoches. It can be either "mean-geometric-mean-total" (default),
+#' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts.
+#' @param locfunc The location function used to find the representive value.
+#' @param round_exprs A logic flag to determine whether or not the expression value should be rounded.
+#' @param method A character to specify the size factor calculation appraoches.
+#' It can be either "mean-geometric-mean-total" (default),
 #' "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".
 #'
 #' @importFrom stats median
@@ -375,11 +382,8 @@ estimate.size.factors.sparse <- function(
 
 #' Estimate size factors dense matrix
 #'
-#' @param counts The matrix for the gene expression data, either read counts or FPKM values or transcript counts
-#' @param locfunc The location function used to find the representive value
-#' @param round_exprs A logic flag to determine whether or not the expression value should be rounded
-#' @param method A character to specify the size factor calculation appraoches. It can be either "mean-geometric-mean-total" (default),
-#' "weighted-median", "median-geometric-mean", "median", "mode", "geometric-mean-total".
+#' @inheritParams estimate.size.factors.sparse
+#'
 #' @importFrom stats median
 #'
 #' @export
@@ -444,7 +448,7 @@ estimate.size.factors.dense <- function(
 
 #' Find the most commonly occuring relative expression value in each cell
 #'
-#' Converting relative expression values to mRNA copies per cell requires
+#' @description Converting relative expression values to mRNA copies per cell requires
 #' knowing the most commonly occuring relative expression value in each cell
 #' This value typically corresponds to an RPC value of 1. This function
 #' finds the most commonly occuring (log-transformed) relative expression value
@@ -460,6 +464,7 @@ estimate.size.factors.dense <- function(
 #' respectively. Row and column names should be included.
 #' Expression values should not be log-transformed.
 #' @param relative_expr_thresh Relative expression values below this threshold are considered zero.
+#'
 #' @return an vector of most abundant relative_expr value corresponding to the RPC 1.
 #' @export
 estimate.t <- function(
@@ -469,17 +474,21 @@ estimate.t <- function(
   unlist(
     apply(
       relative_expr_matrix, 2, function(relative_expr) {
-        10^mean(dmode(log10(relative_expr[relative_expr > relative_expr_thresh])))
+        10^mean(transcript.mode(log10(relative_expr[relative_expr > relative_expr_thresh])))
       }
     )
   ) # avoid multiple output
 }
 
 #' use gaussian kernel to calculate the mode of transcript counts
+#'
 #' @param x log tranformed relative expression
 #' @param  breaks control parameter
-#' @importFrom stats density
-dmode <- function(x, breaks = "Sturges") {
+#'
+#' @export
+transcript.mode <- function(
+    x,
+    breaks = "Sturges") {
   if (length(x) < 2) {
     return(0)
   }

@@ -1,16 +1,18 @@
-utils::globalVariables(c(
-  "x",
-  "y",
-  "xend",
-  "yend",
-  "weight",
-  "Interaction",
-  "name",
-  "regulator",
-  "degree",
-  "edges",
-  "curvetype"
-))
+utils::globalVariables(
+  c(
+    "x",
+    "y",
+    "xend",
+    "yend",
+    "weight",
+    "Interaction",
+    "name",
+    "regulator",
+    "degree",
+    "edges",
+    "curvetype"
+  )
+)
 
 #' @title Check input parameters
 #'
@@ -19,20 +21,20 @@ utils::globalVariables(c(
 #'
 #' @return No return value, called for check input parameters
 #' @export
-#'
-check.parameters <- function(matrix,
-                             penalty,
-                             algorithm,
-                             cross_validation,
-                             seed,
-                             n_folds,
-                             k_folds,
-                             r_threshold,
-                             regulators,
-                             targets,
-                             regulators_num,
-                             verbose,
-                             cores) {
+check.parameters <- function(
+    matrix,
+    penalty,
+    algorithm,
+    cross_validation,
+    seed,
+    n_folds,
+    k_folds,
+    r_threshold,
+    regulators,
+    targets,
+    regulators_num,
+    verbose,
+    cores) {
   if (verbose) message("Checking input parameters.")
 
   error_message <- paste0(
@@ -317,10 +319,11 @@ print.inferCSNCV <- function(x, ...) {
 #' @return Return the predict value
 #' @export
 #'
-predict.inferCSN <- function(object,
-                             newx,
-                             lambda = NULL,
-                             gamma = NULL, ...) {
+predict.inferCSN <- function(
+    object,
+    newx,
+    lambda = NULL,
+    gamma = NULL, ...) {
   beta <- coef.inferCSN(object, lambda, gamma)
   if (object$settings$intercept) {
     # add a column of ones for the intercept
@@ -342,10 +345,11 @@ predict.inferCSN <- function(object,
 #' @return Return the predict value
 #' @export
 #'
-predict.inferCSNCV <- function(object,
-                               newx,
-                               lambda = NULL,
-                               gamma = NULL, ...) {
+predict.inferCSNCV <- function(
+    object,
+    newx,
+    lambda = NULL,
+    gamma = NULL, ...) {
   predict.inferCSN(object$fit, newx, lambda, gamma, ...)
 }
 

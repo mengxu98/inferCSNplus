@@ -7,8 +7,7 @@
 find.overlapping.coordinates(coord_list, coord, maxgap = 0)
 }
 \arguments{
-\item{coord_list}{A list of coordinates to be searched for overlap in the
-form chr_100_2000.}
+\item{coord_list}{A list of coordinates to be searched for overlap in the form chr_100_2000.}
 
 \item{coord}{The coordinates that you want to find in the form chr1_100_2000.}
 
@@ -23,9 +22,11 @@ This function from:\url{https://github.com/cole-trapnell-lab/cicero-release/blob
 }
 \examples{
 test_coords <- c(
-  "chr18_10025_10225", "chr18_10603_11103",
+  "chr18_10025_10225",
+  "chr18_10603_11103",
   "chr18_11604_13986",
-  "chr18_157883_158536", "chr18_217477_218555",
+  "chr18_157883_158536",
+  "chr18_217477_218555",
   "chr18_245734_246234"
 )
 find.overlapping.coordinates(test_coords, "chr18:10,100-1246234")

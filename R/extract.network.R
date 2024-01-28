@@ -80,7 +80,10 @@ extract.nodes <- function(
 #' @param cre_gene_list A list of CRE-gene
 #' @param cre_tf_list A list of CRE-TF
 #' @param clusters cluster information
+#'
 #' @return TF-G dataframe
+#'
+#' @export
 get.tf.gene <- function(
     cre_gene_list,
     cre_tf_list,

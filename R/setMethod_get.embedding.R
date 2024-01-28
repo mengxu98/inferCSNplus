@@ -1,15 +1,19 @@
+#' @param cores Using n threads for \code{\link[uwot]{umap}}.
+#'
 #' @export
 #'
 #' @method get.embedding default
 #'
 #' @rdname get.embedding
-get.embedding.default <- function(object, ...) {
+get.embedding.default <- function(
+    object,
+    cores = 1,
+    ...) {
   pca_res <- stats::prcomp(object)
   pca_res <- pca_res$x
   rownames(pca_res) <- rownames(object)
-  umap_res <- umap::umap(object)
+  umap_res <- suppressMessages(uwot::umap(object, n_threads = cores))
   rownames(umap_res) <- rownames(object)
-  umap_res <- cbind(UMAP1 = umap_res$layout[, 1], UMAP2 = umap_res$layout[, 2])
   embedding <- list(pca_res, umap_res)
   names(embedding) <- c("PCA", "UMAP")
 

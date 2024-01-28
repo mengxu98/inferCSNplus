@@ -12,7 +12,7 @@ ranges.for.coords(coord_strings, meta_data_df = NULL, with_names = FALSE)
 \item{meta_data_df}{A data frame with any meta data columns you want
 included with the ranges. Must be in the same order as coord_strings.}
 
-\item{with_names}{logical - should meta data include coordinate string (field coord_string)?}
+\item{with_names}{logical, should meta data include coordinate string (field coord_string)?}
 }
 \value{
 GRanges object of the input strings
@@ -28,16 +28,23 @@ Coordinate strings consist of three pieces of information:
 }
 \examples{
 ran1 <- ranges.for.coords("chr1:2039-30239", with_names = TRUE)
-ran2 <- ranges.for.coords(c("chr1:2049-203902", "chrX:489249-1389389"),
+ran1
+
+ran2 <- ranges.for.coords(
+  c("chr1:2049-203902", "chrX:489249-1389389"),
   meta_data_df = data.frame(dat = c("1", "X"))
 )
-ran3 <- ranges.for.coords(c("chr1:2049-203902", "chrX:489249-1389389"),
+ran2
+
+ran3 <- ranges.for.coords(
+  c("chr1:2049-203902", "chrX:489249-1389389"),
   with_names = TRUE,
   meta_data_df = data.frame(
     dat = c("1", "X"),
     stringsAsFactors = FALSE
   )
 )
+ran3
 }
 \seealso{
 \code{\link[GenomicRanges]{GRanges-class}}
