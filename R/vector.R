@@ -68,7 +68,6 @@ vector.main <- function(
 #' @return output
 #' @export
 vector.rankPCA <- function(PCA) {
-  PCA <- PCA # ncol=num(PC)
   R.PCA <- apply(PCA, 2, rank)
   PCA.OUT <- gmodels::fast.prcomp(
     R.PCA,
@@ -101,7 +100,14 @@ vector.buildGrid <- function(
   N <- N
 
   if (SHOW == TRUE) {
-    graphics::plot(VEC.E, col = COL, pch = 16, cex = 0.2, xlab = "", ylab = "", axes = FALSE, asp = 1)
+    graphics::plot(
+      VEC.E,
+      col = COL,
+      pch = 16,
+      cex = 0.2,
+      xlab = "",
+      ylab = "",
+      axes = FALSE)
     graphics::rect(
       graphics::par("usr")[1],
       graphics::par("usr")[3],
@@ -181,8 +187,7 @@ vector.buildNet <- function(
       cex = 0.2,
       xlab = "",
       ylab = "",
-      axes = FALSE,
-      asp = 1
+      axes = FALSE
     )
     graphics::rect(
       graphics::par("usr")[1],
@@ -362,7 +367,14 @@ vector.gridValue <- function(OUT, SHOW = TRUE) {
   COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
   if (SHOW == TRUE) {
-    graphics::plot(OUT$VEC, col = "grey80", pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE, asp = 1)
+    graphics::plot(
+      OUT$VEC,
+      col = "grey80",
+      pch = 16,
+      cex = 0.5,
+      xlab = "",
+      ylab = "",
+      axes = FALSE)
     graphics::rect(
       graphics::par("usr")[1],
       graphics::par("usr")[3],
@@ -488,8 +500,14 @@ vector.autoCenter <- function(OUT, UP = 0.9, SHOW = TRUE) {
   }
 
   if (SHOW == TRUE) {
-    # plot(OUT$VEC, col=OUT$COL, pch=16, cex=0.5 )
-    graphics::plot(OUT$VEC, col = OUT$ORIG.COL, pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE, asp = 1)
+    graphics::plot(
+      OUT$VEC,
+      col = OUT$ORIG.COL,
+      pch = 16,
+      cex = 0.5,
+      xlab = "",
+      ylab = "",
+      axes = FALSE)
     graphics::rect(
       graphics::par("usr")[1],
       graphics::par("usr")[3],
@@ -497,10 +515,30 @@ vector.autoCenter <- function(OUT, UP = 0.9, SHOW = TRUE) {
       graphics::par("usr")[4],
       col = NA,
       border = "black")
-    graphics::text(CENTER_VEC[HIGH, 1], CENTER_VEC[HIGH, 2], labels = PCH, cex = 1, pos = 2)
-    graphics::points(CENTER_VEC[HIGH, 1], CENTER_VEC[HIGH, 2], col = "black", pch = 16, cex = 1)
-    graphics::points(CENTER_VEC[SUMMIT, 1], CENTER_VEC[SUMMIT, 2], col = "black", pch = 16, cex = 1.5)
-    graphics::points(CENTER_VEC[SUMMIT, 1], CENTER_VEC[SUMMIT, 2], col = "red", pch = 16, cex = 1)
+    graphics::text(
+      CENTER_VEC[HIGH, 1],
+      CENTER_VEC[HIGH, 2],
+      labels = PCH,
+      cex = 1,
+      pos = 2)
+    graphics::points(
+      CENTER_VEC[HIGH, 1],
+      CENTER_VEC[HIGH, 2],
+      col = "black",
+      pch = 16,
+      cex = 1)
+    graphics::points(
+      CENTER_VEC[SUMMIT, 1],
+      CENTER_VEC[SUMMIT, 2],
+      col = "black",
+      pch = 16,
+      cex = 1.5)
+    graphics::points(
+      CENTER_VEC[SUMMIT, 1],
+      CENTER_VEC[SUMMIT, 2],
+      col = "red",
+      pch = 16,
+      cex = 1)
   }
 
   OUT$SCORE <- SCORE
@@ -522,11 +560,11 @@ vector.autoCenter <- function(OUT, UP = 0.9, SHOW = TRUE) {
 #' @param SHOW SHOW
 #' @param COL COL
 #' @param OL OL
-#' @param AL AL
+#' @param arrow_length2 arrow_length2
 #' @param CEX CEX
-#' @param AW AW
+#' @param arrow_width arrow_width
 #' @param BD BD
-#' @param AC AC
+#' @param arrow_color arrow_color
 #' @param SHOW.SUMMIT SHOW.SUMMIT
 #'
 #' @return output
@@ -537,11 +575,11 @@ vector.drawArrow <- function(
     SHOW = TRUE,
     COL = "grey70",
     OL = 1.5,
-    AL = 60,
+    arrow_length2 = 70,
     CEX = 0.5,
-    AW = 2,
+    arrow_width = 1,
     BD = TRUE,
-    AC = "grey20",
+    arrow_color = "grey30",
     SHOW.SUMMIT = TRUE) {
   USED <- OUT$USED
   DIST <- OUT$DIST
@@ -556,14 +594,17 @@ vector.drawArrow <- function(
   DIV <- 1 / P
 
   if (SHOW == TRUE) {
-    # plot(ALL_VEC,col=COL,pch=16,cex=CEX)
     if (BD == TRUE) {
       graphics::plot(
         ALL_VEC,
-        col = COL, pch = 16, cex = CEX,
+        col = COL,
+        pch = 16,
+        cex = CEX,
         xlim = c(min(ALL_VEC[, 1]) - one, max(ALL_VEC[, 1]) + one),
         ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one),
-        xlab = "", ylab = "", axes = FALSE, asp = 1
+        xlab = "",
+        ylab = "",
+        axes = FALSE
       )
       graphics::rect(
         graphics::par("usr")[1],
@@ -571,14 +612,21 @@ vector.drawArrow <- function(
         graphics::par("usr")[2],
         graphics::par("usr")[4],
         col = NA,
-        border = "black")
+        border = "black"
+      )
     } else {
       graphics::plot(
         ALL_VEC,
-        col = COL, pch = 16, cex = CEX,
+        col = COL,
+        pch = 16,
+        cex = CEX,
         xlim = c(min(ALL_VEC[, 1]) - one, max(ALL_VEC[, 1]) + one),
-        ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one), yaxt = "n", axes = F,
-        xlab = "", ylab = "", axes = FALSE, asp = 1
+        ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one),
+        yaxt = "n",
+        axes = F,
+        xlab = "",
+        ylab = "",
+        axes = FALSE
       )
       graphics::rect(
         graphics::par("usr")[1],
@@ -586,16 +634,20 @@ vector.drawArrow <- function(
         graphics::par("usr")[2],
         graphics::par("usr")[4],
         col = NA,
-        border = "black")
+        border = "black"
+      )
     }
   }
   N.SCORE <- .normX(SCORE)
-  SCORE.COL <- vector.vcol(N.SCORE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
+  SCORE.COL <- vector.vcol(
+    N.SCORE,
+    c(0, 0.5, 1),
+    c("#009FFF", "#FFF200", "#ec2F4B")
+  )
 
   A1_VEC <- c()
   A2_VEC <- c()
   A_LENGTH <- c()
-  # one=min(dist(USED_CENTER_VEC)) * OL
 
   i <- 1
   while (i <= length(USED)) {
@@ -614,45 +666,44 @@ vector.drawArrow <- function(
 
     this_p2_loc <- c(this_p1_loc[1] + final_vec[1], this_p1_loc[2] + final_vec[2])
 
-    # plot(ALL_VEC,col=COL,pch=16,cex=0.2)
-    # this_arrow_length=0.1*sqrt(sum(final_vec^2))
-    # this_arrow_length=sqrt(sum(final_vec^2))#0.1 #* (1+sqrt(sum(final_vec^2)))
-    this_arrow_length <- grDevices::dev.size()[1] / AL * sqrt(sum(final_vec^2)) / one # * sqrt(sum(final_vec^2)) #0.25
+    arrow_length <- grDevices::dev.size()[1] / arrow_length2 * sqrt(sum(final_vec^2)) / one # * sqrt(sum(final_vec^2)) #0.25
     if (SHOW == TRUE) {
-      this_arrow_col <- AC # grey20'
-      # if(AC==TRUE){this_arrow_col=SCORE.COL[i]}
       graphics::arrows(
-        x0 = this_p1_loc[1], y0 = this_p1_loc[2],
-        x1 = this_p2_loc[1], y1 = this_p2_loc[2],
-        lwd = AW, length = this_arrow_length,
-        col = this_arrow_col
-        # col=this_arrow_col#SCORE.COL[i]
+        x0 = this_p1_loc[1],
+        y0 = this_p1_loc[2],
+        x1 = this_p2_loc[1],
+        y1 = this_p2_loc[2],
+        lwd = arrow_width,
+        length = arrow_length,
+        col = arrow_color
       )
     }
     A1_VEC <- cbind(A1_VEC, this_p1_loc)
     A2_VEC <- cbind(A2_VEC, this_p2_loc)
-    A_LENGTH <- c(A_LENGTH, this_arrow_length)
+    A_LENGTH <- c(A_LENGTH, arrow_length)
     i <- i + 1
   }
 
   if (SHOW == TRUE & SHOW.SUMMIT == TRUE) {
-    # graphics::points(OUT$CENTER_VEC[OUT$SUMMIT,],col='black',pch=16,cex=1)
-    # graphics::points(OUT$CENTER_VEC[OUT$SUMMIT,],col='red',pch=16,cex=0.5)
     X1 <- min(OUT$CENTER_VEC[OUT$SUMMIT, 1]) - one / 10
     X2 <- max(OUT$CENTER_VEC[OUT$SUMMIT, 1]) + one / 10
     Y1 <- min(OUT$CENTER_VEC[OUT$SUMMIT, 2]) - one / 10
     Y2 <- max(OUT$CENTER_VEC[OUT$SUMMIT, 2]) + one / 10
 
     graphics::rect(
-      xleft = X1, ybottom = Y1, xright = X2, ytop = Y2, angle = 45,
-      col = NA, border = "#009FFF", lty = 1, lwd = 2
+      xleft = X1,
+      ybottom = Y1,
+      xright = X2,
+      ytop = Y2,
+      angle = 45,
+      col = NA,
+      border = "#009FFF",
+      lty = 1,
+      lwd = 2
     )
-    # rect(xleft=X1, ybottom=Y1, xright=X2, ytop=Y2, angle = 45,
-    # col = NA, border = 'black', lty = 2, lwd = 2)
   }
   A1_VEC <- t(A1_VEC)
   A2_VEC <- t(A2_VEC)
-  # OUT=list()
   OUT$A1_VEC <- A1_VEC
   OUT$A2_VEC <- A2_VEC
   OUT$A_LENGTH <- A_LENGTH

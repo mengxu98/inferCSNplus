@@ -8,7 +8,7 @@
 \usage{
 get.embedding(object, ...)
 
-\method{get.embedding}{default}(object, ...)
+\method{get.embedding}{default}(object, cores = 1, ...)
 
 \method{get.embedding}{Seurat}(object, ...)
 }
@@ -16,6 +16,8 @@ get.embedding(object, ...)
 \item{object}{The input data, a matrix with cells/samples by genes/features or a seurat object.}
 
 \item{...}{Arguments for other methods}
+
+\item{cores}{Using n threads for \code{\link[uwot]{umap}}.}
 }
 \value{
 Embedding information

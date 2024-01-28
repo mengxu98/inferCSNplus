@@ -10,11 +10,11 @@ vector.drawArrow(
   SHOW = TRUE,
   COL = "grey70",
   OL = 1.5,
-  AL = 60,
+  arrow_length2 = 70,
   CEX = 0.5,
-  AW = 2,
+  arrow_width = 1,
   BD = TRUE,
-  AC = "grey20",
+  arrow_color = "grey30",
   SHOW.SUMMIT = TRUE
 )
 }
@@ -29,15 +29,15 @@ vector.drawArrow(
 
 \item{OL}{OL}
 
-\item{AL}{AL}
+\item{arrow_length2}{arrow_length2}
 
 \item{CEX}{CEX}
 
-\item{AW}{AW}
+\item{arrow_width}{arrow_width}
 
 \item{BD}{BD}
 
-\item{AC}{AC}
+\item{arrow_color}{arrow_color}
 
 \item{SHOW.SUMMIT}{SHOW.SUMMIT}
 }
