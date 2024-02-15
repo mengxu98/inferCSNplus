@@ -118,11 +118,16 @@ network.heatmap <- function(weight_table,
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' # because `ggnetwork` package may be cause error
+#' # you can install `igraph 1.6.0` or lower to deal error
+#' # or waitting a new version of `ggnetwork` package
 #' library(inferCSN)
 #' data("example_matrix")
 #' weight_table <- inferCSN(example_matrix)
 #' g <- dynamic.networks(weight_table, regulators = weight_table[1, 1])
 #' g
+#' }
 dynamic.networks <- function(
     weight_table,
     regulators = NULL,

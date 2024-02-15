@@ -13,8 +13,8 @@ A method for inferring cell-specific gene regulatory network from single-cell se
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://mengxu98.github.io/inferCSN/}
-  \item Report bugs at \url{https://github.com/mengxu98/inferCSN/issues}
+  \item \url{https://mengxu98.github.io/inferCSNplus/}
+  \item Report bugs at \url{https://github.com/mengxu98/inferCSNplus/issues}
 }
 
 }
