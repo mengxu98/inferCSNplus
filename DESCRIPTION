@@ -13,6 +13,7 @@ BugReports: https://github.com/mengxu98/inferCSNplus/issues
 Depends: 
     R (>= 3.3.0)
 Imports:
+    cli,
     circlize,
     ComplexHeatmap,
     doParallel,
