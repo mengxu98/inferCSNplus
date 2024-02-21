@@ -95,7 +95,6 @@ reference:
   - print.inferCSNCV
   - predict.inferCSN
   - predict.inferCSNCV
-  - is.scalar
   - table.to.matrix
   - peaks.split
   - ranges.for.coords
@@ -108,6 +107,7 @@ reference:
   - extract.network
   - extract.nodes
   - extract.peak.tf.links
+  - is.sparse
 
 - subtitle: "Example data"
 - contents:
