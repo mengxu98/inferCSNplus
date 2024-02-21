@@ -106,7 +106,7 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/is.scalar.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN.logo.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/is.sparse.html</loc>
@@ -137,6 +137,9 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/print.inferCSN.html</loc>
+  </url>
+  <url>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/print.logo.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/promoter_regions_hg19.html</loc>
