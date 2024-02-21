@@ -8,7 +8,7 @@
 
 ## **Introduction**
 
-[*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/) is an package for inferring cell-specific gene regulatory network from single-cell sequencing data.
+[*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/) is an package for inferring cell-type-specific gene regulatory networks from single-cell omics data.
 
 <img src="man/figures/inferCSNplus.png" width="90%"/>
 
