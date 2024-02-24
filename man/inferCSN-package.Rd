@@ -3,12 +3,12 @@
 \docType{package}
 \name{inferCSN-package}
 \alias{inferCSN-package}
-\title{inferCSN: Inferring Cell-Specific Gene Regulatory Network}
+\title{Inferring cell-type-specific gene regulatory networks from single-cell omics data}
 \source{
 \url{https://github.com/mengxu98/inferCSN}
 }
 \description{
-A method for inferring cell-specific gene regulatory network from single-cell sequencing data.
+An package for inferring cell-type-specific gene regulatory networks from single-cell omics data.
 }
 \seealso{
 Useful links:
