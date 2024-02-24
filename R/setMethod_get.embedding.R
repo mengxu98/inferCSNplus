@@ -2,40 +2,42 @@
 #'
 #' @export
 #'
-#' @method get.embedding default
+#' @method get.dimensional default
 #'
-#' @rdname get.embedding
-get.embedding.default <- function(
+#' @rdname get.dimensional
+get.dimensional.default <- function(
     object,
     cores = 1,
     ...) {
-  pca_res <- gmodels::fast.prcomp(object)
-  pca_res <- pca_res$x
-  rownames(pca_res) <- rownames(object)
-  umap_res <- suppressMessages(uwot::umap(object, n_threads = cores))
+  pca_res <- stats::prcomp(object)
+  cell_embeddings <- pca_res$x
+  rownames(cell_embeddings) <- rownames(object)
+  umap_res <- suppressMessages(
+    uwot::umap(object, n_threads = cores)
+  )
   rownames(umap_res) <- rownames(object)
-  embedding <- list(
-    "PCA" = pca_res,
-    "UMAP" = umap_res
+  dimensional <- list(
+    "PCA" = cell_embeddings,
+    "UMAP" = umap_res,
+    "feature_loadings" = pca_res$rotation,
+    "sdev" = pca_res$sdev
   )
 
-  return(embedding)
+  return(dimensional)
 }
 
 #' @export
 #'
-#' @method get.embedding Seurat
+#' @method get.dimensional Seurat
 #'
-#' @rdname get.embedding
-get.embedding.Seurat <- function(object, ...) {
-  pca_res <- object@reductions$pca@cell.embeddings
-  rownames(pca_res) <- colnames(object)
-  umap_res <- object@reductions$umap@cell.embeddings
-  rownames(umap_res) <- colnames(object)
-  embedding <- list(
-    "PCA" = pca_res,
-    "UMAP" = umap_res
+#' @rdname get.dimensional
+get.dimensional.Seurat <- function(object, ...) {
+  dimensional <- list(
+    "PCA" = object@reductions$pca@cell.embeddings,
+    "UMAP" = object@reductions$umap@cell.embeddings,
+    "feature_loadings" = object@reductions$pca@feature.loadings,
+    "sdev" = object@reductions$pca@stdev
   )
 
-  return(embedding)
+  return(dimensional)
 }

@@ -34,20 +34,20 @@ setGeneric("inferCSN",
              UseMethod(generic = "inferCSN", object = object)
            })
 
-#' Get embedding information
+#' Get dimensional information
 #'
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
 #'
-#' @return Embedding information
+#' @return Dimensional information
 #' @export
 #'
 #' @examples
 #' library(inferCSN)
 #' data("example_matrix")
-#' embedding_information <- get.embedding(example_matrix)
-setGeneric("get.embedding",
+#' dimensional_information <- get.dimensional(example_matrix)
+setGeneric("get.dimensional",
            signature = "object",
            function(object, ...) {
-             UseMethod(generic = "get.embedding", object = object)
+             UseMethod(generic = "get.dimensional", object = object)
            })
