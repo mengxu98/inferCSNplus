@@ -3,6 +3,7 @@
 #include "RcppArmadillo.h"
 #include "Grid.h"
 #include "utils.h"
+
 // [[Rcpp::depends(RcppArmadillo)]]
 
 template <typename T>
@@ -73,20 +74,20 @@ GridParams<T> makeGridParams(const std::string Loss, const std::string Penalty,
 
 
 template <typename T>
-Rcpp::List _inferCSNFit(const T& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
-                       const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
-                       const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
-                       const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
-                       const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
-                       const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
-                       const std::vector< std::vector<double> > Lambdas, const std::size_t ExcludeFirstK,
-                       const bool Intercept,  const bool withBounds, const arma::vec &Lows,
-                       const arma::vec &Highs){
+Rcpp::List _SRM_model_fit(const T& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
+                          const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
+                          const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
+                          const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
+                          const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
+                          const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
+                          const std::vector< std::vector<double> > Lambdas, const std::size_t ExcludeFirstK,
+                          const bool Intercept,  const bool withBounds, const arma::vec &Lows,
+                          const arma::vec &Highs){
 
   GridParams<T> PG = makeGridParams<T>(Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows,
-                      Lambda2Max, Lambda2Min, PartialSort, MaxIters, rtol, atol, ActiveSet,
-                      ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize,
-                      LambdaU, Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
+                                       Lambda2Max, Lambda2Min, PartialSort, MaxIters, rtol, atol, ActiveSet,
+                                       ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize,
+                                       LambdaU, Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
 
   Grid<T> G(X, y, PG);
   G.Fit();
@@ -122,21 +123,21 @@ Rcpp::List _inferCSNFit(const T& X, const arma::vec& y, const std::string Loss, 
 }
 
 template <typename T>
-Rcpp::List _inferCSNCV(const T& X, const arma::vec& y, const std::string Loss,
-                      const std::string Penalty, const std::string Algorithm,
-                      const unsigned int NnzStopNum, const unsigned int G_ncols,
-                      const unsigned int G_nrows, const double Lambda2Max,
-                      const double Lambda2Min, const bool PartialSort,
-                      const unsigned int MaxIters, const double rtol,
-                      const double atol, const bool ActiveSet,
-                      const unsigned int ActiveSetNum,
-                      const unsigned int MaxNumSwaps, const double ScaleDownFactor,
-                      const unsigned int ScreenSize, const bool LambdaU,
-                      const std::vector< std::vector<double> > Lambdas,
-                      const unsigned int nfolds, const double seed,
-                      const unsigned int ExcludeFirstK, const bool Intercept,
-                      const bool withBounds, const arma::vec &Lows,
-                      const arma::vec &Highs){
+Rcpp::List _SRM_model_fit_CV(const T& X, const arma::vec& y, const std::string Loss,
+                             const std::string Penalty, const std::string Algorithm,
+                             const unsigned int NnzStopNum, const unsigned int G_ncols,
+                             const unsigned int G_nrows, const double Lambda2Max,
+                             const double Lambda2Min, const bool PartialSort,
+                             const unsigned int MaxIters, const double rtol,
+                             const double atol, const bool ActiveSet,
+                             const unsigned int ActiveSetNum,
+                             const unsigned int MaxNumSwaps, const double ScaleDownFactor,
+                             const unsigned int ScreenSize, const bool LambdaU,
+                             const std::vector< std::vector<double> > Lambdas,
+                             const unsigned int nfolds, const double seed,
+                             const unsigned int ExcludeFirstK, const bool Intercept,
+                             const bool withBounds, const arma::vec &Lows,
+                             const arma::vec &Highs){
 
   GridParams<T> PG = makeGridParams<T>(Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows,
                                        Lambda2Max, Lambda2Min, PartialSort, MaxIters, rtol, atol,
@@ -288,79 +289,79 @@ Rcpp::List _inferCSNCV(const T& X, const arma::vec& y, const std::string Loss,
 
 
 // [[Rcpp::export]]
-Rcpp::List inferCSNFit_sparse(const arma::sp_mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
-                      const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
-                      const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
-                      const bool PartialSort, const std::size_t MaxIters, const double rtol,
-                      const double atol, const bool ActiveSet, const std::size_t ActiveSetNum,
-                      const std::size_t MaxNumSwaps, const double ScaleDownFactor,
-                      const std::size_t ScreenSize, const bool LambdaU,
-                      const std::vector< std::vector<double> > Lambdas,
-                      const std::size_t ExcludeFirstK, const bool Intercept,
-                      const bool withBounds, const arma::vec &Lows, const arma::vec &Highs) {
+Rcpp::List SRM_model_fit_sparse(const arma::sp_mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
+                                const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
+                                const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
+                                const bool PartialSort, const std::size_t MaxIters, const double rtol,
+                                const double atol, const bool ActiveSet, const std::size_t ActiveSetNum,
+                                const std::size_t MaxNumSwaps, const double ScaleDownFactor,
+                                const std::size_t ScreenSize, const bool LambdaU,
+                                const std::vector< std::vector<double> > Lambdas,
+                                const std::size_t ExcludeFirstK, const bool Intercept,
+                                const bool withBounds, const arma::vec &Lows, const arma::vec &Highs) {
 
-  return _inferCSNFit(X, y, Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows, Lambda2Max, Lambda2Min,
-                     PartialSort, MaxIters, rtol, atol, ActiveSet, ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize, LambdaU,
-                     Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
+  return _SRM_model_fit(X, y, Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows, Lambda2Max, Lambda2Min,
+                        PartialSort, MaxIters, rtol, atol, ActiveSet, ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize, LambdaU,
+                        Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
 }
 
 
 // [[Rcpp::export]]
-Rcpp::List inferCSNFit_dense(const arma::mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
-                      const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
-                      const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
-                      const bool PartialSort, const std::size_t MaxIters, const double rtol,
-                      const double atol, const bool ActiveSet, const std::size_t ActiveSetNum,
-                      const std::size_t MaxNumSwaps, const double ScaleDownFactor,
-                      const std::size_t ScreenSize, const bool LambdaU,
-                      const std::vector< std::vector<double> > Lambdas,
-                      const std::size_t ExcludeFirstK, const bool Intercept,
-                      const bool withBounds, const arma::vec &Lows, const arma::vec &Highs) {
+Rcpp::List SRM_model_fit_dense(const arma::mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
+                               const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
+                               const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
+                               const bool PartialSort, const std::size_t MaxIters, const double rtol,
+                               const double atol, const bool ActiveSet, const std::size_t ActiveSetNum,
+                               const std::size_t MaxNumSwaps, const double ScaleDownFactor,
+                               const std::size_t ScreenSize, const bool LambdaU,
+                               const std::vector< std::vector<double> > Lambdas,
+                               const std::size_t ExcludeFirstK, const bool Intercept,
+                               const bool withBounds, const arma::vec &Lows, const arma::vec &Highs) {
 
-      return _inferCSNFit(X, y, Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows, Lambda2Max, Lambda2Min,
-                       PartialSort, MaxIters, rtol, atol, ActiveSet, ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize, LambdaU,
-                       Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
+  return _SRM_model_fit(X, y, Loss, Penalty, Algorithm, NnzStopNum, G_ncols, G_nrows, Lambda2Max, Lambda2Min,
+                        PartialSort, MaxIters, rtol, atol, ActiveSet, ActiveSetNum, MaxNumSwaps, ScaleDownFactor, ScreenSize, LambdaU,
+                        Lambdas, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
 }
 
 
 // [[Rcpp::export]]
-Rcpp::List inferCSNCV_sparse(const arma::sp_mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
-                     const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
-                     const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
-                     const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
-                     const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
-                     const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
-                     const std::vector< std::vector<double> > Lambdas, const std::size_t nfolds,
-                     const double seed, const std::size_t ExcludeFirstK, const bool Intercept,
-                     const bool withBounds, const arma::vec &Lows, const arma::vec &Highs){
+Rcpp::List SRM_model_fit_CV_sparse(const arma::sp_mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
+                                   const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
+                                   const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
+                                   const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
+                                   const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
+                                   const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
+                                   const std::vector< std::vector<double> > Lambdas, const std::size_t nfolds,
+                                   const double seed, const std::size_t ExcludeFirstK, const bool Intercept,
+                                   const bool withBounds, const arma::vec &Lows, const arma::vec &Highs){
 
-    return _inferCSNCV(X, y, Loss, Penalty,
-                      Algorithm, NnzStopNum, G_ncols, G_nrows,
-                      Lambda2Max, Lambda2Min, PartialSort,
-                      MaxIters, rtol,atol, ActiveSet,
-                      ActiveSetNum, MaxNumSwaps,
-                      ScaleDownFactor, ScreenSize, LambdaU, Lambdas,
-                      nfolds, seed, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
+  return _SRM_model_fit_CV(X, y, Loss, Penalty,
+                           Algorithm, NnzStopNum, G_ncols, G_nrows,
+                           Lambda2Max, Lambda2Min, PartialSort,
+                           MaxIters, rtol,atol, ActiveSet,
+                           ActiveSetNum, MaxNumSwaps,
+                           ScaleDownFactor, ScreenSize, LambdaU, Lambdas,
+                           nfolds, seed, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
 }
 
 // [[Rcpp::export]]
-Rcpp::List inferCSNCV_dense(const arma::mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
-                    const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
-                    const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
-                    const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
-                    const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
-                    const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
-                    const std::vector< std::vector<double> > Lambdas, const std::size_t nfolds,
-                    const double seed, const std::size_t ExcludeFirstK, const bool Intercept,
-                    const bool withBounds, const arma::vec &Lows, const arma::vec &Highs){
+Rcpp::List SRM_model_fit_CV_dense(const arma::mat& X, const arma::vec& y, const std::string Loss, const std::string Penalty,
+                                  const std::string Algorithm, const std::size_t NnzStopNum, const std::size_t G_ncols,
+                                  const std::size_t G_nrows, const double Lambda2Max, const double Lambda2Min,
+                                  const bool PartialSort, const std::size_t MaxIters, const double rtol, const double atol,
+                                  const bool ActiveSet, const std::size_t ActiveSetNum, const std::size_t MaxNumSwaps,
+                                  const double ScaleDownFactor, const std::size_t ScreenSize, const bool LambdaU,
+                                  const std::vector< std::vector<double> > Lambdas, const std::size_t nfolds,
+                                  const double seed, const std::size_t ExcludeFirstK, const bool Intercept,
+                                  const bool withBounds, const arma::vec &Lows, const arma::vec &Highs){
 
-  return _inferCSNCV(X, y, Loss, Penalty,
-                    Algorithm, NnzStopNum, G_ncols, G_nrows,
-                    Lambda2Max, Lambda2Min, PartialSort,
-                    MaxIters, rtol,atol, ActiveSet,
-                    ActiveSetNum, MaxNumSwaps,
-                    ScaleDownFactor, ScreenSize, LambdaU, Lambdas,
-                    nfolds, seed, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
+  return _SRM_model_fit_CV(X, y, Loss, Penalty,
+                           Algorithm, NnzStopNum, G_ncols, G_nrows,
+                           Lambda2Max, Lambda2Min, PartialSort,
+                           MaxIters, rtol,atol, ActiveSet,
+                           ActiveSetNum, MaxNumSwaps,
+                           ScaleDownFactor, ScreenSize, LambdaU, Lambdas,
+                           nfolds, seed, ExcludeFirstK, Intercept, withBounds, Lows, Highs);
 }
 
 // [[Rcpp::export]]
