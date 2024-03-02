@@ -142,8 +142,6 @@ sub.model.fit <- function(
   if (is(x, "sparseMatrix")) x <- as.matrix(x)
   y <- targets_matrix[, target]
 
-  if (is.null(regulators_num)) regulators_num <- ncol(x)
-
   coefficients <- sparse.regression(
     x, y,
     cross_validation = cross_validation,
@@ -201,7 +199,7 @@ model.fit <- function(
     x, y,
     penalty = "L0",
     algorithm = "CD",
-    regulators_num = 100,
+    regulators_num = NULL,
     cross_validation = FALSE,
     n_folds = 10,
     seed = 1,
@@ -226,6 +224,10 @@ model.fit <- function(
     lows = -Inf,
     highs = Inf) {
   # Check parameter values
+  if (is.null(regulators_num)) {
+    regulators_num <- ncol(x)
+  }
+
   if ((rtol < 0) || (rtol >= 1)) {
     stop("The specified rtol parameter must exist in [0, 1).")
   }
