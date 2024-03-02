@@ -87,7 +87,7 @@ inferCSN.default <- function(
 
     weight_table <- purrr::map_dfr(targets, function(x) {
       if (verbose) pb$tick()
-      sub.model.fit(
+      single.network(
         regulators_matrix = regulators_matrix,
         targets_matrix = targets_matrix,
         target = x,
@@ -109,9 +109,9 @@ inferCSN.default <- function(
     "%dopar%" <- foreach::"%dopar%"
     weight_list <- foreach::foreach(
       target = targets,
-      .export = c("sub.model.fit", "sparse.regression")
+      .export = c("single.network", "sparse.regression")
     ) %dopar% {
-      sub.model.fit(
+      single.network(
         regulators_matrix = regulators_matrix,
         targets_matrix = targets_matrix,
         target = target,
@@ -496,7 +496,7 @@ inferCSN.Seurat <- function(
         Y <- as.matrix(Y)
         target <- rownames(Y)
         regulators_matrix <- t(matrix)
-        weight_list[[i]] <- sub.model.fit(
+        weight_list[[i]] <- single.network(
           regulators_matrix = t(X),
           targets_matrix = t(matrix),
           target = target,
@@ -521,7 +521,7 @@ inferCSN.Seurat <- function(
     "%dopar%" <- foreach::"%dopar%"
     weight_list <- foreach::foreach(
       i = seq_along(targets),
-      .export = c("sub.model.fit", "sparse.regression")
+      .export = c("single.network", "sparse.regression")
     ) %dopar% {
       p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
       p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
@@ -548,7 +548,7 @@ inferCSN.Seurat <- function(
         target <- rownames(Y)
         regulators_matrix <- t(matrix)
         targets_matrix <- t(matrix)
-        sub.model.fit(
+        single.network(
           regulators_matrix = X,
           targets_matrix = Y,
           target = target,
