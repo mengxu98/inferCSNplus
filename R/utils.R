@@ -450,3 +450,23 @@ predict.SRM_fit_CV <- function(
 is.scalar <- function(x) {
   is.atomic(x) && length(x) == 1L && !is.character(x) && Im(x) == 0 && !is.nan(x) && !is.na(x)
 }
+
+#' normalization
+#'
+#' @param x A numeric vector.
+#' @param method Method for normalization.
+#'
+#' @return Normalized vector
+#' @export
+normalization <- function(
+    x,
+    method = "max_min") {
+  y <- switch(
+    EXPR = method,
+    "max_min" = ((x - min(x)) / (max(x) - min(x))),
+    "max" = (x / max(abs(x))),
+    "sum" = (x / sum(abs(x)))
+  )
+
+  return(y)
+}
