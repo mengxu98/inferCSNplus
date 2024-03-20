@@ -3,7 +3,6 @@
 #' @param filter_value filter_value
 #'
 #' @export
-#'
 peaks.filter <- function(
     object,
     filter_value = 0.9) {
