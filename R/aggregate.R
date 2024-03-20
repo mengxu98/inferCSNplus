@@ -49,8 +49,8 @@ aggregating.data <- function(
     }
     subobject <- subset(object, idents = uniqe_cluster[i])
     sub_index <- which(cluster %in% uniqe_cluster[i])
-    cell_coord_i <- cell_coord[sub_index, ]
-    sub_aggregated_data <- generate.aggregated.data(
+    cell_coord_i <- as.data.frame(cell_coord[sub_index, ])
+    sub_aggregated_data <- generate_aggregated_data(
       subobject,
       cell_coord_i,
       k_neigh,
@@ -127,7 +127,7 @@ aggregating.data <- function(
 #'
 #' @return Aggregated data.
 #' @export
-generate.aggregated.data <- function(
+generate_aggregated_data <- function(
     object,
     cell_coord,
     k_neigh = 50,
