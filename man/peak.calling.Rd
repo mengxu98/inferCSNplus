@@ -7,7 +7,7 @@
 peak.calling(object, fragments = NULL, macs2_path = NULL, verbose = FALSE)
 }
 \arguments{
-\item{object}{An expression matrix, cells by genes}
+\item{object}{An expression matrix, cells by genes.}
 
 \item{fragments}{fragments}
 
