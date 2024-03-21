@@ -1,4 +1,4 @@
-#' @param object An expression matrix, cells by genes
+#' @param object An expression matrix, cells by genes.
 #' @param penalty The type of regularization.
 #' This can take either one of the following choices: "L0" and "L0L2".
 #' For high-dimensional and sparse data, such as single-cell sequencing data, "L0L2" is more effective.
@@ -58,19 +58,18 @@ inferCSN.default <- function(
   )
 
   if (!is.null(regulators)) {
-    regulators_matrix <- matrix[, intersect(colnames(matrix), regulators)]
+    regulators <- intersect(colnames(matrix), regulators)
   } else {
-    regulators_matrix <- matrix
+    regulators <- colnames(matrix)
   }
 
   if (!is.null(targets)) {
-    targets_matrix <- matrix[, intersect(colnames(matrix), targets)]
+    targets <- intersect(colnames(matrix), targets)
   } else {
-    targets_matrix <- matrix
+    targets <- colnames(matrix)
   }
-  targets <- colnames(targets_matrix)
-  rm(matrix)
 
+  target <- NULL
   cores <- min(
     (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
   )
@@ -85,23 +84,25 @@ inferCSN.default <- function(
       width = 80
     )
 
-    weight_table <- purrr::map_dfr(targets, function(x) {
-      if (verbose) pb$tick()
-      single.network(
-        regulators_matrix = regulators_matrix,
-        targets_matrix = targets_matrix,
-        target = x,
-        cross_validation = cross_validation,
-        seed = seed,
-        penalty = penalty,
-        algorithm = algorithm,
-        n_folds = n_folds,
-        k_folds = k_folds,
-        r_threshold = r_threshold,
-        regulators_num = regulators_num,
-        verbose = verbose
-      )
-    })
+    weight_table <- purrr::map_dfr(
+      targets, function(target) {
+        if (verbose) pb$tick()
+        single.network(
+          matrix = matrix,
+          regulators = regulators,
+          target = target,
+          cross_validation = cross_validation,
+          seed = seed,
+          penalty = penalty,
+          algorithm = algorithm,
+          n_folds = n_folds,
+          k_folds = k_folds,
+          r_threshold = r_threshold,
+          regulators_num = regulators_num,
+          verbose = verbose
+        )
+      }
+    )
   } else {
     doParallel::registerDoParallel(cores = cores)
     if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
@@ -112,8 +113,8 @@ inferCSN.default <- function(
       .export = c("single.network", "sparse.regression")
     ) %dopar% {
       single.network(
-        regulators_matrix = regulators_matrix,
-        targets_matrix = targets_matrix,
+        matrix = matrix,
+        regulators = regulators,
         target = target,
         cross_validation = cross_validation,
         seed = seed,
@@ -130,8 +131,12 @@ inferCSN.default <- function(
     doParallel::stopImplicitCluster()
   }
 
-  weight_table <- weight_table[order(abs(as.numeric(weight_table$weight)), decreasing = TRUE), ]
+  weight_table <- net.format(
+    weight_table,
+    abs_weight = FALSE
+  )
   if (verbose) message("Run done.")
+
   return(weight_table)
 }
 
@@ -231,7 +236,13 @@ inferCSN.Seurat <- function(
     if (verbose) {
       message(paste0("Running for cluster: ", cluster, "."))
     }
-    object_sub <- subset(object, cluster == cluster[1])
+    object_sub <- subset(object, cluster == cluster)
+    if (ncol(object_sub) < 50) {
+      return()
+      next
+    }
+
+    targets <- dynamic.genes(object_sub)
 
     if (aggregate) {
       if ("aggregated_data" %in% names(Seurat::Misc(object_sub))) {
@@ -242,7 +253,7 @@ inferCSN.Seurat <- function(
           k_neigh = k_neigh,
           atacbinary = atacbinary,
           max_overlap = max_overlap,
-          reduction_name = NULL,
+          reduction_name = reduction_name,
           size_factor_normalize = size_factor_normalize,
           verbose = verbose
         )
@@ -258,34 +269,26 @@ inferCSN.Seurat <- function(
       }
     } else {
       if ("RNA" %in% names(object_sub@assays)) {
-        data_rna <- matrix(
-          0,
-          nrow = nrow(object_sub@assays$RNA$counts),
-          ncol = 1
-        )
+        data_rna <- Matrix::as.matrix(object_sub@assays$RNA$data)
       }
       if ("ATAC" %in% names(object_sub@assays)) {
-        data_atac <- matrix(
-          0,
-          nrow = nrow(object_sub@assays$ATAC@counts),
-          ncol = 1
-        )
+        data_atac <- Matrix::as.matrix(object_sub@assays$ATAC$data)
       }
     }
 
-    if ("RNA" %in% names(agg_data)) {
+    if ("RNA" %in% names(object_sub@assays)) {
       Seurat::DefaultAssay(object_sub) <- "RNA"
-      if (is.null(targets)) {
-        # targets <- Seurat::VariableFeatures(object = object)
-        if ("all_markers_list" %in% names(Seurat::Misc(object))) {
-          all_markers_list <- Seurat::Misc(object_sub, slot = "all_markers_list")
-        }
-        all_markers_list <- as.data.frame(all_markers_list)
-        focused_markers <- all_markers_list[which(
-          all_markers_list$cluster %in% cluster
-        ), , drop = FALSE]
-        targets <- focused_markers$gene
-      }
+      # if (is.null(targets)) {
+      #   # targets <- Seurat::VariableFeatures(object = object)
+      #   if ("all_markers_list" %in% names(Seurat::Misc(object))) {
+      #     all_markers_list <- Seurat::Misc(object_sub, slot = "all_markers_list")
+      #   }
+      #   all_markers_list <- as.data.frame(all_markers_list)
+      #   focused_markers <- all_markers_list[which(
+      #     all_markers_list$cluster %in% cluster
+      #   ), , drop = FALSE]
+      #   targets <- focused_markers$gene
+      # }
       weight_table_rna <- inferCSN(
         t(data_rna),
         penalty = penalty,
