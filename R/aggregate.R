@@ -17,8 +17,8 @@ aggregating.data <- function(
     seed = 123,
     verbose = FALSE) {
   if (verbose) {
-    message("---Because 'aggregate = TRUE', and there is no aggregated data in seurat object.")
-    message("---Generating aggregated data, and using 'names(Seurat::Misc(object))' to check it.")
+    message("---Setting 'aggregate = TRUE', and there is no aggregated data in seurat object.")
+    message("---Aggregating data, and using 'names(Seurat::Misc(object))' to check it.")
   }
   if (!is.null(reduction_name)) {
     cell_coord <- object@reductions[[reduction_name]]
@@ -27,7 +27,7 @@ aggregating.data <- function(
       cell_coord <- object@reductions$wnn.umap@cell.embeddings
     } else {
       if ("umap" %in% names(object@reductions)) {
-        cell_coord <- object@reductions[["umap"]]@cell.embeddings
+        cell_coord <- object@reductions$umap@cell.embeddings
       }
     }
   }
