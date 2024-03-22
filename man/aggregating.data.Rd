@@ -16,7 +16,7 @@ aggregating.data(
 )
 }
 \arguments{
-\item{object}{An expression matrix, cells by genes}
+\item{object}{An expression matrix, cells by genes.}
 
 \item{k_neigh}{Number of cells to be aggregated per cluster.}
 
