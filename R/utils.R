@@ -166,7 +166,8 @@ table.to.matrix <- function(
   weight_matrix <- filter_sort.matrix(
     weight_matrix,
     regulators = regulators,
-    targets = targets)
+    targets = targets
+  )
 
   return(weight_matrix)
 }
