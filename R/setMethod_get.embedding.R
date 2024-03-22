@@ -1,4 +1,5 @@
 #' @param cores Using n threads for \code{\link[uwot]{umap}}.
+#' @param seed Set a random seed, default sets to 1.
 #'
 #' @export
 #'
@@ -8,7 +9,10 @@
 get.dimensional.default <- function(
     object,
     cores = 1,
+    seed = 1,
     ...) {
+  set.seed(seed = seed)
+
   pca_res <- stats::prcomp(object)
   cell_embeddings <- pca_res$x
   rownames(cell_embeddings) <- rownames(object)
@@ -22,9 +26,11 @@ get.dimensional.default <- function(
     "feature_loadings" = pca_res$rotation,
     "sdev" = pca_res$sdev
   )
+  class(dimensional) <- "VERTOR_dimension"
 
   return(dimensional)
 }
+
 
 #' @export
 #'
@@ -38,6 +44,7 @@ get.dimensional.Seurat <- function(object, ...) {
     "feature_loadings" = object@reductions$pca@feature.loadings,
     "sdev" = object@reductions$pca@stdev
   )
+  class(dimensional) <- "VERTOR_dimension"
 
   return(dimensional)
 }
