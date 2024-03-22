@@ -8,7 +8,7 @@
 \usage{
 get.dimensional(object, ...)
 
-\method{get.dimensional}{default}(object, cores = 1, ...)
+\method{get.dimensional}{default}(object, cores = 1, seed = 1, ...)
 
 \method{get.dimensional}{Seurat}(object, ...)
 }
@@ -18,6 +18,8 @@ get.dimensional(object, ...)
 \item{...}{Arguments for other methods}
 
 \item{cores}{Using n threads for \code{\link[uwot]{umap}}.}
+
+\item{seed}{Set a random seed, default sets to 1.}
 }
 \value{
 Dimensional information
