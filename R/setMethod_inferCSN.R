@@ -76,7 +76,7 @@ inferCSN.default <- function(
   if (cores == 1) {
     if (verbose) message("Using 1 core.")
     # Format progress information
-    format <- "Running [:bar] :percent, No.:current of :total genes, :elapsed."
+    format <- "Running [:bar] :percent, No.:current of :total targets, :elapsed."
     pb <- progress::progress_bar$new(
       format = format,
       total = length(targets),
@@ -278,17 +278,6 @@ inferCSN.Seurat <- function(
 
     if ("RNA" %in% names(object_sub@assays)) {
       Seurat::DefaultAssay(object_sub) <- "RNA"
-      # if (is.null(targets)) {
-      #   # targets <- Seurat::VariableFeatures(object = object)
-      #   if ("all_markers_list" %in% names(Seurat::Misc(object))) {
-      #     all_markers_list <- Seurat::Misc(object_sub, slot = "all_markers_list")
-      #   }
-      #   all_markers_list <- as.data.frame(all_markers_list)
-      #   focused_markers <- all_markers_list[which(
-      #     all_markers_list$cluster %in% cluster
-      #   ), , drop = FALSE]
-      #   targets <- focused_markers$gene
-      # }
       weight_table_rna <- inferCSN(
         t(data_rna),
         penalty = penalty,
@@ -298,17 +287,13 @@ inferCSN.Seurat <- function(
         n_folds = n_folds,
         k_folds = k_folds,
         r_threshold = r_threshold,
-        regulators = targets,
+        regulators = regulators,
         targets = targets,
         regulators_num = regulators_num,
         verbose = verbose,
         cores = cores
       )
 
-      weight_table_rna <- weight_table_rna[order(
-        abs(as.numeric(weight_table_rna$weight)),
-        decreasing = TRUE
-      ), ]
       weight_table_rna_list[[c]] <- weight_table_rna
     }
 
@@ -400,9 +385,15 @@ inferCSN.Seurat <- function(
     if (verbose) message(paste0("Run done for cluster: ", cluster, "."))
   }
 
-  names(weight_table_rna_list) <- clusters
-  names(weight_table_atac_list) <- clusters
-  names(weight_table_final_list) <- clusters
+  if ("RNA" %in% names(object_sub@assays)) {
+    names(weight_table_rna_list) <- clusters
+  }
+  if ("ATAC" %in% names(object_sub@assays)) {
+    names(weight_table_atac_list) <- clusters
+  }
+  if (all(c("RNA", "ATAC") %in% names(object_sub@assays))) {
+    names(weight_table_final_list) <- clusters
+  }
 
   # save result
   Seurat::Misc(object, slot = "weight_table_rna_list") <- weight_table_rna_list
@@ -462,7 +453,7 @@ inferCSN.Seurat <- function(
   if (cores == 1) {
     if (verbose) message("Using 1 core.")
     # Format progress information
-    format <- "Running [:bar] :percent, No.:current of :total peaks, :elapsed."
+    format <- "Running [:bar] :percent, No.:current of :total targets, :elapsed."
     pb <- progress::progress_bar$new(
       format = format,
       total = length(targets),
