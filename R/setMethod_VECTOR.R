@@ -1,5 +1,3 @@
-#' inferVECTOR
-#'
 #' @param object The information of PCA and UMAP.
 #' @param plot Logical value.
 #'
@@ -106,7 +104,6 @@ inferVECTOR.matrix <- function(
   return(object)
 }
 
-#'
 #' @method inferVECTOR Seurat
 #'
 #' @rdname inferVECTOR

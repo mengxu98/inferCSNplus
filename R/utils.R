@@ -462,12 +462,15 @@ is.scalar <- function(x) {
 normalization <- function(
     x,
     method = "max_min") {
-  y <- switch(
+  na_index <- which(is.na(x))
+  x[na_index] <- 0
+  x <- switch(
     EXPR = method,
     "max_min" = ((x - min(x)) / (max(x) - min(x))),
     "max" = (x / max(abs(x))),
     "sum" = (x / sum(abs(x)))
   )
+  x[na_index] <- NA
 
-  return(y)
+  return(x)
 }

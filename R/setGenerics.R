@@ -1,4 +1,4 @@
-#' Inferring Cell-Specific Gene Regulatory Network
+#' @title Inferring Cell-Specific Gene Regulatory Network
 #'
 #' @useDynLib inferCSN
 #'
@@ -41,7 +41,7 @@ setGeneric(
   }
 )
 
-#' Get dimensional information
+#' @title Get dimensional information
 #'
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
@@ -61,7 +61,7 @@ setGeneric(
   }
 )
 
-#' Get dimensional information
+#' @title infer VECTOR
 #'
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
@@ -81,7 +81,7 @@ setGeneric(
   }
 )
 
-#' Get dimensional information
+#' @title Get dynamic genes
 #'
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
@@ -93,5 +93,20 @@ setGeneric(
   signature = "object",
   function(object, ...) {
     UseMethod(generic = "dynamic.genes", object = object)
+  }
+)
+
+#' @title get_pseudotime
+#'
+#' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
+#' @param ... Arguments for other methods
+#'
+#' @return Dimensional information
+#' @export
+setGeneric(
+  "get.pseudotime",
+  signature = "object",
+  function(object, ...) {
+    UseMethod(generic = "get.pseudotime", object = object)
   }
 )

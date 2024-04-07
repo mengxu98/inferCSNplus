@@ -6,7 +6,7 @@
 \alias{inferVECTOR.VERTOR_dimension}
 \alias{inferVECTOR.matrix}
 \alias{inferVECTOR.Seurat}
-\title{Get dimensional information}
+\title{infer VECTOR}
 \usage{
 inferVECTOR(object, ...)
 
@@ -34,9 +34,7 @@ Dimensional information
 vector result
 }
 \description{
-Get dimensional information
-
-inferVECTOR
+infer VECTOR
 }
 \examples{
 library(inferCSN)

@@ -335,7 +335,10 @@ vector.gridValue <- function(OUT, plot = TRUE) {
 #'
 #' @return output
 #' @export
-vector.autoCenter <- function(OUT, UP = 0.9, plot = TRUE) {
+vector.autoCenter <- function(
+    OUT,
+    UP = 0.9,
+    plot = TRUE) {
   DIST <- OUT$DIST
   USED <- OUT$USED
   USED_NAME <- OUT$USED_NAME
