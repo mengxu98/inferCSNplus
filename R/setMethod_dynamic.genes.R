@@ -113,7 +113,7 @@ findDynGenes <- function(
 
   object <- object[, meta_data$cells]
 
-  gpChr <- gamFit(object, meta_data$pseudotime)
+  dynamic_genes <- gamFit(object, meta_data$pseudotime)
   cells <- data.frame(
     cells = meta_data$cells,
     pseudotime = meta_data$pseudotime,
@@ -121,12 +121,10 @@ findDynGenes <- function(
   )
   cells <- cells[order(cells$pseudotime), ]
 
-  ans <- list(genes = gpChr, cells = cells)
+  ans <- list(genes = dynamic_genes, cells = cells)
 
   ans
 }
-
-
 
 #' @export
 #'
@@ -190,13 +188,6 @@ dynamic.genes.Seurat <- function(
   return(genes)
 }
 
-
-
-
-
-
-
-
 #' find genes expressed dynamically
 #'
 #' @param object properly normalized expression matrix
@@ -205,6 +196,7 @@ dynamic.genes.Seurat <- function(
 #' @param group_column column name in meta_data annotating groups in the cluster_by
 #' @param pseudotime_column column name in meta_data annotating pseudotime or latent time
 #' @param min_cells min cells
+#' @param p_value p_value = 0.05
 #'
 #' @return pvals and cell info
 #'
@@ -215,7 +207,8 @@ findDynGenes_new <- function(
     cluster_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
-    min_cells = 100) {
+    min_cells = 100,
+    p_value = 0.05) {
   meta_data$pseudotime <- meta_data[, pseudotime_column]
   meta_data <- meta_data[which(!is.na(meta_data$pseudotime)), ]
 
@@ -250,14 +243,19 @@ findDynGenes_new <- function(
 
       object <- object[, x$cells]
 
-      gpChr <- gamFit(object, x$pseudotime)
+      dynamic_genes <- gamFit(object, x$pseudotime)
+      dynamic_genes <- as.data.frame(dynamic_genes)
+      dynamic_genes$genes <- rownames(dynamic_genes)
+      dynamic_genes <- dynamic_genes[dynamic_genes$dynamic_genes < p_value, ]
+      dynamic_genes <- na.omit(dynamic_genes)
+
       cells <- data.frame(
         cells = x$cells,
         pseudotime = x$pseudotime,
         group = as.vector(x$cluster)
       )
       cells <- cells[order(cells$pseudotime), ]
-      res <- list(genes = gpChr, cells = cells)
+      res <- list(genes = dynamic_genes, cells = cells)
 
       return(res)
     }
@@ -400,7 +398,7 @@ define_epochs_new <- function(
 #'
 #' @return epochs a list detailing genes active in each epoch
 #' @export
-assign_epochs_new <- function(
+assign_epochs_new1 <- function(
     matrix,
     dynamic_object,
     method = "active_expression",
@@ -555,3 +553,155 @@ assign_epochs_new <- function(
   epochs
 }
 
+#' Assigns genes to epochs
+#'
+#' @param matrix genes-by-cells expression matrix
+#' @param dynamic_object individual path result of running define_epochs
+#' @param method method of assigning epoch genes, either "active_expression" (looks for active expression in epoch) or "DE" (looks for differentially expressed genes per epoch)
+#' @param p_value pval threshold if gene is dynamically expressed
+#' @param pThresh_DE pval if gene is differentially expressed. Ignored if method is active_expression.
+#' @param active_thresh value between 0 and 1. Percent threshold to define activity
+#' @param toScale whether or not to scale the data
+#' @param forceGenes whether or not to rescue orphan dyanmic genes, forcing assignment into epoch with max expression.
+#'
+#' @return epochs a list detailing genes active in each epoch
+#' @export
+assign_epochs_new <- function(
+    matrix,
+    dynamic_object,
+    method = "active_expression",
+    p_value = 0.05,
+    pThresh_DE = 0.05,
+    active_thresh = 0.33,
+    toScale = FALSE,
+    forceGenes = TRUE) {
+  if (active_thresh < 0 | active_thresh > 1) {
+    stop("active_thresh must be between 0 and 1.")
+  }
+  message("Starting.")
+
+  dynamic_object <- dynamic_object[[2]]
+  # limit exp to dynamically expressed genes
+  dynamic_genes <- dynamic_object$genes
+  dynamic_genes <- dynamic_genes[dynamic_genes$dynamic_genes < p_value, ]$genes
+  exp <- Matrix::as.matrix(
+    matrix[intersect(rownames(matrix), dynamic_genes), ]
+  )
+  # scale the data if needed
+  if (toScale) {
+    if (class(exp)[1] != "matrix") {
+      exp <- t(scale(Matrix::t(exp)))
+    } else {
+      exp <- t(scale(t(exp)))
+    }
+  }
+
+  # Assign epochs based on assignment in dynamic_object$cells$epoch
+  # create empty list to contain active genes
+  epoch_names <- unique(dynamic_object$cells$group)
+  epochs <- vector("list", length(epoch_names))
+  names(epochs) <- epoch_names
+
+  navg <- ceiling(ncol(exp) * 0.05)
+  # compute thresholds for each gene
+  # for each gene, order expression --- compute top as average of top 5%, bottom as average of bottom 5%
+  # set threshold (active/inactive) as midpoint (or maybe 1/3 in case gene is expressed at different levels) between top and bottom
+  thresholds <- data.frame(
+    gene = rownames(exp),
+    thresh = rep(0, length(rownames(exp)))
+  )
+  rownames(thresholds) <- thresholds$gene
+  for (gene in rownames(exp)) {
+    profile <- exp[gene, ][order(exp[gene, ], decreasing = FALSE)]
+    bottom <- mean(profile[1:navg])
+    top <- mean(profile[(length(profile) - navg):length(profile)])
+
+    thresh <- ((top - bottom) * active_thresh) + bottom
+    thresholds[gene, "thresh"] <- thresh
+  }
+
+  mean_expression <- data.frame(
+    gene = character(),
+    epoch = numeric(),
+    mean_expression = numeric()
+  )
+  if (method == "active_expression") {
+    # determine activity based on average expression in each epoch
+    for (epoch in names(epochs)) {
+      # chunk_cells <- rownames(dynamic_object$cells[dynamic_object$cells$epoch == epoch, ])
+      # chunk_cells <- dynamic_object$cells[dynamic_object$cells$epoch == epoch, "cells"]
+      chunk_cells <- dynamic_object$cells[dynamic_object$cells$group == epoch, "cells"]
+      # chunk_cells <- dynamic_object$cells[, "cells"]
+      chunk <- exp[, chunk_cells]
+
+      chunk_df <- data.frame(means = rowMeans(chunk))
+      chunk_df <- cbind(chunk_df, thresholds)
+      chunk_df$active <- (chunk_df$means >= chunk_df$thresh)
+
+      epochs[[epoch]] <- rownames(chunk_df[chunk_df$active, ])
+
+      mean_expression <- rbind(
+        mean_expression,
+        data.frame(
+          gene = rownames(chunk),
+          epoch = rep(epoch, length(rownames(chunk))),
+          mean_expression = rowMeans(chunk)
+        )
+      )
+    }
+  } else {
+    # Data is scaled and log-normalized. Use t-test here
+    for (epoch in names(epochs)) {
+      # chunk_cells <- rownames(dynamic_object$cells[dynamic_object$cells$epoch == epoch, ])
+      chunk_cells <- dynamic_object$cells[dynamic_object$cells$epoch == epoch, "cells"]
+      chunk <- exp[, chunk_cells]
+
+      background <- exp[, !(colnames(exp) %in% chunk_cells)]
+
+      diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
+      for (gene in rownames(exp)) {
+        t <- t.test(chunk[gene, ], background[gene, ])
+        ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        diffres <- rbind(diffres, ans)
+      }
+
+      diffres$padj <- p.adjust(diffres$pval, method = "BH")
+      diffres <- diffres[diffres$mean_diff > 0, ] # Filter for genes that are on
+
+      epochs[[epoch]] <- diffres$gene[diffres$padj < pThresh_DE]
+
+      # Filter for genes that are actively expressed
+      chunk_df <- data.frame(means = rowMeans(chunk))
+      chunk_df <- cbind(chunk_df, thresholds)
+      chunk_df$active <- (chunk_df$means >= chunk_df$thresh)
+
+      epochs[[epoch]] <- intersect(epochs[[epoch]], rownames(chunk_df[chunk_df$active, ]))
+
+      mean_expression <- rbind(
+        mean_expression,
+        data.frame(
+          gene = rownames(chunk),
+          epoch = rep(epoch, length(rownames(chunk))),
+          mean_expression = rowMeans(chunk)
+        )
+      )
+    }
+  }
+
+  # some dynamically assigned genes may not be assigned to any epoch
+  # if forceGenes, then assign these orphan genes to the epoch in which they have max expression
+  if (forceGenes) {
+    assignedGenes <- unique(unlist(epochs))
+    orphanGenes <- setdiff(rownames(exp), assignedGenes)
+    message("There are ", length(orphanGenes), " orphan genes\n")
+    for (oGene in orphanGenes) {
+      xdat <- mean_expression[mean_expression$gene == oGene, ]
+      ep <- xdat[which.max(xdat$mean_expression), ]$epoch
+      epochs[[ep]] <- append(epochs[[ep]], oGene)
+    }
+  }
+
+  epochs$mean_expression <- mean_expression
+
+  epochs
+}
