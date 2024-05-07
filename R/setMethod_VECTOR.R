@@ -14,7 +14,7 @@ inferVECTOR.default <- function(
   return(inferVECTOR(object))
 }
 
-#' @method inferVECTOR VERTOR_dimension
+#' @method inferVECTOR VECTOR_dimension
 #'
 #' @rdname inferVECTOR
 #'
@@ -23,7 +23,7 @@ inferVECTOR.default <- function(
 #' data("example_matrix")
 #' dimensional_information <- get.dimensional(example_matrix)
 #' vector_result <- inferVECTOR(dimensional_information)
-inferVECTOR.VERTOR_dimension <- function(
+inferVECTOR.VECTOR_dimension <- function(
     object,
     plot = TRUE,
     ...) {
@@ -91,9 +91,17 @@ inferVECTOR.matrix <- function(
     rownames(object) <- paste0(rep("cell_", nrow(object)), 1:nrow(object))
   }
   pseudotime <- result$P.PS[selected]
-  pseudotime <- (pseudotime - min(pseudotime)) / (max(pseudotime) - min(pseudotime))
-  object <- new(
-    Class = "VECTOR",
+  pseudotime <- normalization(pseudotime, method = "max_min")
+
+  # object <- new(
+  #   Class = "VECTOR",
+  #   matrix = object,
+  #   pseudotime = data.frame(
+  #     cells = rownames(object),
+  #     pseudotime = pseudotime
+  #   )
+  # )
+  object <- list(
     matrix = object,
     pseudotime = data.frame(
       cells = rownames(object),

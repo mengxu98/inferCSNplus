@@ -3,7 +3,7 @@
 \name{inferVECTOR}
 \alias{inferVECTOR}
 \alias{inferVECTOR.default}
-\alias{inferVECTOR.VERTOR_dimension}
+\alias{inferVECTOR.VECTOR_dimension}
 \alias{inferVECTOR.matrix}
 \alias{inferVECTOR.Seurat}
 \title{infer VECTOR}
@@ -12,7 +12,7 @@ inferVECTOR(object, ...)
 
 \method{inferVECTOR}{default}(object, plot = TRUE, ...)
 
-\method{inferVECTOR}{VERTOR_dimension}(object, plot = TRUE, ...)
+\method{inferVECTOR}{VECTOR_dimension}(object, plot = TRUE, ...)
 
 \method{inferVECTOR}{matrix}(object, filter = TRUE, plot = TRUE, ...)
 

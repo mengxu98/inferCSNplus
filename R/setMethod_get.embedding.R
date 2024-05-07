@@ -26,7 +26,7 @@ get.dimensional.default <- function(
     "feature_loadings" = pca_res$rotation,
     "sdev" = pca_res$sdev
   )
-  class(dimensional) <- "VERTOR_dimension"
+  class(dimensional) <- "VECTOR_dimension"
 
   return(dimensional)
 }
@@ -44,7 +44,7 @@ get.dimensional.Seurat <- function(object, ...) {
     "feature_loadings" = object@reductions$pca@feature.loadings,
     "sdev" = object@reductions$pca@stdev
   )
-  class(dimensional) <- "VERTOR_dimension"
+  class(dimensional) <- "VECTOR_dimension"
 
   return(dimensional)
 }

@@ -16,7 +16,7 @@ aggregating.data <- function(
     size_factor_normalize = TRUE,
     seed = 123,
     verbose = FALSE) {
-  if (verbose) {
+  if (verbose == 2) {
     message("---Setting 'aggregate = TRUE', and there is no aggregated data in seurat object.")
     message("---Aggregating data, and using 'names(Seurat::Misc(object))' to check it.")
   }
@@ -299,6 +299,7 @@ as.slam.matrix <- function(sp_mat) {
 }
 
 #' is.sparse
+#'
 #' @param x Data
 #' @export
 is.sparse <- function(x) {
@@ -377,6 +378,7 @@ estimate.size.factors.sparse <- function(
   }
 
   sfs[is.na(sfs)] <- 1
+
   return(sfs)
 }
 

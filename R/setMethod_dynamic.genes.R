@@ -10,14 +10,14 @@
 #' @method dynamic.genes default
 #'
 #' @rdname dynamic.genes
-
+#'
 #' @examples
 #' library(inferCSN)
 #' data("example_matrix")
 #' vector_result <- inferVECTOR(example_matrix)
 #' dynamic.genes(
-#'   object = t(vector_result@matrix),
-#'   pseudotime = vector_result@pseudotime[, 2]
+#'   object = t(vector_result$matrix),
+#'   pseudotime = vector_result$pseudotime[, 2]
 #' )
 dynamic.genes.default <- function(
     object,
@@ -28,7 +28,7 @@ dynamic.genes.default <- function(
     return(rownames(object))
   }
   sorted_genes <- names(
-    sort(apply(object, 1, var), decreasing = TRUE)
+    sort(apply(object, 1, stats::var), decreasing = TRUE)
   )
   object <- object[sorted_genes, ]
 
@@ -50,7 +50,7 @@ dynamic.genes.default <- function(
       )
     }
   )
-  res$fdr <- p.adjust(res$P_value, method = "BH")
+  res$fdr <- stats::p.adjust(res$P_value, method = "BH")
   genes <- res[res$fdr < fdr_threshold, 1]
   if (length(genes) < 3) {
     genes <- sorted_genes
@@ -61,8 +61,6 @@ dynamic.genes.default <- function(
 gamFit <- function(
     matrix,
     celltime) {
-  message("Starting gammma.")
-  # could print out if any missing
   ans <- apply(matrix, 1, function(z) {
     d <- data.frame(z = z, t = celltime)
     tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
@@ -126,29 +124,6 @@ findDynGenes <- function(
   ans
 }
 
-#' @export
-#'
-#' @method dynamic.genes VECTOR
-#'
-#' @rdname dynamic.genes
-#' @examples
-#' library(inferCSN)
-#' data("example_matrix")
-#' vector_result <- inferVECTOR(example_matrix)
-#' dynamic.genes(vector_result)
-dynamic.genes.VECTOR <- function(
-    object,
-    fdr_threshold = 0.05,
-    ...) {
-  genes <- dynamic.genes(
-    t(object@matrix),
-    pseudotime = object@pseudotime[, 2],
-    fdr_threshold = fdr_threshold
-  )
-
-  return(genes)
-}
-
 #' @param cluster cluster
 #' @param group_by idents
 #' @param slot slot used
@@ -197,52 +172,47 @@ dynamic.genes.Seurat <- function(
 #' @param pseudotime_column column name in meta_data annotating pseudotime or latent time
 #' @param min_cells min cells
 #' @param p_value p_value = 0.05
+#' @param verbose verbose
 #'
 #' @return pvals and cell info
 #'
 #' @export
-findDynGenes_new <- function(
+dynamic.genes_new <- function(
     object,
     meta_data,
     cluster_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
     min_cells = 100,
-    p_value = 0.05) {
+    p_value = 0.05,
+    verbose = FALSE) {
   meta_data$pseudotime <- meta_data[, pseudotime_column]
   meta_data <- meta_data[which(!is.na(meta_data$pseudotime)), ]
 
   meta_data$cluster <- meta_data[, group_column]
   meta_data$cells <- rownames(meta_data)
 
-  # if (is.null(cluster_by)) { # 这里是用不同细胞类型，后续添加一个参数，不区分细胞类型，使用所有细胞
-  #   cluster_by <- unique(meta_data[, group_column])
-  # }
-  #
-  # meta_data_list <- purrr::map(
-  #   cluster_by, function(x) {
-  #     res <- filter(meta_data, cluster == x)
-  #     if (nrow(res) < min_cells) {
-  #       return(NULL)
-  #     }
-  #     return(res)
-  #   }
-  # )
-  # names(meta_data_list) <- cluster_by
-  meta_data_list <- dynamic.windowing(meta_data)
-  cluster_by <- names(meta_data_list)
+  meta_data_list <- dynamic.windowing(
+    meta_data,
+    group_column = "cluster",
+    pseudotime_column = "pseudotime",
+    min_cells = min_cells
+  )
 
-  dynamic_genes_list <- lapply(
-    meta_data_list, function(x) {
+  cluster_by <- names(meta_data_list)
+  dynamic_genes_list <- purrr::map(
+    cluster_by, function(x) {
+      cluster <- x
+      x <- meta_data_list[[x]]
       if (is.null(x)) {
-        return(NULL)
-      }
-      if (nrow(x) < min_cells) {
+        message(cluster, " not existed.")
+        log_message()
         return(NULL)
       }
 
       object <- object[, x$cells]
 
+      message("Starting gammma for cluster: ", cluster, ".")
       dynamic_genes <- gamFit(object, x$pseudotime)
       dynamic_genes <- as.data.frame(dynamic_genes)
       dynamic_genes$genes <- rownames(dynamic_genes)
@@ -260,6 +230,7 @@ findDynGenes_new <- function(
       return(res)
     }
   )
+
   names(dynamic_genes_list) <- cluster_by
 
   meta_data_list <- meta_data_list[!purrr::map_lgl(meta_data_list, is.null)]
@@ -282,6 +253,8 @@ findDynGenes_new <- function(
 #' @param num_epochs number of epochs to define. Ignored if epoch_transitions, pseudotime_cuts, or group_assignments are provided.
 #' @param pseudotime_cuts vector of pseudotime cutoffs. If NULL, cuts are set to max(pseudotime)/num_epochs.
 #' @param group_assignments a list of vectors where names(assignment) are epoch names, and vectors contain groups belonging to corresponding epoch
+#' @param p_value p_value
+#' @param winSize winSize
 #'
 #' @return updated list of dynamic_object with epoch column included in dynamic_object$cells
 #' @export
@@ -296,7 +269,8 @@ define_epochs_new <- function(
     winSize = 2) {
   # put dynamic_object and matrix into list, if not already
   # for cleaner code later on... just put everything is in list.
-  if (class(dynamic_object[[1]]) != "list") {
+  # if (class(dynamic_object[[1]]) != "list") {
+  if (!is.list(dynamic_object[[1]])) {
     dynamic_object <- list(dynamic_object)
     matrix <- list(matrix)
   }
@@ -507,12 +481,12 @@ assign_epochs_new1 <- function(
 
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
-        t <- t.test(chunk[gene, ], background[gene, ])
+        t <- stats::t.test(chunk[gene, ], background[gene, ])
         ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
         diffres <- rbind(diffres, ans)
       }
 
-      diffres$padj <- p.adjust(diffres$pval, method = "BH")
+      diffres$padj <- stats::p.adjust(diffres$pval, method = "BH")
       diffres <- diffres[diffres$mean_diff > 0, ] # Filter for genes that are on
 
       epochs[[epoch]] <- diffres$gene[diffres$padj < pThresh_DE]
@@ -566,7 +540,7 @@ assign_epochs_new1 <- function(
 #'
 #' @return epochs a list detailing genes active in each epoch
 #' @export
-assign_epochs_new <- function(
+assign_network <- function(
     matrix,
     dynamic_object,
     method = "active_expression",
@@ -660,12 +634,12 @@ assign_epochs_new <- function(
 
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
-        t <- t.test(chunk[gene, ], background[gene, ])
+        t <- stats::t.test(chunk[gene, ], background[gene, ])
         ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
         diffres <- rbind(diffres, ans)
       }
 
-      diffres$padj <- p.adjust(diffres$pval, method = "BH")
+      diffres$padj <- stats::p.adjust(diffres$pval, method = "BH")
       diffres <- diffres[diffres$mean_diff > 0, ] # Filter for genes that are on
 
       epochs[[epoch]] <- diffres$gene[diffres$padj < pThresh_DE]

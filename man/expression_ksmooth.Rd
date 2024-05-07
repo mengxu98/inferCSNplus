@@ -4,16 +4,21 @@
 \alias{expression_ksmooth}
 \title{expression_ksmooth}
 \usage{
-expression_ksmooth(matrix, meta_data, bandwith = 0.25)
+expression_ksmooth(
+  matrix,
+  meta_data,
+  pseudotime_column = "pseudotime",
+  bandwith = 0.25
+)
 }
 \arguments{
 \item{matrix}{expression matrix.}
 
 \item{meta_data}{meta_data includes "cell_name", "pseudotime", "group".}
 
-\item{bandwith}{bandwith for kernel smoother.}
+\item{pseudotime_column}{pseudotime_column.}
 
-\item{npoints}{n.points parameter for kernel smoother.}
+\item{bandwith}{bandwith for kernel smoother.}
 }
 \value{
 smoothed matrix
