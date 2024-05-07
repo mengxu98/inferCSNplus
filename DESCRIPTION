@@ -2,7 +2,7 @@ Type: Package
 Package: inferCSN
 Title: Inferring Cell-Specific Gene Regulatory Network
 Version: 2.0.0
-Date: 2024-2-21
+Date: 2024-5-7
 Authors@R: 
     person("Meng", "Xu", email = "mengxu98@qq.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-8300-1054"))
 Maintainer: Meng Xu <mengxu98@qq.com>
@@ -10,20 +10,17 @@ Description: An package for inferring cell-type-specific gene regulatory network
 License: MIT + file LICENSE
 URL: https://mengxu98.github.io/inferCSNplus/
 BugReports: https://github.com/mengxu98/inferCSNplus/issues
-Depends: 
+Depends:
     R (>= 3.3.0)
 Imports:
-    cli,
-    circlize,
     ComplexHeatmap,
     doParallel,
     dplyr,
     foreach,
-    FNN,
+    GenomicRanges,
     ggnetwork,
     ggplot2,
     ggraph,
-    gmodels,
     Matrix,
     methods,
     parallel,
@@ -31,29 +28,58 @@ Imports:
     progress,
     purrr,
     Rcpp,
+    sparseMatrixStats,
     slam,
     Signac,
     Seurat,
+    SeuratObject,
+    tidygraph,
     stats,
     utils
 Suggests:
     BSgenome.Hsapiens.UCSC.hg38,
+    cli,
+    circlize,
     chromVAR,
-    GenomicRanges,
+    FNN,
+    gam,
     gatepoints,
     gtools,
     grDevices,
     motifmatchr,
     igraph,
-    IRanges,
     precrec,
     pROC,
     scales,
-    stringi,
-    stringr,
+    slingshot,
     testthat (>= 3.0.0),
-    tidygraph,
-    uwot
+    bayestestR,
+    brms,
+    cowplot,
+    glmnetUtils,
+    gmodels,
+    gridExtra,
+    grr,
+    irlba,
+    pbapply,
+    plyr,
+    presto,
+    reshape2,
+    reticulate,
+    viridis,
+    xgboost,
+    pheatmap,
+    tidyselect,
+    uwot,
+    RColorBrewer,
+    IRanges,
+    S4Vectors,
+    ggpointdensity,
+    pals,
+    tibble,
+    tidyr,
+    stringi,
+    stringr
 LinkingTo: 
     Rcpp,
     RcppArmadillo
@@ -61,5 +87,6 @@ Config/Needs/website: mengxu98/mxtemplate
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: gzip
 RoxygenNote: 7.3.1
 Language: en-US

@@ -32,28 +32,35 @@ reference:
 
 - subtitle: "inferCSN"
 - contents:
-  - inferCSN.logo
   - inferCSN-package
+  - inferCSN.logo
   - inferCSN
+  - inferCSN2
+  - initiate_object
+
+- subtitle: "Class"
+- contents:
+  - CSNObject-class
+  - Modules-class
+  - Network-class
+  - Regions-class
+  - RegulatoryNetwork-class
 
 - subtitle: "vector functions"
 - contents:
-  - get.embedding
+  - inferVECTOR
   - vector.autoCenter
   - vector.buildGrid
   - vector.buildNet
   - vector.drawArrow
   - vector.getValue
   - vector.gridValue
-  - vector.main
   - vector.rankPCA
 
-- subtitle: "Data processing"
+- subtitle: "RNA data processing"
 - contents:
-  - peak.calling
-  - peaks.filter
   - normalize.seurat.object
-  - generate.aggregated.data
+  - generate_aggregated_data
   - aggregating.data
   - as.slam.matrix
   - as.sparse
@@ -61,57 +68,204 @@ reference:
   - estimate.size.factors.dense
   - estimate.size.factors.sparse
   - estimate.t
+  - aggregate_assay
+  - aggregate_matrix
+  - expression_ksmooth
+  - generate_aggregated_data
 
-- subtitle: "Network visualization"
+- subtitle: "Peak data processing"
 - contents:
-  - dynamic.networks
-  - contrast.networks
-  - network.heatmap
-
-- subtitle: "Network evaluation"
-- contents:
-  - auc.calculate
-  - acc.calculate
-
-- subtitle: "Compute gene rank"
-- contents:
-  - compute.gene.rank
-
-- subtitle: "Sparse regression model"
-- contents:
-  - sparse.regression
-  - sub.inferCSN
-  - inferCSN.fit
-
-- subtitle: "Utils functions"
-- contents:
-  - check.parameters
-  - coef.inferCSN
-  - coef.inferCSNCV
-  - net.format
-  - prepare.performance.data
-  - print.logo
-  - print.inferCSN
-  - print.inferCSNCV
-  - predict.inferCSN
-  - predict.inferCSNCV
-  - table.to.matrix
-  - peaks.split
-  - ranges.for.coords
-  - find.overlapping.coordinates
-  - get.tf.gene
-  - transcript.mode
   - extract.cre
   - extract.cre.gene.links
   - extract.links
   - extract.network
   - extract.nodes
   - extract.peak.tf.links
+  - find.overlapping.coordinates
+  - find_peaks_near_genes
+
+- subtitle: "Dynamic object"
+- contents:
+  - get.pseudotime
+  - get.dimensional
+  - findDynGenes
+
+- subtitle: "Network processing"
+- contents:
+  - add_interaction_type
+  - add_type
+  - DefaultNetwork
+  - GetAssay
+  - GetAssaySummary
+  - GetGRN
+  - GetNetwork
+  - LayerData
+  - NetworkFeatures
+  - NetworkGraph
+  - NetworkModules
+  - NetworkParams
+  - NetworkRegions
+  - NetworkTFs
+  - Params
+  - VariableFeatures
+  - crossweight
+  - define_epochs
+  - define_epochs_new
+  - density.points
+  - diffnet_community_detection
+  - dynamic.genes
+  - dynamic.genes_new
+  - dynamic.networks
+  - dynamic.windowing
+  - dynamic_difference_network
+  - dynamic_shortest_path
+  - dynamic_shortest_path_multiple
+  - edge_uniqueness
+  - epochGRN
+  - compileDynGenes
+  - compile_epochs
+  - get_network_graph
+  - get_tf_network
+  - gof
+  - assign_epochs_simple
+  - assign_epochs
+  - assign_epochs_new1
+  - assign_network
+  - subnets
+  - split_epochs_by_group
+  - split_epochs_by_pseudotime
+  - biglist_compute_betweenness_degree
+  - caoGenes
+  - compute_JI_topregs
+  - compute_betweenness_degree
+  - compute_frobenius_distance
+  - cor_and_add_action
+  - find_communities
+  - find_cuts_by_clustering
+  - find_cuts_by_similarity
+  - find_modules
+  - find_motifs
+  - find_targets
+  - static_shortest_path
+
+- subtitle: "Network visualization"
+- contents:
+  - dynamic.networks
+  - contrast.networks
+  - network.heatmap
+  - plot_detail_network
+  - plot_diffnet_detail
+  - plot_dyn_diffnet
+  - plot_dynamic_network
+  - plot_gof
+  - plot_heatmap_by_treatment
+  - plot_module_metrics
+  - plot_network_graph
+  - plot_targets_and_regulators
+  - plot_targets_with_top_regulators_detail
+  - plot_tf_network
+  - plot_top_features
+  - heatmap_by_treatment_group
+  - hm_dyn
+  - hm_dyn_clust
+  - hm_dyn_epoch
+
+- subtitle: "Network evaluation"
+- contents:
+  - auc.calculate
+  - acc.calculate
+  - JI_across_topregs
+
+- subtitle: "Calculate gene rank"
+- contents:
+  - calculate.gene.rank
+  - compute_pagerank
+
+- subtitle: "Sparse regression model"
+- contents:
+  - single.network
+  - sparse.regression
+  - model.fit
+  - fit_bagging_ridge
+  - fit_bayesian_ridge
+  - fit_brms
+  - fit_cvglmnet
+  - fit_cvsrm
+  - fit_glm
+  - fit_glmnet
+  - fit_grn_models
+  - fit_model
+  - fit_srm
+  - fit_xgb
+  - format_coefs
+
+- subtitle: "Utils functions"
+- contents:
+  - check.parameters
+  - coef.SRM_fit
+  - coef.SRM_fit_CV
+  - coef.CSNObject
+  - crossweight
+  - net.format
+  - normalization
+  - table.to.matrix
+  - filter_sort_matrix
+  - prepare.performance.data
+  - print.logo
+  - print.SRM_fit
+  - print.SRM_fit_CV
+  - print.RegulatoryNetwork
+  - predict.SRM_fit
+  - predict.SRM_fit_CV
+  - peaks.split
+  - ranges.for.coords
+  - get.tf.gene
+  - transcript.mode
   - is.sparse
+  - weight_filter
+  - map_par
+  - mean_module_expression
+  - mean_subnetwork_expression
+  - no_legend
+  - no_margin
+  - no_x_text
+  - no_y_text
+  - order_genes
+  - peaks.split
+  - pre_pseudotime_matrix
+  - ranges.for.coords
+  - rough_hierarchy
+  - sample_and_epoch_reconstruct
+  - score_targets
+  - sparse_cor
+  - dMcast
+  - edge_rank
+  - fast_aggregate
+  - get_umap
+  - ig_NiceGraph
+  - ig_convertLarge
+  - ig_convertMedium
+  - ig_convertSmall
+  - wn_ig_tabToIgraph
+  - ig_convertTFs
+  - ig_exemplars
+  - ig_scaleV
+  - ig_tabToIgraph
+  - log_message
+  - r2
+  - rse
+  - sse
+  - sparse_covcor
 
 - subtitle: "Example data"
 - contents:
   - example_matrix
   - example_ground_truth
+  - example_meta_data
   - promoter_regions_hg19
   - promoter_regions_hg38
+  - EnsDb.Hsapiens.v93.annot.UCSC.hg38
+  - SCREEN.ccRE.UCSC.hg38
+  - phastConsElements20Mammals.UCSC.hg38
+  - motif2tf
+  - motifs
