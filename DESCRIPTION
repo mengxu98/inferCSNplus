@@ -63,7 +63,6 @@ Suggests:
     irlba,
     pbapply,
     plyr,
-    presto,
     reshape2,
     reticulate,
     viridis,
