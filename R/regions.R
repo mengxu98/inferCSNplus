@@ -1,5 +1,3 @@
-#' Initiate the \code{RegulatoryNetwork} object.
-#'
 #' @param regions Candidate regions to consider for binding site inference.
 #' If \code{NULL}, all peaks regions are considered.
 #' @param peak_assay A character vector indicating the name of the chromatin
@@ -88,10 +86,6 @@ initiate_object.Seurat <- function(
   return(object)
 }
 
-#' Initiate the \code{RegulatoryNetwork} object.
-#'
-#' @param object An object.
-#'
 #' @rdname initiate_object
 #' @export
 #' @method initiate_object CSNObject
@@ -102,11 +96,16 @@ initiate_object.CSNObject <- function(
     rna_assay = "RNA",
     exclude_exons = TRUE,
     ...) {
-  initiate_object(object@data)
+  initiate_object(
+    object@data,
+    regions = regions,
+    peak_assay = peak_assay,
+    rna_assay = rna_assay,
+    exclude_exons = exclude_exons,
+    ...
+  )
 }
 
-#' Scan for motifs in candidate regions.
-#'
 #' @param pfm A \code{PFMatrixList} object with position weight matrices.
 #' @param genome A \code{BSgenome} object with the genome of interest.
 #' @param motif_tfs A data frame matching motifs with TFs. The first column is assumed
@@ -123,19 +122,20 @@ find_motifs.CSNObject <- function(
     pfm,
     genome,
     motif_tfs = NULL,
+    regulators = NULL,
     verbose = TRUE,
     ...) {
   params <- Params(object)
 
   # Add TF info for motifs
-  log_message("Adding TF info", verbose = verbose)
+  log_message("Adding TF information", verbose = verbose)
   if (!is.null(motif_tfs)) {
     motif2tf <- motif_tfs
   } else {
     utils::data(motif2tf, envir = environment())
   }
 
-  # Spread dataframe to sparse matrix
+  # Spread data frame to sparse matrix
   motif2tf <- motif2tf %>%
     dplyr::select("motif" = 1, "tf" = 2) %>%
     dplyr::distinct() %>%
@@ -148,10 +148,18 @@ find_motifs.CSNObject <- function(
     tibble::column_to_rownames("motif") %>%
     as.matrix() %>%
     Matrix::Matrix(sparse = TRUE)
+
   tfs_use <- intersect(
     rownames(GetAssay(object, params$rna_assay)),
     colnames(motif2tf)
   )
+  if (!is.null(regulators)) {
+    tfs_use <- intersect(
+      regulators,
+      tfs_use
+    )
+  }
+
   if (length(tfs_use) == 0) {
     stop("None of the provided TFs were found in the dataset.
          Consider providing a custom motif-to-TF map as `motif_tfs`")

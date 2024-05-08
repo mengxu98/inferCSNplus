@@ -496,18 +496,6 @@ sparse_cor <- function(
       y <- Matrix::Matrix(y, sparse = TRUE)
     }
     corr_mat <- sparse_covcor(x, y)$cor
-  } else if (method == "spearman" & requireNamespace("presto", quietly = TRUE)) {
-    # devtools::install_github("immunogenomics/presto")
-    xr <- Matrix::Matrix(presto::rank_matrix(t(x))$X_ranked, sparse = TRUE)
-    rownames(xr) <- rownames(x)
-    colnames(xr) <- colnames(x)
-    if (!is.null(y)) {
-      yr <- Matrix::Matrix(presto::rank_matrix(t(y))$X_ranked, sparse = TRUE)
-      rownames(yr) <- rownames(y)
-      colnames(yr) <- colnames(y)
-      y <- yr
-    }
-    corr_mat <- sparse_covcor(xr, y)$cor
   } else {
     x <- as.matrix(x)
     if (!is.null(y)) {
@@ -525,5 +513,6 @@ sparse_cor <- function(
   if (!allow_neg) {
     corr_mat[corr_mat < 0] <- 0
   }
+
   return(corr_mat)
 }

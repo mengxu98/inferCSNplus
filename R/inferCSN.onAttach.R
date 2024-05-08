@@ -6,8 +6,6 @@
 
 This message can be suppressed by:
   suppressPackageStartupMessages(library(inferCSN))
-
-To restore the default display use options(\"restore_inferCSN_show\" = TRUE)
 ========================================
 ")
 

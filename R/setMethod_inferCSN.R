@@ -37,12 +37,12 @@ inferCSN.default <- function(
     verbose = FALSE,
     cores = 1,
     ...) {
-  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
-  matrix <- object
-  rm(object)
+  if (verbose) {
+    message(paste("Running start for <", class(object)[1], ">."))
+  }
   # Check input parameters
   check.parameters(
-    matrix = matrix,
+    matrix = object,
     penalty = penalty,
     algorithm = algorithm,
     cross_validation = cross_validation,
@@ -58,15 +58,15 @@ inferCSN.default <- function(
   )
 
   if (!is.null(regulators)) {
-    regulators <- intersect(colnames(matrix), regulators)
+    regulators <- intersect(colnames(object), regulators)
   } else {
-    regulators <- colnames(matrix)
+    regulators <- colnames(object)
   }
 
   if (!is.null(targets)) {
-    targets <- intersect(colnames(matrix), targets)
+    targets <- intersect(colnames(object), targets)
   } else {
-    targets <- colnames(matrix)
+    targets <- colnames(object)
   }
 
   target <- NULL
@@ -74,7 +74,9 @@ inferCSN.default <- function(
     (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
   )
   if (cores == 1) {
-    if (verbose) message("Using 1 core.")
+    if (verbose) {
+      message("Using 1 core.")
+    }
     # Format progress information
     format <- "Running [:bar] :percent, No.:current of :total targets, :elapsed."
     pb <- progress::progress_bar$new(
@@ -88,7 +90,7 @@ inferCSN.default <- function(
       targets, function(target) {
         if (verbose) pb$tick()
         single.network(
-          matrix = matrix,
+          matrix = object,
           regulators = regulators,
           target = target,
           cross_validation = cross_validation,
@@ -105,7 +107,9 @@ inferCSN.default <- function(
     )
   } else {
     doParallel::registerDoParallel(cores = cores)
-    if (verbose) message("Using ", foreach::getDoParWorkers(), " cores.")
+    if (verbose) {
+      message("Using ", foreach::getDoParWorkers(), " cores.")
+    }
     target <- NULL
     "%dopar%" <- foreach::"%dopar%"
     weight_list <- foreach::foreach(
@@ -113,7 +117,7 @@ inferCSN.default <- function(
       .export = c("single.network", "sparse.regression")
     ) %dopar% {
       single.network(
-        matrix = matrix,
+        matrix = object,
         regulators = regulators,
         target = target,
         cross_validation = cross_validation,
@@ -159,8 +163,9 @@ inferCSN.data.frame <- function(
     verbose = FALSE,
     cores = 1,
     ...) {
-  if (verbose) message(paste("Running start for <", class(object)[1], ">."))
-  if (verbose) message("Converting the class type of input data from <data.frame> to <matrix>.")
+  if (verbose) {
+    message("Converting the class type of input data from <data.frame> to <matrix>.")
+  }
   matrix <- as.matrix(object)
   inferCSN(
     matrix,
@@ -224,7 +229,9 @@ inferCSN.Seurat <- function(
     low_corr_cutoff = NULL,
     rescued = TRUE,
     ...) {
-  if (verbose) message(paste("Running start for <", class(object)[1], "object >."))
+  if (verbose) {
+    message(paste("Running start for <", class(object)[1], "object >."))
+  }
   object$cluster <- Seurat::Idents(object)
 
   clusters <- as.character(unique(object$cluster))
@@ -714,10 +721,13 @@ inferCSN.CSNObject <- function(
 
   # Get assay data or summary
   if (is.null(aggregate_rna_col)) {
-    gene_data <- Matrix::t(LayerData(
-      object,
-      assay = params$rna_assay, layer = "data"
-    ))
+    gene_data <- Matrix::t(
+      LayerData(
+        object,
+        assay = params$rna_assay,
+        layer = "data"
+      )
+    )
     gene_groups <- TRUE
   } else {
     gene_data <- GetAssaySummary(
@@ -807,7 +817,6 @@ inferCSN.CSNObject <- function(
   # Loop through features and fit models/run CV for each
   names(features) <- features
 
-  # target <- NULL
   cores <- min(
     (parallel::detectCores(logical = FALSE) - 1), cores, length(features)
   )
@@ -853,13 +862,15 @@ inferCSN.CSNObject <- function(
         peak_motifs <- peaks2motif[gene_peaks, , drop = FALSE][peaks_use, , drop = FALSE]
 
         # Select TFs with motifs in peaks
-        gene_peak_tfs <- purrr::map(rownames(peak_motifs), function(p) {
-          x <- as.logical(peak_motifs[p, ])
-          peak_tfs <- colMaxs(motif2tf[x, , drop = FALSE])
-          peak_tfs <- colnames(motif2tf)[as.logical(peak_tfs)]
-          peak_tfs <- setdiff(peak_tfs, g)
-          return(peak_tfs)
-        })
+        gene_peak_tfs <- purrr::map(
+          rownames(peak_motifs), function(p) {
+            x <- as.logical(peak_motifs[p, ])
+            peak_tfs <- colMaxs(motif2tf[x, , drop = FALSE])
+            peak_tfs <- colnames(motif2tf)[as.logical(peak_tfs)]
+            peak_tfs <- setdiff(peak_tfs, g)
+            return(peak_tfs)
+          }
+        )
         names(gene_peak_tfs) <- rownames(peak_motifs)
 
         # Check correlation of peaks with target gene
@@ -880,20 +891,22 @@ inferCSN.CSNObject <- function(
           rename("tf" = 1, "corr" = 2)
 
         # Filter TFs and make formula string
-        frml_string <- purrr::map(names(gene_peak_tfs), function(p) {
-          peak_tfs <- gene_peak_tfs[[p]]
-          peak_tfs <- peak_tfs[peak_tfs %in% tfs_use]
-          if (length(peak_tfs) == 0) {
-            return()
+        frml_string <- purrr::map(
+          names(gene_peak_tfs), function(p) {
+            peak_tfs <- gene_peak_tfs[[p]]
+            peak_tfs <- peak_tfs[peak_tfs %in% tfs_use]
+            if (length(peak_tfs) == 0) {
+              return()
+            }
+            peak_name <- stringr::str_replace_all(p, "-", "_")
+            tf_name <- stringr::str_replace_all(peak_tfs, "-", "_")
+            formula_str <- paste(
+              paste(peak_name, interaction_term, tf_name, sep = " "),
+              collapse = " + "
+            )
+            return(list(tfs = peak_tfs, frml = formula_str))
           }
-          peak_name <- stringr::str_replace_all(p, "-", "_")
-          tf_name <- stringr::str_replace_all(peak_tfs, "-", "_")
-          formula_str <- paste(
-            paste(peak_name, interaction_term, tf_name, sep = " "),
-            collapse = " + "
-          )
-          return(list(tfs = peak_tfs, frml = formula_str))
-        })
+        )
         frml_string <- frml_string[!purrr::map_lgl(frml_string, is.null)]
         if (length(frml_string) == 0) {
           log_message("Warning: No valid peak:TF pairs found for ", g, verbose = verbose == 2)
@@ -1059,8 +1072,14 @@ inferCSN.CSNObject <- function(
     log_message("Warning: Fitting model failed for all genes.", verbose = verbose)
   }
 
-  coefs <- purrr::map_dfr(model_fits, function(x) x$coefs, .id = "target")
-  coefs <- format_coefs(coefs, term = interaction_term, adjust_method = adjust_method)
+  coefs <- purrr::map_dfr(
+    model_fits, function(x) x$coefs, .id = "target"
+  )
+  coefs <- format_coefs(
+    coefs,
+    term = interaction_term,
+    adjust_method = adjust_method
+  )
   corrs <- purrr::map_dfr(model_fits, function(x) x$corr, .id = "target")
   if (nrow(coefs) > 0) {
     coefs <- suppressMessages(left_join(coefs, corrs))
@@ -1326,109 +1345,110 @@ fit_grn_models.CSNObject <- function(
   log_message("Fitting models for ", length(features), " target genes", verbose = verbose)
   # Loop through features and fit models/run CV for each
   names(features) <- features
-  model_fits <- map_par(features, function(g) {
-    # Select peaks near gene
-    if (!g %in% rownames(peaks2gene)) {
-      log_message("Warning: ", g, " not found in EnsDb", verbose = verbose == 2)
-      return()
-    }
-    gene_peaks <- as.logical(peaks2gene[g, ])
-    if (sum(gene_peaks) == 0) {
-      log_message("Warning: No peaks found near ", g, verbose = verbose == 2)
-      return()
-    }
-
-    # Select peaks correlating with target gene expression
-    g_x <- gene_data[gene_groups, g, drop = FALSE]
-    peak_x <- peak_data[peak_groups, gene_peaks, drop = FALSE]
-    peak_g_cor <- as(sparse_cor(peak_x, g_x), "generalMatrix")
-    peak_g_cor[is.na(peak_g_cor)] <- 0
-    peaks_use <- rownames(peak_g_cor)[abs(peak_g_cor[, 1]) > peak_cor]
-    if (length(peaks_use) == 0) {
-      log_message("Warning: No correlating peaks found for ", g, verbose = verbose == 2)
-      return()
-    }
-    peak_x <- peak_x[, peaks_use, drop = FALSE]
-    peak_motifs <- peaks2motif[gene_peaks, , drop = FALSE][peaks_use, , drop = FALSE]
-
-    # Select TFs with motifs in peaks
-    gene_peak_tfs <- purrr::map(rownames(peak_motifs), function(p) {
-      x <- as.logical(peak_motifs[p, ])
-      peak_tfs <- colMaxs(motif2tf[x, , drop = FALSE])
-      peak_tfs <- colnames(motif2tf)[as.logical(peak_tfs)]
-      peak_tfs <- setdiff(peak_tfs, g)
-      return(peak_tfs)
-    })
-    names(gene_peak_tfs) <- rownames(peak_motifs)
-
-    # Check correlation of peaks with target gene
-    gene_tfs <- purrr::reduce(gene_peak_tfs, union)
-    tf_x <- gene_data[gene_groups, gene_tfs, drop = FALSE]
-    tf_g_cor <- as(sparse_cor(tf_x, g_x), "generalMatrix")
-    tf_g_cor[is.na(tf_g_cor)] <- 0
-    tfs_use <- rownames(tf_g_cor)[abs(tf_g_cor[, 1]) > tf_cor]
-    if (length(tfs_use) == 0) {
-      log_message("Warning: No correlating TFs found for ", g, verbose = verbose == 2)
-      return()
-    }
-    tf_g_corr_df <- tibble::as_tibble(
-      tf_g_cor[unique(tfs_use), , drop = FALSE],
-      rownames = "tf",
-      .name_repair = "check_unique"
-    ) %>%
-      rename("tf" = 1, "corr" = 2)
-
-    # Filter TFs and make formula string
-    frml_string <- purrr::map(names(gene_peak_tfs), function(p) {
-      peak_tfs <- gene_peak_tfs[[p]]
-      peak_tfs <- peak_tfs[peak_tfs %in% tfs_use]
-      if (length(peak_tfs) == 0) {
+  model_fits <- map_par(
+    features, function(g) {
+      # Select peaks near gene
+      if (!g %in% rownames(peaks2gene)) {
+        log_message("Warning: ", g, " not found in EnsDb", verbose = verbose == 2)
         return()
       }
-      peak_name <- stringr::str_replace_all(p, "-", "_")
-      tf_name <- stringr::str_replace_all(peak_tfs, "-", "_")
-      formula_str <- paste(
-        paste(peak_name, interaction_term, tf_name, sep = " "),
-        collapse = " + "
+      gene_peaks <- as.logical(peaks2gene[g, ])
+      if (sum(gene_peaks) == 0) {
+        log_message("Warning: No peaks found near ", g, verbose = verbose == 2)
+        return()
+      }
+
+      # Select peaks correlating with target gene expression
+      g_x <- gene_data[gene_groups, g, drop = FALSE]
+      peak_x <- peak_data[peak_groups, gene_peaks, drop = FALSE]
+      peak_g_cor <- as(sparse_cor(peak_x, g_x), "generalMatrix")
+      peak_g_cor[is.na(peak_g_cor)] <- 0
+      peaks_use <- rownames(peak_g_cor)[abs(peak_g_cor[, 1]) > peak_cor]
+      if (length(peaks_use) == 0) {
+        log_message("Warning: No correlating peaks found for ", g, verbose = verbose == 2)
+        return()
+      }
+      peak_x <- peak_x[, peaks_use, drop = FALSE]
+      peak_motifs <- peaks2motif[gene_peaks, , drop = FALSE][peaks_use, , drop = FALSE]
+
+      # Select TFs with motifs in peaks
+      gene_peak_tfs <- purrr::map(rownames(peak_motifs), function(p) {
+        x <- as.logical(peak_motifs[p, ])
+        peak_tfs <- colMaxs(motif2tf[x, , drop = FALSE])
+        peak_tfs <- colnames(motif2tf)[as.logical(peak_tfs)]
+        peak_tfs <- setdiff(peak_tfs, g)
+        return(peak_tfs)
+      })
+      names(gene_peak_tfs) <- rownames(peak_motifs)
+
+      # Check correlation of peaks with target gene
+      gene_tfs <- purrr::reduce(gene_peak_tfs, union)
+      tf_x <- gene_data[gene_groups, gene_tfs, drop = FALSE]
+      tf_g_cor <- as(sparse_cor(tf_x, g_x), "generalMatrix")
+      tf_g_cor[is.na(tf_g_cor)] <- 0
+      tfs_use <- rownames(tf_g_cor)[abs(tf_g_cor[, 1]) > tf_cor]
+      if (length(tfs_use) == 0) {
+        log_message("Warning: No correlating TFs found for ", g, verbose = verbose == 2)
+        return()
+      }
+      tf_g_corr_df <- tibble::as_tibble(
+        tf_g_cor[unique(tfs_use), , drop = FALSE],
+        rownames = "tf",
+        .name_repair = "check_unique"
+      ) %>%
+        rename("tf" = 1, "corr" = 2)
+
+      # Filter TFs and make formula string
+      frml_string <- purrr::map(names(gene_peak_tfs), function(p) {
+        peak_tfs <- gene_peak_tfs[[p]]
+        peak_tfs <- peak_tfs[peak_tfs %in% tfs_use]
+        if (length(peak_tfs) == 0) {
+          return()
+        }
+        peak_name <- stringr::str_replace_all(p, "-", "_")
+        tf_name <- stringr::str_replace_all(peak_tfs, "-", "_")
+        formula_str <- paste(
+          paste(peak_name, interaction_term, tf_name, sep = " "),
+          collapse = " + "
+        )
+        return(list(tfs = peak_tfs, frml = formula_str))
+      })
+      frml_string <- frml_string[!purrr::map_lgl(frml_string, is.null)]
+      if (length(frml_string) == 0) {
+        log_message("Warning: No valid peak:TF pairs found for ", g, verbose = verbose == 2)
+        return()
+      }
+
+      target <- stringr::str_replace_all(g, "-", "_")
+      model_frml <- stats::as.formula(
+        paste0(target, " ~ ", paste0(purrr::map(frml_string, function(x) x$frml), collapse = " + "))
       )
-      return(list(tfs = peak_tfs, frml = formula_str))
-    })
-    frml_string <- frml_string[!purrr::map_lgl(frml_string, is.null)]
-    if (length(frml_string) == 0) {
-      log_message("Warning: No valid peak:TF pairs found for ", g, verbose = verbose == 2)
-      return()
-    }
 
-    target <- stringr::str_replace_all(g, "-", "_")
-    model_frml <- stats::as.formula(
-      paste0(target, " ~ ", paste0(purrr::map(frml_string, function(x) x$frml), collapse = " + "))
-    )
+      # Get expression data
+      nfeats <- sum(purrr::map_dbl(frml_string, function(x) length(x$tfs)))
+      gene_tfs <- purrr::reduce(purrr::map(frml_string, function(x) x$tfs), union)
+      gene_x <- gene_data[gene_groups, union(g, gene_tfs), drop = FALSE]
+      model_mat <- as.data.frame(cbind(gene_x, peak_x))
+      if (scale) model_mat <- as.data.frame(scale(as.matrix(model_mat)))
+      colnames(model_mat) <- stringr::str_replace_all(colnames(model_mat), "-", "_")
 
-    # Get expression data
-    nfeats <- sum(purrr::map_dbl(frml_string, function(x) length(x$tfs)))
-    gene_tfs <- purrr::reduce(purrr::map(frml_string, function(x) x$tfs), union)
-    gene_x <- gene_data[gene_groups, union(g, gene_tfs), drop = FALSE]
-    model_mat <- as.data.frame(cbind(gene_x, peak_x))
-    if (scale) model_mat <- as.data.frame(scale(as.matrix(model_mat)))
-    colnames(model_mat) <- stringr::str_replace_all(colnames(model_mat), "-", "_")
-
-    log_message("Fitting model with ", nfeats, " variables for ", g, verbose = verbose == 2)
-    result <- try(fit_model(
-      model_frml,
-      data = model_mat,
-      method = method,
-      ...
-    ), silent = TRUE)
-    if (any(class(result) == "try-error")) {
-      log_message("Warning: Fitting model failed for ", g, verbose = verbose)
-      log_message(result, verbose = verbose == 2)
-      return()
-    } else {
-      result$gof$nvariables <- nfeats
-      result$corr <- tf_g_corr_df
-      return(result)
-    }
-  }, verbose = verbose, parallel = parallel)
+      log_message("Fitting model with ", nfeats, " variables for ", g, verbose = verbose == 2)
+      result <- try(fit_model(
+        model_frml,
+        data = model_mat,
+        method = method,
+        ...
+      ), silent = TRUE)
+      if (any(class(result) == "try-error")) {
+        log_message("Warning: Fitting model failed for ", g, verbose = verbose)
+        log_message(result, verbose = verbose == 2)
+        return()
+      } else {
+        result$gof$nvariables <- nfeats
+        result$corr <- tf_g_corr_df
+        return(result)
+      }
+    }, verbose = verbose, parallel = parallel)
 
   model_fits <- model_fits[!purrr::map_lgl(model_fits, is.null)]
   if (length(model_fits) == 0) {
@@ -1436,7 +1456,11 @@ fit_grn_models.CSNObject <- function(
   }
 
   coefs <- purrr::map_dfr(model_fits, function(x) x$coefs, .id = "target")
-  coefs <- format_coefs(coefs, term = interaction_term, adjust_method = adjust_method)
+  coefs <- format_coefs(
+    coefs,
+    term = interaction_term,
+    adjust_method = adjust_method
+  )
   corrs <- purrr::map_dfr(model_fits, function(x) x$corr, .id = "target")
   if (nrow(coefs) > 0) {
     coefs <- suppressMessages(left_join(coefs, corrs))
@@ -1464,8 +1488,6 @@ fit_grn_models.CSNObject <- function(
   return(object)
 }
 
-
-
 #' @title Format network coefficients
 #'
 #' @param coefs A data frame with coefficients
@@ -1484,7 +1506,10 @@ format_coefs <- function(
   }
 
   if ("pval" %in% colnames(coefs)) {
-    coefs$padj <- stats::p.adjust(coefs$pval, method = adjust_method)
+    coefs$padj <- stats::p.adjust(
+      coefs$pval,
+      method = adjust_method
+    )
   }
 
   term_pattern <- paste0("(.+)", term, "(.+)")
@@ -1510,8 +1535,6 @@ format_coefs <- function(
   return(coefs_use)
 }
 
-#' @title Find TF modules in regulatory network
-#'
 #' @param p_thresh Float indicating the significance threshold on the adjusted p-value.
 #' @param rsq_thresh Float indicating the \eqn{R^2} threshold on the adjusted p-value.
 #' @param nvar_thresh Integer indicating the minimum number of variables in the model.
@@ -1667,6 +1690,7 @@ find_modules.Network <- function(
     nvar_thresh = nvar_thresh,
     min_genes_per_module = min_genes_per_module
   )
+
   return(object)
 }
 
@@ -1708,4 +1732,3 @@ find_modules.CSNObject <- function(
 
   return(object)
 }
-

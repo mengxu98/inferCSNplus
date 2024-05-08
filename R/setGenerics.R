@@ -109,7 +109,7 @@ setGeneric(
 #' @param ... Arguments for other methods
 #'
 #' @return Dimensional information
-#' @export
+#' @export get.pseudotime
 #'
 #' @rdname get.pseudotime
 setGeneric(
@@ -120,6 +120,8 @@ setGeneric(
   }
 )
 
+#' @title Initiate the \code{RegulatoryNetwork} object.
+#'
 #' @param object The input data, a seurat object.
 #' @param ... Arguments for other methods
 #'
@@ -129,6 +131,8 @@ initiate_object <- function(object, ...) {
   UseMethod(generic = "initiate_object", object = object)
 }
 
+#' @title Scan for motifs in candidate regions
+#'
 #' @param object The input data, a grn object.
 #' @param ... Arguments for other methods
 #'
@@ -309,6 +313,8 @@ gof <- function(object, ...) {
   UseMethod(generic = "gof", object = object)
 }
 
+#' @title Find TF modules in regulatory network
+#'
 #' @param object The input data, a grn object.
 #' @param ... Arguments for other methods
 #'
