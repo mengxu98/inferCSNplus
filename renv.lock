@@ -4514,33 +4514,6 @@
       ],
       "Hash": "e5a70cbe83260613031dfdc9a91496e0"
     },
-    "presto": {
-      "Package": "presto",
-      "Version": "1.0.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "presto",
-      "RemoteUsername": "immunogenomics",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "7636b3d0465c468c35853f82f1717d3a64b3c8f6",
-      "Requirements": [
-        "Matrix",
-        "R",
-        "Rcpp",
-        "RcppArmadillo",
-        "data.table",
-        "dplyr",
-        "methods",
-        "purrr",
-        "rlang",
-        "stats",
-        "tibble",
-        "tidyr",
-        "utils"
-      ],
-      "Hash": "c682f57757230a29913ad71f22aef990"
-    },
     "prettyunits": {
       "Package": "prettyunits",
       "Version": "1.2.0",
