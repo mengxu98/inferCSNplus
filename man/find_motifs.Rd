@@ -27,6 +27,8 @@ find_motifs(object, ...)
 \item{motif_tfs}{A data frame matching motifs with TFs. The first column is assumed
 to be the name of the motif, the second the name of the TF.}
 
+\item{regulators}{regulators.}
+
 \item{verbose}{Display messages.}
 
 \item{...}{Arguments for other methods}

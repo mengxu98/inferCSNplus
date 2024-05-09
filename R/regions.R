@@ -110,6 +110,7 @@ initiate_object.CSNObject <- function(
 #' @param genome A \code{BSgenome} object with the genome of interest.
 #' @param motif_tfs A data frame matching motifs with TFs. The first column is assumed
 #' to be the name of the motif, the second the name of the TF.
+#' @param regulators regulators.
 #' @param verbose Display messages.
 #'
 #' @return A CSNObject object with updated motif info.
