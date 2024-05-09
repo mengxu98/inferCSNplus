@@ -514,6 +514,7 @@ fit_bagging_ridge <- function(
   gof <- tibble::tibble(
     rsq = r2(response, y_pred)
   )
+
   return(list(gof = gof, coefs = coefs))
 }
 
