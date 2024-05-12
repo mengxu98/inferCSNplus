@@ -103,7 +103,7 @@ RegulatoryNetwork <- setClass(
 #' The CSNObject object is an extended \code{Seurat} object
 #' for the storage and analysis of Regulatory network data.
 #'
-#' @slot grn A named list containing \code{RegulatoryNetwork} objects with inferred networks.
+#' @slot csn A named list containing \code{RegulatoryNetwork} objects with inferred networks.
 #' @slot data Seurat object.
 #'
 #' @name CSNObject-class
@@ -112,7 +112,7 @@ RegulatoryNetwork <- setClass(
 CSNObject <- setClass(
   Class = "CSNObject",
   slots = list(
-    "grn" = "RegulatoryNetwork",
+    "csn" = "RegulatoryNetwork",
     "data" = "Seurat"
   )
 )
@@ -129,7 +129,7 @@ GetNetwork.CSNObject <- function(
     object,
     network = DefaultNetwork(object),
     ...) {
-  return(GetNetwork(object@grn, network = network))
+  return(GetNetwork(object@csn, network = network))
 }
 
 
@@ -185,7 +185,7 @@ NetworkFeatures.RegulatoryNetwork <- function(
 #' @method NetworkTFs CSNObject
 #' @export
 NetworkTFs.CSNObject <- function(object, ...) {
-  return(object@grn@regions@tfs)
+  return(object@csn@regions@tfs)
 }
 
 
@@ -202,7 +202,7 @@ NetworkTFs.RegulatoryNetwork <- function(object, ...) {
 #' @method NetworkRegions CSNObject
 #' @export
 NetworkRegions.CSNObject <- function(object, ...) {
-  return(object@grn@regions)
+  return(object@csn@regions)
 }
 
 
@@ -219,7 +219,7 @@ NetworkRegions.RegulatoryNetwork <- function(object, ...) {
 #' @method GetGRN CSNObject
 #' @export
 GetGRN.CSNObject <- function(object, ...) {
-  return(object@grn)
+  return(object@csn)
 }
 
 
@@ -354,7 +354,7 @@ DefaultNetwork.RegulatoryNetwork <- function(object, ...) {
 
 #' Get fitted coefficients
 #'
-#' @param object The grn object
+#' @param object The csn object
 #' @param network network
 #' @param ... other parameters
 #'
@@ -434,7 +434,7 @@ gof.Network <- function(
 #' @method Params CSNObject
 #' @export
 Params.CSNObject <- function(object, ...) {
-  return(object@grn@params)
+  return(object@csn@params)
 }
 
 
@@ -531,7 +531,7 @@ VariableFeatures.CSNObject <- function(object, ...) {
 
 #' Print RegulatoryNetwork objects
 #'
-#' @param x A grn object
+#' @param x A csn object
 #' @param ... other parameters
 #'
 #' @rdname print

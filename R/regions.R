@@ -1,9 +1,9 @@
 #' @param regions Candidate regions to consider for binding site inference.
 #' If \code{NULL}, all peaks regions are considered.
-#' @param peak_assay A character vector indicating the name of the chromatin
-#' accessibility assay in the \code{Seurat} object.
 #' @param rna_assay A character vector indicating the name of the gene expression
 #' assay in the \code{Seurat} object.
+#' @param peak_assay A character vector indicating the name of the chromatin
+#' accessibility assay in the \code{Seurat} object.
 #' @param exclude_exons Logical. Whether to consider exons for binding site inference.
 #'
 #' @return A CSNObject object containing a RegulatoryNetwork object.
@@ -14,8 +14,8 @@
 initiate_object.Seurat <- function(
     object,
     regions = NULL,
-    peak_assay = "peaks",
     rna_assay = "RNA",
+    peak_assay = "peaks",
     exclude_exons = TRUE,
     ...) {
   gene_annot <- Signac::Annotation(object[[peak_assay]])
@@ -71,7 +71,7 @@ initiate_object.Seurat <- function(
     exclude_exons = exclude_exons
   )
 
-  grn_obj <- methods::new(
+  csn_obj <- methods::new(
     Class = "RegulatoryNetwork",
     regions = regions_obj,
     params = params
@@ -79,7 +79,7 @@ initiate_object.Seurat <- function(
 
   object <- methods::new(
     Class = "CSNObject",
-    grn = grn_obj,
+    csn = csn_obj,
     data = object
   )
 
@@ -165,17 +165,17 @@ find_motifs.CSNObject <- function(
     stop("None of the provided TFs were found in the dataset.
          Consider providing a custom motif-to-TF map as `motif_tfs`")
   }
-  object@grn@regions@tfs <- motif2tf[, tfs_use]
+  object@csn@regions@tfs <- motif2tf[, tfs_use]
 
   # Find motif positions with Signac/motifmatchr
-  cand_ranges <- object@grn@regions@ranges
+  cand_ranges <- object@csn@regions@ranges
   motif_pos <- Signac::AddMotifs(
     object = cand_ranges,
     genome = genome,
     pfm = pfm,
     verbose = verbose
   )
-  object@grn@regions@motifs <- motif_pos
+  object@csn@regions@motifs <- motif_pos
 
   return(object)
 }

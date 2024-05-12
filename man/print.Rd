@@ -16,7 +16,7 @@
 \method{print}{Regions}(x, ...)
 }
 \arguments{
-\item{x}{A grn object}
+\item{x}{A csn object}
 
 \item{...}{other parameters}
 }

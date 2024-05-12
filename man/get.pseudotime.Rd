@@ -4,7 +4,7 @@
 \alias{get.pseudotime}
 \alias{get.pseudotime.default}
 \alias{get.pseudotime.Seurat}
-\title{get_pseudotime}
+\title{Get pseudotime information}
 \usage{
 get.pseudotime(object, ...)
 
@@ -53,7 +53,7 @@ A list with a matrix and new meta data
 Seurat object
 }
 \description{
-get_pseudotime
+Get pseudotime information
 }
 \examples{
 library(inferCSN)

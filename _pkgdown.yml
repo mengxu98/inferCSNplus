@@ -35,11 +35,10 @@ reference:
   - inferCSN-package
   - inferCSN.logo
   - inferCSN
-  - inferCSN2
-  - initiate_object
 
 - subtitle: "Class"
 - contents:
+  - initiate_object
   - CSNObject-class
   - Modules-class
   - Network-class
@@ -111,7 +110,7 @@ reference:
   - crossweight
   - define_epochs
   - define_epochs_new
-  - density.points
+  - density_points
   - diffnet_community_detection
   - dynamic.genes
   - dynamic.genes_new
@@ -147,6 +146,7 @@ reference:
   - find_motifs
   - find_targets
   - static_shortest_path
+  - scale_matrix
 
 - subtitle: "Network visualization"
 - contents:
@@ -183,9 +183,12 @@ reference:
 
 - subtitle: "Sparse regression model"
 - contents:
+  - fit_models
+  - fit_model
+  - format_coefs
+  - model.fit
   - single.network
   - sparse.regression
-  - model.fit
   - fit_bagging_ridge
   - fit_bayesian_ridge
   - fit_brms
@@ -193,11 +196,8 @@ reference:
   - fit_cvsrm
   - fit_glm
   - fit_glmnet
-  - fit_grn_models
-  - fit_model
   - fit_srm
   - fit_xgb
-  - format_coefs
 
 - subtitle: "Utils functions"
 - contents:
@@ -223,7 +223,7 @@ reference:
   - transcript.mode
   - is.sparse
   - weight_filter
-  - map_par
+  - parallelize_fun
   - mean_module_expression
   - mean_subnetwork_expression
   - no_legend

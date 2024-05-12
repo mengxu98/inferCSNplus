@@ -10,7 +10,7 @@
 VariableFeatures(object, ...)
 }
 \arguments{
-\item{object}{The input data, a grn object.}
+\item{object}{The input data, a csn object.}
 
 \item{...}{Arguments for other methods}
 }

@@ -4,13 +4,13 @@
 \alias{initiate_object.Seurat}
 \alias{initiate_object.CSNObject}
 \alias{initiate_object}
-\title{Initiate the \code{RegulatoryNetwork} object.}
+\title{Initiate the \code{RegulatoryNetwork} object}
 \usage{
 \method{initiate_object}{Seurat}(
   object,
   regions = NULL,
-  peak_assay = "peaks",
   rna_assay = "RNA",
+  peak_assay = "peaks",
   exclude_exons = TRUE,
   ...
 )
@@ -32,11 +32,11 @@ initiate_object(object, ...)
 \item{regions}{Candidate regions to consider for binding site inference.
 If \code{NULL}, all peaks regions are considered.}
 
-\item{peak_assay}{A character vector indicating the name of the chromatin
-accessibility assay in the \code{Seurat} object.}
-
 \item{rna_assay}{A character vector indicating the name of the gene expression
 assay in the \code{Seurat} object.}
+
+\item{peak_assay}{A character vector indicating the name of the chromatin
+accessibility assay in the \code{Seurat} object.}
 
 \item{exclude_exons}{Logical. Whether to consider exons for binding site inference.}
 
@@ -46,5 +46,5 @@ assay in the \code{Seurat} object.}
 A CSNObject object containing a RegulatoryNetwork object.
 }
 \description{
-Initiate the \code{RegulatoryNetwork} object.
+Initiate the \code{RegulatoryNetwork} object
 }

@@ -16,12 +16,12 @@ get_tf_network(object, ...)
   order = 3,
   keep_all_edges = FALSE,
   verbose = TRUE,
-  parallel = FALSE,
+  cores = 1,
   ...
 )
 }
 \arguments{
-\item{object}{The input data, a grn object.}
+\item{object}{The input data, a csn object.}
 
 \item{...}{Arguments for other methods}
 
@@ -40,7 +40,7 @@ or prune to the strongest overall connection.}
 
 \item{verbose}{Logical. Whether to print messages.}
 
-\item{parallel}{Logical. Whether to parallelize the computation with \code{\link[foreach]{foreach}}.}
+\item{cores}{Logical. Whether to parallelize the computation with \code{\link[foreach]{foreach}}.}
 }
 \value{
 A CSNObject object.

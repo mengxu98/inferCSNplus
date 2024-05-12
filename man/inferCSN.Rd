@@ -2,15 +2,13 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod_inferCSN.R
 \name{inferCSN}
 \alias{inferCSN}
-\alias{inferCSN.default}
-\alias{inferCSN.data.frame}
-\alias{inferCSN.Seurat}
-\alias{inferCSN.CSNObject}
+\alias{inferCSN,matrix-method}
+\alias{inferCSN,data.frame-method}
+\alias{inferCSN,Seurat-method}
+\alias{inferCSN,CSNObject-method}
 \title{Inferring Cell-Specific Gene Regulatory Network}
 \usage{
-inferCSN(object, ...)
-
-\method{inferCSN}{default}(
+inferCSN(
   object,
   penalty = "L0",
   algorithm = "CD",
@@ -22,12 +20,12 @@ inferCSN(object, ...)
   regulators = NULL,
   targets = NULL,
   regulators_num = NULL,
-  verbose = FALSE,
   cores = 1,
+  verbose = FALSE,
   ...
 )
 
-\method{inferCSN}{data.frame}(
+\S4method{inferCSN}{matrix}(
   object,
   penalty = "L0",
   algorithm = "CD",
@@ -39,12 +37,12 @@ inferCSN(object, ...)
   regulators = NULL,
   targets = NULL,
   regulators_num = NULL,
-  verbose = FALSE,
   cores = 1,
+  verbose = FALSE,
   ...
 )
 
-\method{inferCSN}{Seurat}(
+\S4method{inferCSN}{data.frame}(
   object,
   penalty = "L0",
   algorithm = "CD",
@@ -56,8 +54,25 @@ inferCSN(object, ...)
   regulators = NULL,
   targets = NULL,
   regulators_num = NULL,
-  verbose = FALSE,
   cores = 1,
+  verbose = FALSE,
+  ...
+)
+
+\S4method{inferCSN}{Seurat}(
+  object,
+  penalty = "L0",
+  algorithm = "CD",
+  cross_validation = FALSE,
+  seed = 1,
+  n_folds = 10,
+  k_folds = NULL,
+  r_threshold = 0,
+  regulators = NULL,
+  targets = NULL,
+  regulators_num = NULL,
+  cores = 1,
+  verbose = FALSE,
   aggregate = TRUE,
   k_neigh = 50,
   atacbinary = TRUE,
@@ -71,27 +86,8 @@ inferCSN(object, ...)
   ...
 )
 
-\method{inferCSN}{CSNObject}(
+\S4method{inferCSN}{CSNObject}(
   object,
-  genes = NULL,
-  network_name = paste0(method, "_network"),
-  peak_to_gene_method = c("Signac", "GREAT"),
-  upstream = 1e+05,
-  downstream = 0,
-  extend = 1e+06,
-  only_tss = FALSE,
-  peak_to_gene_domains = NULL,
-  parallel = FALSE,
-  tf_cor = 0.1,
-  peak_cor = 0,
-  aggregate_rna_col = NULL,
-  aggregate_peaks_col = NULL,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge",
-    "bayesian_ridge"),
-  interaction_term = ":",
-  adjust_method = "fdr",
-  scale = FALSE,
-  verbose = TRUE,
   penalty = "L0",
   algorithm = "CD",
   cross_validation = FALSE,
@@ -103,13 +99,31 @@ inferCSN(object, ...)
   targets = NULL,
   regulators_num = NULL,
   cores = 1,
+  verbose = TRUE,
+  genes = NULL,
+  network_name = paste0(method, "_network"),
+  peak_to_gene_method = c("Signac", "GREAT"),
+  upstream = 1e+05,
+  downstream = 0,
+  extend = 1e+06,
+  only_tss = FALSE,
+  peak_to_gene_domains = NULL,
+  tf_cor = 0.1,
+  peak_cor = 0,
+  aggregate_rna_col = NULL,
+  aggregate_peaks_col = NULL,
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge",
+    "bayesian_ridge"),
+  alpha = 0.5,
+  family = "gaussian",
+  interaction_term = ":",
+  adjust_method = "fdr",
+  scale = FALSE,
   ...
 )
 }
 \arguments{
-\item{object}{An expression matrix, cells by genes.}
-
-\item{...}{Additional arguments.}
+\item{object}{The input object for \code{inferCSN}}
 
 \item{penalty}{The type of regularization.
 This can take either one of the following choices: "L0" and "L0L2".
@@ -137,9 +151,11 @@ The CDPSI algorithm may yield better results, but it also increases running time
 The maximum support size at which to terminate the regularization path.
 Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as L0 regularization typically selects a small portion of non-zeros.}
 
-\item{verbose}{Print detailed information.}
+\item{cores}{CPU cores. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 
-\item{cores}{CPU cores.}
+\item{verbose}{Logical. Display messages. Set verbose to '2' to print errors for all model fits.}
+
+\item{...}{Other parameters for the model fitting function.}
 
 \item{aggregate}{Logical, whether to aggregate the data.}
 
@@ -162,12 +178,12 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 \item{rescued}{Logical}
 
 \item{genes}{A character vector with the target genes to consider for GRN inference.
-Takes all VariableFeatures in the object per default.}
+Takes all \code{VariableFeatures} in the object per default.}
 
-\item{network_name}{network_name}
+\item{network_name}{network_name.}
 
 \item{peak_to_gene_method}{Character specifying the method to
-link peak overlapping motif regions to nearby genes. One of 'Signac' or 'GREAT'.}
+link peak overlapping motif regions to nearby genes. One of \code{Signac} or \code{GREAT}.}
 
 \item{upstream}{Integer defining the distance upstream of the gene to consider as potential regulatory region.}
 
@@ -178,9 +194,7 @@ Only used of `peak_to_gene_method = 'GREAT'`.}
 
 \item{only_tss}{Logical. Measure distance from the TSS (\code{TRUE}) or from the entire gene body (\code{FALSE}).}
 
-\item{peak_to_gene_domains}{`GenomicRanges` object with regulatory regions for each gene.}
-
-\item{parallel}{Logical. Whether to parallelize the computation with \code{\link[foreach]{foreach}}.}
+\item{peak_to_gene_domains}{\code{GenomicRanges} object with regulatory regions for each gene.}
 
 \item{tf_cor}{Threshold for TF - target gene correlation.}
 
@@ -191,12 +205,18 @@ Only used of `peak_to_gene_method = 'GREAT'`.}
 \item{aggregate_peaks_col}{aggregate_peaks_col}
 
 \item{method}{A character string indicating the method to fit the model.
+* \code{'srm'} - Sparse Regression Model.
 * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
 * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
 * \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
 * \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
 * \code{'bagging_ridge'} - Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
 * \code{'bayesian_ridge'} - Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.}
+
+\item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
+
+\item{family}{A description of the error distribution and link function to be used in the model.
+See \code{\link[stats]{family}} for mode details.}
 
 \item{interaction_term}{The interaction term to use in the model between TF and binding site.
 * \code{'+'} for additive interaction.
@@ -211,22 +231,18 @@ For more info, see \code{\link[stats]{formula}}}
 \value{
 A data table of gene-gene regulatory relationship
 
-A SeuratPlus object.
+A CSNObject.
 }
 \description{
 Inferring Cell-Specific Gene Regulatory Network
-
-Fit models for gene expression
 }
 \examples{
-library(inferCSN)
 data("example_matrix")
 weight_table <- inferCSN(example_matrix, verbose = TRUE)
 head(weight_table)
 
 weight_table <- inferCSN(example_matrix, cores = 2)
 head(weight_table)
-
 \dontrun{
 data("promoter_regions_hg38")
 seurat_object <- inferCSN(

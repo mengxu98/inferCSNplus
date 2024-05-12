@@ -13,7 +13,7 @@
 \method{coef}{Network}(object, ...)
 }
 \arguments{
-\item{object}{The grn object}
+\item{object}{The csn object}
 
 \item{network}{network}
 

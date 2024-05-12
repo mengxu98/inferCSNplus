@@ -21,7 +21,7 @@ get_network_graph(object, ...)
 )
 }
 \arguments{
-\item{object}{The input data, a grn object.}
+\item{object}{The input data, a csn object.}
 
 \item{...}{Additional arguments for \code{\link[uwot]{umap}}.}
 

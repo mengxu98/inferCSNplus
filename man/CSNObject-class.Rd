@@ -12,7 +12,7 @@ for the storage and analysis of Regulatory network data.
 \section{Slots}{
 
 \describe{
-\item{\code{grn}}{A named list containing \code{RegulatoryNetwork} objects with inferred networks.}
+\item{\code{csn}}{A named list containing \code{RegulatoryNetwork} objects with inferred networks.}
 
 \item{\code{data}}{Seurat object.}
 }}

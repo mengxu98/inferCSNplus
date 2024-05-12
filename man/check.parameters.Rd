@@ -49,9 +49,9 @@ The CDPSI algorithm may yield better results, but it also increases running time
 The maximum support size at which to terminate the regularization path.
 Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as L0 regularization typically selects a small portion of non-zeros.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical. Display messages. Set verbose to '2' to print errors for all model fits.}
 
-\item{cores}{CPU cores.}
+\item{cores}{CPU cores. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 }
 \value{
 No return value, called for check input parameters

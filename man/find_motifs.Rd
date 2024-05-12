@@ -18,7 +18,7 @@
 find_motifs(object, ...)
 }
 \arguments{
-\item{object}{The input data, a grn object.}
+\item{object}{The input data, a csn object.}
 
 \item{pfm}{A \code{PFMatrixList} object with position weight matrices.}
 

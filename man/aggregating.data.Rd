@@ -16,7 +16,7 @@ aggregating.data(
 )
 }
 \arguments{
-\item{object}{An expression matrix, cells by genes.}
+\item{object}{The input object for \code{inferCSN}}
 
 \item{k_neigh}{Number of cells to be aggregated per cluster.}
 
@@ -30,7 +30,7 @@ aggregating.data(
 
 \item{seed}{The seed used in randomly shuffling the data for cross-validation.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical. Display messages. Set verbose to '2' to print errors for all model fits.}
 }
 \value{
 Seurat object with aggregated data

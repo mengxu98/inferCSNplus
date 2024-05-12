@@ -48,7 +48,7 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{r_threshold}{r_threshold.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical. Display messages. Set verbose to '2' to print errors for all model fits.}
 }
 \value{
 The weight data table of sub-network

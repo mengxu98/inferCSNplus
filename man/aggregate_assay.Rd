@@ -7,7 +7,7 @@
 aggregate_assay(object, group_name, fun = "mean", assay = "RNA", slot = "data")
 }
 \arguments{
-\item{object}{The grn object.}
+\item{object}{The csn object.}
 
 \item{group_name}{A character vector indicating the metadata column to aggregate over.}
 

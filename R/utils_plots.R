@@ -354,7 +354,7 @@ get_network_graph.CSNObject <- function(
       tidygraph::activate(nodes) %>%
       dplyr::mutate(centrality = tidygraph::centrality_pagerank())
 
-    object@grn@networks[[network]]@graphs[[graph_name]] <- gene_graph
+    object@csn@networks[[network]]@graphs[[graph_name]] <- gene_graph
     return(object)
   }
 
@@ -371,7 +371,7 @@ get_network_graph.CSNObject <- function(
     dplyr::mutate(centrality = tidygraph::centrality_pagerank()) %>%
     dplyr::inner_join(coex_umap, by = c("name" = "gene"))
 
-  object@grn@networks[[network]]@graphs[[graph_name]] <- gene_graph
+  object@csn@networks[[network]]@graphs[[graph_name]] <- gene_graph
 
   return(object)
 }
@@ -481,7 +481,7 @@ plot_network_graph.CSNObject <- function(
 #' @param keep_all_edges Logical, whether to maintain all edges to each leaf
 #' or prune to the strongest overall connection.
 #' @param verbose Logical. Whether to print messages.
-#' @param parallel Logical. Whether to parallelize the computation with \code{\link[foreach]{foreach}}.
+#' @param cores Logical. Whether to parallelize the computation with \code{\link[foreach]{foreach}}.
 #'
 #' @return A CSNObject object.
 #'
@@ -497,7 +497,7 @@ get_tf_network.CSNObject <- function(
     order = 3,
     keep_all_edges = FALSE,
     verbose = TRUE,
-    parallel = FALSE,
+    cores = 1,
     ...) {
   gene_graph <- NetworkGraph(object, network = network, graph = graph)
   gene_graph_nodes <- gene_graph %N>% tibble::as_tibble()
@@ -520,7 +520,7 @@ get_tf_network.CSNObject <- function(
     stop("Selected TF has fewer than 3 targets.")
   }
 
-  spath_list <- map_par(spaths, function(p) {
+  spath_list <- parallelize_fun(spaths, function(p) {
     edg <- names(p)
     edg_graph <- gene_graph %>%
       dplyr::filter(name %in% edg) %>%
@@ -572,7 +572,7 @@ get_tf_network.CSNObject <- function(
         )
       )
     )
-  }, parallel = parallel)
+  }, cores = cores, verbose = verbose)
 
   log_message("Pruning graph", verbose = verbose)
   spath_dir <- purrr::map_dfr(spath_list, function(x) x$path) %>%
@@ -582,7 +582,7 @@ get_tf_network.CSNObject <- function(
     )
   spath_graph <- purrr::map_dfr(spath_list, function(x) x$graph)
 
-  grn_pruned <- spath_dir %>%
+  csn_pruned <- spath_dir %>%
     dplyr::select(
       start_node,
       end_node,
@@ -592,39 +592,39 @@ get_tf_network.CSNObject <- function(
     dplyr::filter(order <= order)
 
   if (!keep_all_edges) {
-    if ("padj" %in% colnames(grn_pruned)) {
-      grn_pruned <- dplyr::filter(
-        grn_pruned,
+    if ("padj" %in% colnames(csn_pruned)) {
+      csn_pruned <- dplyr::filter(
+        csn_pruned,
         order == 1 | mean_padj == max(mean_padj)
       )
     } else {
-      grn_pruned <- dplyr::filter(
-        grn_pruned,
+      csn_pruned <- dplyr::filter(
+        csn_pruned,
         order == 1 | mean_estimate == max(mean_estimate)
       )
     }
   }
 
   spath_graph_pruned <- spath_graph %>%
-    dplyr::filter(path %in% grn_pruned$path) %>%
+    dplyr::filter(path %in% csn_pruned$path) %>%
     dplyr::select(from_node, to_node, end_node, comb_dir) %>%
     dplyr::distinct()
 
-  grn_graph_pruned <- gene_graph %E>%
+  csn_graph_pruned <- gene_graph %E>%
     dplyr::mutate(
       from_node = tidygraph::.N()$name[from],
       to_node = tidygraph::.N()$name[to]
     ) %>%
     tibble::as_tibble() %>%
     dplyr::distinct()
-  grn_graph_pruned <- suppressMessages(
-    inner_join(grn_graph_pruned, spath_graph_pruned)
+  csn_graph_pruned <- suppressMessages(
+    inner_join(csn_graph_pruned, spath_graph_pruned)
   ) %>%
     dplyr::select(from_node, to_node, tidyselect::everything(), -from, -to) %>%
     dplyr::arrange(comb_dir) %>%
     tidygraph::as_tbl_graph()
 
-  object@grn@networks[[network]]@graphs$tf_graphs[[tf]] <- grn_graph_pruned
+  object@csn@networks[[network]]@graphs$tf_graphs[[tf]] <- csn_graph_pruned
 
   return(object)
 }
