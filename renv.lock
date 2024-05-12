@@ -909,7 +909,7 @@
     },
     "RcppArmadillo": {
       "Package": "RcppArmadillo",
-      "Version": "0.12.8.2.1",
+      "Version": "0.12.8.3.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -919,7 +919,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "d5448fb24fb114c4da1275a37a571f37"
+      "Hash": "1eb4a0603478b5557b77d75534251371"
     },
     "RcppEigen": {
       "Package": "RcppEigen",
@@ -1104,7 +1104,7 @@
     },
     "Seurat": {
       "Package": "Seurat",
-      "Version": "5.0.3",
+      "Version": "5.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1167,11 +1167,11 @@
         "utils",
         "uwot"
       ],
-      "Hash": "f5325a968489ef65254a51d74dc0c520"
+      "Hash": "aa2040fec3d03e3e598e0b406a84a104"
     },
     "SeuratObject": {
       "Package": "SeuratObject",
-      "Version": "5.0.1",
+      "Version": "5.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1194,7 +1194,7 @@
         "tools",
         "utils"
       ],
-      "Hash": "424c2b9e50b053c86fc38f17e09917da"
+      "Hash": "e9b70412b7e04571b46101f5dcbaacad"
     },
     "Signac": {
       "Package": "Signac",
@@ -3386,6 +3386,27 @@
       ],
       "Hash": "588d091c35389f1f4a9d533c8d709b35"
     },
+    "harmony": {
+      "Package": "harmony",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "RcppProgress",
+        "RhpcBLASctl",
+        "cowplot",
+        "dplyr",
+        "ggplot2",
+        "methods",
+        "rlang",
+        "tibble"
+      ],
+      "Hash": "4f3b181961712ff4127a8634c1367f89"
+    },
     "here": {
       "Package": "here",
       "Version": "1.0.1",
@@ -4704,14 +4725,14 @@
     },
     "ragg": {
       "Package": "ragg",
-      "Version": "1.3.0",
+      "Version": "1.3.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "systemfonts",
         "textshaping"
       ],
-      "Hash": "082e1a198e3329d571f4448ef0ede4bc"
+      "Hash": "539dcb63ce611fe389b4c8e2b546cf24"
     },
     "rappdirs": {
       "Package": "rappdirs",
@@ -5643,7 +5664,7 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.8.3",
+      "Version": "1.8.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -5652,7 +5673,7 @@
         "tools",
         "utils"
       ],
-      "Hash": "058aebddea264f4c99401515182e656a"
+      "Hash": "39e1144fd75428983dc3f63aa53dfa91"
     },
     "stringr": {
       "Package": "stringr",
@@ -5869,13 +5890,13 @@
     },
     "tinytex": {
       "Package": "tinytex",
-      "Version": "0.50",
+      "Version": "0.51",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "xfun"
       ],
-      "Hash": "be7a76845222ad20adb761f462eed3ea"
+      "Hash": "d44e2fcd2e4e076f0aac540208559d1d"
     },
     "tradeSeq": {
       "Package": "tradeSeq",
