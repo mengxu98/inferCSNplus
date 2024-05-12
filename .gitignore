@@ -1,14 +1,18 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
-docs
+# Binary files
+*.dll
 *.o
-.DS_Store
+*.so
+
+# Directories
+docs
+pkgdown
 src-i386
 src-x64
-src/inferCSN.so
-src/inferCSN.dll
-scripts/test.R
-revdep/
-.vscode/settings.json
+
+# macOS file
+.DS_Store
+
+# R files
+.Rhistory
+.Rproj.user
+.Ruserdata
