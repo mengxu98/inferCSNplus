@@ -210,19 +210,19 @@ subnets <- function(
 # Flatten networks
 # function for within an epoch network, or within a static network
 flatten_network <- function(
-    weight_table,
+    network_table,
     communities,
     community_column = "communities",
     weight_column = "weight") {
   # match TFs/TGs to their communities
-  weight_table$TG_module <- communities[, community_column][match(weight_table$target, communities$gene)]
-  weight_table$TF_module <- communities[, community_column][match(weight_table$regulator, communities$gene)]
-  weight_table$TG_module[is.na(weight_table$TG_module)] <- weight_table$TF_module[is.na(weight_table$TG_module)]
+  network_table$TG_module <- communities[, community_column][match(network_table$target, communities$gene)]
+  network_table$TF_module <- communities[, community_column][match(network_table$regulator, communities$gene)]
+  network_table$TG_module[is.na(network_table$TG_module)] <- network_table$TF_module[is.na(network_table$TG_module)]
 
-  weight_table$interaction <- "activation"
-  weight_table$interaction[weight_table$corr < 0] <- "repression"
+  network_table$interaction <- "activation"
+  network_table$interaction[network_table$corr < 0] <- "repression"
 
-  flatDF <- weight_table[, c("TF_module", "TG_module", weight_column, "interaction")]
+  flatDF <- network_table[, c("TF_module", "TG_module", weight_column, "interaction")]
 
   # make edge weight negative for repressive edges
   flatDF$edge_score <- flatDF[, weight_column]
@@ -281,8 +281,8 @@ find_paths_to <- function(modnet, module) {
 #' @examples
 #' library(inferCSN)
 #' data("example_matrix")
-#' weight_table <- inferCSN(example_matrix, verbose = TRUE)
-#' rough_hierarchy(weight_table)
+#' network_table <- inferCSN(example_matrix, verbose = TRUE)
+#' rough_hierarchy(network_table)
 rough_hierarchy <- function(
     modnet,
     abs_weight = TRUE) {
@@ -307,31 +307,31 @@ rough_hierarchy <- function(
 
 #' Function to return shortest path from 1 regulator to 1 target in a static network
 #'
-#' @param weight_table a static network dataframe
+#' @param network_table a static network dataframe
 #' @param from the starting regulator/gene
 #' @param to the end regulator/gene
-#' @param weight_column column name in weight_table with edge weights that will be converted to distances
+#' @param weight_column column name in network_table with edge weights that will be converted to distances
 #' @param compare_to_average if TRUE will compute normalized against average path length
 #'
 #' @return shortest path, distance, normalized distance, and action
 #'
 #' @export
 static_shortest_path <- function(
-    weight_table,
+    network_table,
     from,
     to,
     weight_column = "weight",
     compare_to_average = FALSE) {
   # compute relative edge lengths
-  weight_table$normalized_score <- normalization(
-    weight_table[, weight_column],
+  network_table$normalized_score <- normalization(
+    network_table[, weight_column],
     method = "max"
   )
-  weight_table$edge_length <- 1 - weight_table$normalized_score
+  network_table$edge_length <- 1 - network_table$normalized_score
 
   # find shortest paths
   ig <- igraph::graph_from_data_frame(
-    weight_table[, c("regulator", "target", "edge_length", "weight")],
+    network_table[, c("regulator", "target", "edge_length", "weight")],
     directed = TRUE
   )
   path <- igraph::shortest_paths(
@@ -393,7 +393,7 @@ static_shortest_path <- function(
 #' @param grn a dyanmic network
 #' @param from the starting regulator
 #' @param to the end regulator
-#' @param weight_column column name in weight_table with edge weights that will be converted to distances
+#' @param weight_column column name in network_table with edge weights that will be converted to distances
 #' @param compare_to_average if TRUE will compute normalized against average path length
 #'
 #' @return shortest path, distance, normalized distance, and action
@@ -406,10 +406,10 @@ dynamic_shortest_path <- function(
     weight_column = "weight",
     compare_to_average = FALSE) {
   # merge
-  weight_table <- do.call("rbind", grn)
-  weight_table <- weight_table[!duplicated(weight_table[, c("regulator", "target")]), ]
+  network_table <- do.call("rbind", grn)
+  network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
 
-  res <- static_shortest_path(weight_table, from, to, weight_column, compare_to_average)
+  res <- static_shortest_path(network_table, from, to, weight_column, compare_to_average)
   res
 }
 
@@ -425,7 +425,7 @@ dynamic_shortest_path <- function(
 #' @param grn a dyanmic network
 #' @param from the starting TFs
 #' @param to the end TFs
-#' @param weight_column column name in weight_table with edge weights that will be converted to distances
+#' @param weight_column column name in network_table with edge weights that will be converted to distances
 #'
 #' @return dataframe with shortest path, distance, normalized distance, and action
 #'
@@ -470,11 +470,11 @@ dynamic_shortest_path_multiple <- function(
     }
   }
 
-  weight_table <- do.call("rbind", grn)
-  weight_table <- weight_table[!duplicated(weight_table[, c("regulator", "target")]), ]
-  weight_table$normalized_score <- weight_table[, weight_column] / max(weight_table[, weight_column])
-  weight_table$edge_length <- 1 - weight_table$normalized_score
-  ig <- igraph::graph_from_data_frame(weight_table[, c("regulator", "target", "edge_length", "corr")], directed = TRUE)
+  network_table <- do.call("rbind", grn)
+  network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
+  network_table$normalized_score <- network_table[, weight_column] / max(network_table[, weight_column])
+  network_table$edge_length <- 1 - network_table$normalized_score
+  ig <- igraph::graph_from_data_frame(network_table[, c("regulator", "target", "edge_length", "corr")], directed = TRUE)
 
   avg_path_length <- igraph::mean_distance(ig, directed = TRUE)
   res$distance_over_average <- res$distance / avg_path_length
@@ -511,26 +511,26 @@ cor_and_add_action <- function(
 # max dist numeric value, otherwise "less_than_mean"
 # from is a either a character or vector of characters
 static_reachability <- function(
-    weight_table,
+    network_table,
     from,
     max_dist = "less_than_mean",
     weight_column = "weight",
     tfs = NULL,
     tf_only = FALSE) {
   # compute relative edge lengths
-  weight_table$normalized_score <- normalization(weight_table[, weight_column], method = "max")
-  weight_table$edge_length <- 1 - weight_table$normalized_score
+  network_table$normalized_score <- normalization(network_table[, weight_column], method = "max")
+  network_table$edge_length <- 1 - network_table$normalized_score
 
   if (tf_only) {
     if (is.null(tfs)) {
       stop("Supply TFs.")
     } else {
-      weight_table <- weight_table[weight_table$target %in% tfs, ]
+      network_table <- network_table[network_table$target %in% tfs, ]
     }
   }
 
   ig <- igraph::graph_from_data_frame(
-    weight_table[, c("regulator", "target", "edge_length", "corr")],
+    network_table[, c("regulator", "target", "edge_length", "corr")],
     directed = TRUE
   )
 
@@ -539,7 +539,7 @@ static_reachability <- function(
     max_dist <- avg_path_length
   }
 
-  from <- intersect(from, union(weight_table$regulator, weight_table$target))
+  from <- intersect(from, union(network_table$regulator, network_table$target))
 
   # compute distances
   distance_mat <- igraph::distances(
@@ -568,11 +568,11 @@ dynamic_reachability <- function(
     tfs = NULL,
     tf_only = FALSE) {
   # merge
-  weight_table <- do.call("rbind", grn)
-  weight_table <- weight_table[!duplicated(weight_table[, c("regulator", "target")]), ]
+  network_table <- do.call("rbind", grn)
+  network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
 
   res <- static_reachability(
-    weight_table,
+    network_table,
     from = from,
     max_dist = max_dist,
     weight_column = weight_column,

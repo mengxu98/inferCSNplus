@@ -25,7 +25,7 @@ inferVECTOR(object, ...)
 
 \item{plot}{Logical value.}
 
-\item{filter}{Logical value, default set to `TRUE`,
+\item{filter}{Logical value, default set to \code{TRUE},
 will filter cells though pseudotime.}
 }
 \value{
@@ -44,7 +44,9 @@ library(inferCSN)
 data("example_matrix")
 dimensional_information <- get.dimensional(example_matrix)
 vector_result <- inferVECTOR(dimensional_information)
-library(inferCSN)
 data("example_matrix")
-vector_result <- inferVECTOR(example_matrix, plot = FALSE)
+vector_result <- inferVECTOR(
+  example_matrix,
+  plot = FALSE
+)
 }

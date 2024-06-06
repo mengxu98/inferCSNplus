@@ -1,8 +1,9 @@
-#' Select dynamic genes
+#' @title Select dynamic genes
 #'
 #' @param object Expression object.
 #' @param pseudotime Pseudotime
 #' @param fdr_threshold Threshold of fdr.
+#' @param cores cores
 #'
 #' @return Gene list
 #' @export
@@ -12,7 +13,6 @@
 #' @rdname dynamic.genes
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
 #' vector_result <- inferVECTOR(example_matrix)
 #' dynamic.genes(
@@ -23,6 +23,7 @@ dynamic.genes.default <- function(
     object,
     pseudotime = NULL,
     fdr_threshold = 0.05,
+    cores = 1,
     ...) {
   if (is.null(pseudotime)) {
     return(rownames(object))
@@ -33,7 +34,7 @@ dynamic.genes.default <- function(
   object <- object[sorted_genes, ]
 
   # Fit a GAM model with a loess term for pseudotime
-  res <- purrr::map_dfr(
+  res <- parallelize_fun(
     sorted_genes,
     function(x) {
       data <- data.frame(
@@ -48,8 +49,12 @@ dynamic.genes.default <- function(
         gene = x,
         P_value = summary(gam_model)[4][[1]][1, 5]
       )
-    }
+    },
+    cores = cores,
+    verbose = FALSE
   )
+  res <- purrr::list_rbind(res)
+
   res$fdr <- stats::p.adjust(res$P_value, method = "BH")
   genes <- res[res$fdr < fdr_threshold, 1]
   if (length(genes) < 3) {
@@ -58,16 +63,73 @@ dynamic.genes.default <- function(
   return(genes)
 }
 
+#' @param cluster cluster
+#' @param cluster_column idents
+#' @param pseudotime_column pseudotime_column
+#' @param slot slot used
+#'
+#' @export
+#'
+#' @method dynamic.genes Seurat
+#'
+#' @rdname dynamic.genes
+dynamic.genes.Seurat <- function(
+    object,
+    fdr_threshold = 0.05,
+    cluster = NULL,
+    cluster_column = NULL,
+    pseudotime_column = NULL,
+    slot = "data",
+    ...) {
+  if (!is.null(cluster_column)) {
+    Seurat::Idents(object) <- cluster_column
+  }
+  if (!is.null(cluster)) {
+    object$cluster <- Seurat::Idents(object)
+    object <- subset(object, cluster == cluster)
+  }
+
+  genes <- dynamic.genes(
+    Matrix::as.matrix(
+      switch(
+        EXPR = slot,
+        "counts" = object@assays$RNA$counts,
+        "data" = object@assays$RNA$data
+      )
+    ),
+    pseudotime = object@meta.data[[pseudotime_column]],
+    fdr_threshold = fdr_threshold
+  )
+
+  return(genes)
+}
+
 gamFit <- function(
     matrix,
-    celltime) {
-  ans <- apply(matrix, 1, function(z) {
-    d <- data.frame(z = z, t = celltime)
-    tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
-    p <- summary(tmp)[4][[1]][1, 5]
-    p
-  })
-  ans
+    celltime,
+    cores = 1) {
+  # ans <- apply(matrix, 1, function(z) {
+  #   d <- data.frame(z = z, t = celltime)
+  #   tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
+  #   p <- summary(tmp)[4][[1]][1, 5]
+  #   p
+  # })
+  ans <- parallelize_fun(
+    seq_len(nrow(matrix)),
+    fun = function(z) {
+      z <- matrix[z, ]
+      d <- data.frame(z = z, t = celltime)
+      tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
+      p <- summary(tmp)[4][[1]][1, 5]
+      p
+    },
+    cores = cores,
+    verbose = FALSE
+  )
+  ans <- purrr::list_c(ans)
+  names(ans) <- rownames(matrix)
+
+  return(ans)
 }
 
 #' find genes expressed dynamically
@@ -77,6 +139,7 @@ gamFit <- function(
 #' @param cluster_by vector of group names to include
 #' @param group_column column name in meta_data annotating groups in the cluster_by
 #' @param pseudotime_column column name in meta_data annotating pseudotime or latent time
+#' @param cores cores
 #'
 #' @return pvals and cell info
 #'
@@ -86,7 +149,8 @@ findDynGenes <- function(
     meta_data,
     cluster_by = NULL,
     group_column = "cluster",
-    pseudotime_column = "pseudotime") {
+    pseudotime_column = "pseudotime",
+    cores = 1) {
   meta_data$pseudotime <- meta_data[, pseudotime_column]
   meta_data <- meta_data[which(!is.na(meta_data$pseudotime)), ]
 
@@ -111,7 +175,11 @@ findDynGenes <- function(
 
   object <- object[, meta_data$cells]
 
-  dynamic_genes <- gamFit(object, meta_data$pseudotime)
+  dynamic_genes <- gamFit(
+    object,
+    meta_data$pseudotime,
+    cores = cores
+  )
   cells <- data.frame(
     cells = meta_data$cells,
     pseudotime = meta_data$pseudotime,
@@ -124,45 +192,6 @@ findDynGenes <- function(
   ans
 }
 
-#' @param cluster cluster
-#' @param group_by idents
-#' @param slot slot used
-#'
-#' @export
-#'
-#' @method dynamic.genes Seurat
-#'
-#' @rdname dynamic.genes
-dynamic.genes.Seurat <- function(
-    object,
-    fdr_threshold = 0.05,
-    group_by = NULL,
-    cluster = NULL,
-    slot = "counts",
-    ...) {
-  if (!is.null(group_by)) {
-    Seurat::Idents(object) <- group_by
-  }
-  if (!is.null(cluster)) {
-    object$cluster <- Seurat::Idents(object)
-    object <- subset(object, cluster == cluster)
-  }
-
-  genes <- dynamic.genes(
-    Matrix::as.matrix(
-      switch(
-        EXPR = slot,
-        "counts" = object@assays$RNA$counts,
-        "data" = object@assays$RNA$data
-      )
-    ),
-    pseudotime = object@meta.data$pseudotime,
-    fdr_threshold = fdr_threshold
-  )
-
-  return(genes)
-}
-
 #' find genes expressed dynamically
 #'
 #' @param object properly normalized expression matrix
@@ -173,6 +202,7 @@ dynamic.genes.Seurat <- function(
 #' @param min_cells min cells
 #' @param p_value p_value = 0.05
 #' @param verbose verbose
+#' @param cores cores
 #'
 #' @return pvals and cell info
 #'
@@ -185,7 +215,8 @@ dynamic.genes_new <- function(
     pseudotime_column = "pseudotime",
     min_cells = 100,
     p_value = 0.05,
-    verbose = FALSE) {
+    verbose = TRUE,
+    cores = 1) {
   meta_data$pseudotime <- meta_data[, pseudotime_column]
   meta_data <- meta_data[which(!is.na(meta_data$pseudotime)), ]
 
@@ -194,8 +225,8 @@ dynamic.genes_new <- function(
 
   meta_data_list <- dynamic.windowing(
     meta_data,
-    group_column = "cluster",
-    pseudotime_column = "pseudotime",
+    group_column = group_column,
+    pseudotime_column = pseudotime_column,
     min_cells = min_cells
   )
 
@@ -205,15 +236,17 @@ dynamic.genes_new <- function(
       cluster <- x
       x <- meta_data_list[[x]]
       if (is.null(x)) {
-        message(cluster, " not existed.")
-        log_message()
+        log_message(cluster, " not existed.", verbose = verbose)
         return(NULL)
       }
 
       object <- object[, x$cells]
 
-      message("Starting gammma for cluster: ", cluster, ".")
-      dynamic_genes <- gamFit(object, x$pseudotime)
+      log_message("\rStarting gammma for cluster: ", cluster, verbose = verbose)
+      dynamic_genes <- gamFit(
+        object,
+        x$pseudotime,
+        cores = cores)
       dynamic_genes <- as.data.frame(dynamic_genes)
       dynamic_genes$genes <- rownames(dynamic_genes)
       dynamic_genes <- dynamic_genes[dynamic_genes$dynamic_genes < p_value, ]

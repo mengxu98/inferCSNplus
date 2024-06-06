@@ -5,7 +5,7 @@
 \title{Perform crossweighting}
 \usage{
 crossweight(
-  weight_table,
+  network_table,
   matrix,
   dynamic_object,
   lag = floor(ncol(matrix)/5),
@@ -16,7 +16,7 @@ crossweight(
 )
 }
 \arguments{
-\item{weight_table}{GRN dataframe, the result of running reconstructargetRN or reconstructargetRN_GENIE3}
+\item{network_table}{GRN dataframe, the result of running reconstructargetRN or reconstructargetRN_GENIE3}
 
 \item{matrix}{genes-by-cells expression matrix}
 
@@ -33,7 +33,7 @@ crossweight(
 \item{filter_thresh}{after crossweighting, edges with weights less than filter_thresh will be set to 0.}
 }
 \value{
-weight_table with offset and weighted_score added
+network_table with offset and weighted_score added
 }
 \description{
 Perform crossweighting

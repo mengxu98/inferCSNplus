@@ -8,14 +8,15 @@
 \usage{
 dynamic.genes(object, ...)
 
-\method{dynamic.genes}{default}(object, pseudotime = NULL, fdr_threshold = 0.05, ...)
+\method{dynamic.genes}{default}(object, pseudotime = NULL, fdr_threshold = 0.05, cores = 1, ...)
 
 \method{dynamic.genes}{Seurat}(
   object,
   fdr_threshold = 0.05,
-  group_by = NULL,
   cluster = NULL,
-  slot = "counts",
+  cluster_column = NULL,
+  pseudotime_column = NULL,
+  slot = "data",
   ...
 )
 }
@@ -28,9 +29,13 @@ dynamic.genes(object, ...)
 
 \item{fdr_threshold}{Threshold of fdr.}
 
-\item{group_by}{idents}
+\item{cores}{cores}
 
 \item{cluster}{cluster}
+
+\item{cluster_column}{idents}
+
+\item{pseudotime_column}{pseudotime_column}
 
 \item{slot}{slot used}
 }
@@ -45,7 +50,6 @@ Get dynamic genes
 Select dynamic genes
 }
 \examples{
-library(inferCSN)
 data("example_matrix")
 vector_result <- inferVECTOR(example_matrix)
 dynamic.genes(

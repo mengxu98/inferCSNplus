@@ -20,6 +20,6 @@ returns rough roots in the network, rough roots selected as those connected to m
 \examples{
 library(inferCSN)
 data("example_matrix")
-weight_table <- inferCSN(example_matrix, verbose = TRUE)
-rough_hierarchy(weight_table)
+network_table <- inferCSN(example_matrix, verbose = TRUE)
+rough_hierarchy(network_table)
 }

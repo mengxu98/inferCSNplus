@@ -1,6 +1,6 @@
 #' Perform crossweighting
 #'
-#' @param weight_table GRN dataframe, the result of running reconstructargetRN or reconstructargetRN_GENIE3
+#' @param network_table GRN dataframe, the result of running reconstructargetRN or reconstructargetRN_GENIE3
 #' @param matrix genes-by-cells expression matrix
 #' @param dynamic_object result of running findDynGenes
 #' @param lag lag window on which to run cross-correlation. Cross-correlaiton computed from -lag to +lag.
@@ -9,11 +9,11 @@
 #' @param symmetric_filter whether or not to employ a symmetric weight scheme. If true, absolute offset is used in place of offset.
 #' @param filter_thresh after crossweighting, edges with weights less than filter_thresh will be set to 0.
 #'
-#' @return weight_table with offset and weighted_score added
+#' @return network_table with offset and weighted_score added
 #'
 #' @export
 crossweight <- function(
-    weight_table,
+    network_table,
     matrix,
     dynamic_object,
     lag = floor(ncol(matrix) / 5),
@@ -24,18 +24,18 @@ crossweight <- function(
   # order matrix
   matrix <- matrix[, rownames(dynamic_object$cells)]
 
-  weight_table$target <- as.character(weight_table$target)
-  weight_table$regulator <- as.character(weight_table$regulator)
+  network_table$target <- as.character(network_table$target)
+  network_table$regulator <- as.character(network_table$regulator)
 
-  offset <- apply(weight_table, 1, cross_corr, matrix = matrix, lag = lag)
-  weight_table$offset <- offset
+  offset <- apply(network_table, 1, cross_corr, matrix = matrix, lag = lag)
+  network_table$offset <- offset
 
   weighted_score <- c()
-  for (i in 1:nrow(weight_table)) {
+  for (i in 1:nrow(network_table)) {
     new <- score_offset(
-      # weight_table$zscore[i],
-      weight_table$weight[i],
-      weight_table$offset[i],
+      # network_table$zscore[i],
+      network_table$weight[i],
+      network_table$offset[i],
       min = min,
       max = max,
       symmetric_filter = symmetric_filter
@@ -43,11 +43,11 @@ crossweight <- function(
     weighted_score <- c(weighted_score, new)
   }
 
-  weight_table$weighted_score <- weighted_score
+  network_table$weighted_score <- weighted_score
 
-  weight_table <- weight_table[weight_table$weighted_score > filter_thresh, ]
+  network_table <- network_table[network_table$weighted_score > filter_thresh, ]
 
-  return(weight_table)
+  return(network_table)
 }
 
 

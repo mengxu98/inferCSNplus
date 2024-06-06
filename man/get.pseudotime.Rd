@@ -15,6 +15,9 @@ get.pseudotime(object, ...)
   cluster_by = "cluster",
   cores = 1,
   seed = 1,
+  start_cluster = NULL,
+  end_cluster = NULL,
+  verbose = TRUE,
   ...
 )
 
@@ -23,6 +26,8 @@ get.pseudotime(object, ...)
   assay = "RNA",
   cluster_by = "cluster",
   slot = "data",
+  start_cluster = NULL,
+  end_cluster = NULL,
   ...
 )
 }
@@ -41,6 +46,12 @@ get.pseudotime(object, ...)
 
 \item{seed}{random seed for umap}
 
+\item{start_cluster}{start_cluster}
+
+\item{end_cluster}{end_cluster}
+
+\item{verbose}{verbose}
+
 \item{assay}{assay}
 
 \item{slot}{slot}
@@ -56,7 +67,6 @@ Seurat object
 Get pseudotime information
 }
 \examples{
-library(inferCSN)
 data("example_matrix")
 result <- get.pseudotime(example_matrix)
 }

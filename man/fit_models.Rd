@@ -36,7 +36,7 @@ fit_models(object, ...)
 
 \item{...}{Arguments for other methods}
 
-\item{genes}{A character vector with the target genes to consider for GRN inference.
+\item{genes}{A character vector with the target genes to consider for CSN inference.
 Takes all \code{VariableFeatures} in the object per default.}
 
 \item{network_name}{network_name.}
@@ -82,9 +82,9 @@ For more info, see \code{\link[stats]{formula}}}
 
 \item{scale}{Logical. Whether to z-transform the expression and accessibility matrices.}
 
-\item{verbose}{Logical. Display messages. Set verbose to '2' to print errors for all model fits.}
+\item{verbose}{Print detailed information.}
 
-\item{cores}{CPU cores. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
+\item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 }
 \value{
 A CSNObject.

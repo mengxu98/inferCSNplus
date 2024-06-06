@@ -9,7 +9,8 @@ findDynGenes(
   meta_data,
   cluster_by = NULL,
   group_column = "cluster",
-  pseudotime_column = "pseudotime"
+  pseudotime_column = "pseudotime",
+  cores = 1
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ findDynGenes(
 \item{group_column}{column name in meta_data annotating groups in the cluster_by}
 
 \item{pseudotime_column}{column name in meta_data annotating pseudotime or latent time}
+
+\item{cores}{cores}
 }
 \value{
 pvals and cell info

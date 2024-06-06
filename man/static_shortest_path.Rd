@@ -5,7 +5,7 @@
 \title{Function to return shortest path from 1 regulator to 1 target in a static network}
 \usage{
 static_shortest_path(
-  weight_table,
+  network_table,
   from,
   to,
   weight_column = "weight",
@@ -13,13 +13,13 @@ static_shortest_path(
 )
 }
 \arguments{
-\item{weight_table}{a static network dataframe}
+\item{network_table}{a static network dataframe}
 
 \item{from}{the starting regulator/gene}
 
 \item{to}{the end regulator/gene}
 
-\item{weight_column}{column name in weight_table with edge weights that will be converted to distances}
+\item{weight_column}{column name in network_table with edge weights that will be converted to distances}
 
 \item{compare_to_average}{if TRUE will compute normalized against average path length}
 }

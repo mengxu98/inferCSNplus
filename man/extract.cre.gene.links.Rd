@@ -4,10 +4,10 @@
 \alias{extract.cre.gene.links}
 \title{Extract cre-gene relations of markers}
 \usage{
-extract.cre.gene.links(weight_table, markers, filter = FALSE)
+extract.cre.gene.links(network_table, markers, filter = FALSE)
 }
 \arguments{
-\item{weight_table}{The result of \code{inferCSN()}}
+\item{network_table}{The result of \code{inferCSN()}}
 
 \item{markers}{A dataframe data with marker genes and cluster information,
 such as the results of \code{Seurat::FindAllMarkers(object)}.}

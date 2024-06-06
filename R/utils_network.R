@@ -40,7 +40,7 @@ compute_betweenness_degree <- function(
   ranked_networks <- sapply(names(networks_list), function(x) NULL)
   for (net_name in names(networks_list)) {
     df <- networks_list[[net_name]]
-    df <- net.format(
+    df <- network_format(
       df,
       regulators = regulators,
       targets = targets
@@ -206,7 +206,7 @@ pre_pseudotime_matrix <- function(
 #' @description
 #'  Find communities in a static or dynamic network
 #'
-#' @param weight_table weight_table
+#' @param network_table network_table
 #' @param use_weights whether or not to use edge weights (for weighted graphs)
 #' @param directed Default set to `FALSE`.
 #'  If directed = TRUE, remember to flip target and regulator in diffnet dfs
@@ -215,12 +215,12 @@ pre_pseudotime_matrix <- function(
 #'
 #' @export
 find_communities <- function(
-    weight_table,
+    network_table,
     use_weights = FALSE,
     directed = FALSE) {
-  # if (class(weight_table) == "data.frame") {
-  if (is.data.frame(weight_table)) {
-    graphs <- igraph::graph_from_data_frame(weight_table, directed = directed)
+  # if (class(network_table) == "data.frame") {
+  if (is.data.frame(network_table)) {
+    graphs <- igraph::graph_from_data_frame(network_table, directed = directed)
 
     if (use_weights) {
       weights <- igraph::edge_attr(graphs, "weight")
@@ -236,11 +236,11 @@ find_communities <- function(
       )
     )
     colnames(communities) <- c("gene", "communities")
-  # } else if (class(weight_table) == "list") {
-  } else if (is.list(weight_table)) {
+  # } else if (class(network_table) == "list") {
+  } else if (is.list(network_table)) {
     if (use_weights) {
       graphs <- lapply(
-        weight_table, function(x) {
+        network_table, function(x) {
           igraph::graph_from_data_frame(
             x[, c("regulator", "target", "weight")],
             directed = directed
@@ -263,7 +263,7 @@ find_communities <- function(
       )
     } else {
       graphs <- lapply(
-        weight_table, function(x) {
+        network_table, function(x) {
           igraph::graph_from_data_frame(x, directed = FALSE)
         }
       )

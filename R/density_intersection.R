@@ -70,6 +70,8 @@ density_points <- function(
 
   meta_data$cluster <- meta_data[, group_column]
 
+  meta_data <- meta_data[, c("cluster", "pseudotime")]
+
   if (is.null(cluster_list)) {
     cluster_by <- unique(meta_data$cluster)
   } else{
@@ -77,9 +79,11 @@ density_points <- function(
   }
   meta_data <- purrr::map_dfr(
     cluster_by, function(x) {
-      res <- filter(meta_data, cluster == x)
+      res <- dplyr::filter(meta_data, cluster == x)
       if (nrow(res) >= min_cells) {
         return(res)
+      } else {
+        return()
       }
     }
   )
@@ -401,6 +405,8 @@ dynamic.windowing <- function(
 
   meta_data$cluster <- meta_data[, group_column]
   meta_data$cells <- rownames(meta_data)
+
+  meta_data <- meta_data[, c("cluster", "pseudotime", "cells")]
 
   if (is.null(cluster_list)) {
     cluster_by <- unique(meta_data$cluster)

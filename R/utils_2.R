@@ -1,12 +1,20 @@
-#' Print diagnostic message
+#' @title Print diagnostic message
 #'
 #' @param ... Text to print
 #' @param verbose Display messages
+#' @param method method used to print messages
+#' @param appendLF appendLF messages
 log_message <- function(
     ...,
-    verbose = TRUE) {
+    verbose = TRUE,
+    method = "message",
+    appendLF = FALSE) {
   if (verbose) {
-    message(paste0(...))
+    switch(
+      method,
+      "message" = message(paste0(...), appendLF = appendLF),
+      "cat" = cat(paste0(...))
+    )
   }
 }
 

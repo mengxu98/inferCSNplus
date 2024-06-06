@@ -19,7 +19,7 @@ dynamic_shortest_path(
 
 \item{to}{the end regulator}
 
-\item{weight_column}{column name in weight_table with edge weights that will be converted to distances}
+\item{weight_column}{column name in network_table with edge weights that will be converted to distances}
 
 \item{compare_to_average}{if TRUE will compute normalized against average path length}
 }

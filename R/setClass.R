@@ -117,6 +117,22 @@ CSNObject <- setClass(
   )
 )
 
+#' The CSNObjectList class
+#'
+#' The CSNObjectList object is an extended \code{Seurat} object
+#' for the storage and analysis of Regulatory network data.
+#'
+#' @slot data Seurat object list.
+#'
+#' @name CSNObjectList-class
+#' @rdname CSNObjectList-class
+#' @exportClass CSNObjectList
+CSNObjectList <- setClass(
+  Class = "CSNObjectList",
+  slots = list(
+    "data" = "list"
+  )
+)
 
 #' Get network
 #'
@@ -133,7 +149,7 @@ GetNetwork.CSNObject <- function(
 }
 
 
-#' Get
+#' Get network
 #'
 #' @param network network
 #'

@@ -12,7 +12,8 @@ dynamic.genes_new(
   pseudotime_column = "pseudotime",
   min_cells = 100,
   p_value = 0.05,
-  verbose = FALSE
+  verbose = TRUE,
+  cores = 1
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ dynamic.genes_new(
 \item{p_value}{p_value = 0.05}
 
 \item{verbose}{verbose}
+
+\item{cores}{cores}
 }
 \value{
 pvals and cell info

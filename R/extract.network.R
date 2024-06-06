@@ -122,19 +122,19 @@ get.tf.gene <- function(
 
 #' Extract cre-gene relations of markers
 #'
-#' @param weight_table The result of \code{inferCSN()}
+#' @param network_table The result of \code{inferCSN()}
 #' @param markers A dataframe data with marker genes and cluster information,
 #' such as the results of \code{Seurat::FindAllMarkers(object)}.
 #' @param filter filter
 #'
 #' @export
 extract.cre.gene.links <- function(
-    weight_table,
+    network_table,
     markers,
     filter = FALSE) {
   # loci_gene corresponding relationship
   if (filter) {
-    weight_table <- weight_table[which(weight_table$function_type == "high_corr"), , drop = FALSE]
+    network_table <- network_table[which(network_table$function_type == "high_corr"), , drop = FALSE]
   }
 
   cre_gene_list <- list()
@@ -143,10 +143,10 @@ extract.cre.gene.links <- function(
   for (i in 1:length(uniq_clusters)) {
     marker1 <- markers[markers$cluster == uniq_clusters[i], ]
     marker_gene <- as.character(marker1$gene)
-    effctive_id <- which(weight_table$gene %in% marker_gene)
-    L_G_i <- data.frame(loci = weight_table$target[effctive_id], gene = weight_table$gene[effctive_id])
+    effctive_id <- which(network_table$gene %in% marker_gene)
+    L_G_i <- data.frame(loci = network_table$target[effctive_id], gene = network_table$gene[effctive_id])
     cre_gene_list[[i]] <- L_G_i[!duplicated(L_G_i), , drop = FALSE]
-    P_L_G_i <- data.frame(loci = weight_table$regulator[effctive_id], gene = weight_table$gene[effctive_id])
+    P_L_G_i <- data.frame(loci = network_table$regulator[effctive_id], gene = network_table$gene[effctive_id])
     promoter_cre_gene_list[[i]] <- P_L_G_i[!duplicated(P_L_G_i), , drop = FALSE]
   }
   CRE_Gene <- list()
@@ -290,10 +290,10 @@ extract.peak.tf.links <- function(
 extract.network <- function(
     object,
     cluster) {
-  if ("weight_table_atac" %in% names(Seurat::Misc(object))) {
-    weight_table <- Seurat::Misc(object, slot = "weight_table_atac")
+  if ("network_table_atac" %in% names(Seurat::Misc(object))) {
+    network_table <- Seurat::Misc(object, slot = "network_table_atac")
   }
-  weight_table <- as.data.frame(weight_table)
+  network_table <- as.data.frame(network_table)
 
   if ("all_markers_list" %in% names(Seurat::Misc(object))) {
     all_markers_list <- Seurat::Misc(object, slot = "all_markers_list")
@@ -304,7 +304,7 @@ extract.network <- function(
 
   # CRE-gene connections
   cre_gene <- extract.cre.gene.links(
-    weight_table,
+    network_table,
     markers = focused_markers
   )
 

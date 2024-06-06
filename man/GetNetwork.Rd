@@ -22,5 +22,5 @@ GetNetwork(object, ...)
 \description{
 Get network
 
-Get
+Get network
 }

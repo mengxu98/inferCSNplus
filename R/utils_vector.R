@@ -661,15 +661,23 @@ vector.drawArrow <- function(
 }
 
 # Other functions
-vector.select.Seurat <- function(object) {
+select_Seurat <- function(
+    object,
+    type = "select") {
+  type <- match.arg(type, c("select", "unselect"))
   p <- Seurat::DimPlot(
     object,
     reduction = "umap",
     pt.size = 0.5
   )
-  used_cells <- Seurat::CellSelector(plot = p)
-
-  return(used_cells)
+  selected_cells <- Seurat::CellSelector(plot = p)
+  if (type == "select") {
+    return(selected_cells)
+  } else if (type == "unselect") {
+    return(setdiff(colnames(object), selected_cells))
+  } else {
+    return()
+  }
 }
 
 vector.AddMetaByCell.Seurat <- function(

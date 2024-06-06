@@ -5,7 +5,7 @@
 \title{AUC value calculate}
 \usage{
 auc.calculate(
-  weight_table,
+  network_table,
   ground_truth,
   plot = FALSE,
   line_color = "#1563cc",
@@ -13,7 +13,7 @@ auc.calculate(
 )
 }
 \arguments{
-\item{weight_table}{The weight data table of network}
+\item{network_table}{The weight data table of network}
 
 \item{ground_truth}{Ground truth for calculate AUC}
 
@@ -33,7 +33,7 @@ AUC value calculate
 library(inferCSN)
 data("example_matrix")
 data("example_ground_truth")
-weight_table <- inferCSN(example_matrix)
-auc <- auc.calculate(weight_table, example_ground_truth, plot = TRUE)
+network_table <- inferCSN(example_matrix)
+auc <- auc.calculate(network_table, example_ground_truth, plot = TRUE)
 auc
 }

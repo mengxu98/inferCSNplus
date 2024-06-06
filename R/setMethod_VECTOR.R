@@ -66,7 +66,7 @@ inferVECTOR.VECTOR_dimension <- function(
   return(OUT)
 }
 
-#' @param filter Logical value, default set to `TRUE`,
+#' @param filter Logical value, default set to \code{TRUE},
 #' will filter cells though pseudotime.
 #'
 #' @method inferVECTOR matrix
@@ -74,9 +74,11 @@ inferVECTOR.VECTOR_dimension <- function(
 #' @rdname inferVECTOR
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
-#' vector_result <- inferVECTOR(example_matrix, plot = FALSE)
+#' vector_result <- inferVECTOR(
+#'   example_matrix,
+#'   plot = FALSE
+#' )
 inferVECTOR.matrix <- function(
     object,
     filter = TRUE,
@@ -91,16 +93,8 @@ inferVECTOR.matrix <- function(
     rownames(object) <- paste0(rep("cell_", nrow(object)), 1:nrow(object))
   }
   pseudotime <- result$P.PS[selected]
-  pseudotime <- normalization(pseudotime, method = "max_min")
+  pseudotime <- normalization(pseudotime)
 
-  # object <- new(
-  #   Class = "VECTOR",
-  #   matrix = object,
-  #   pseudotime = data.frame(
-  #     cells = rownames(object),
-  #     pseudotime = pseudotime
-  #   )
-  # )
   object <- list(
     matrix = object,
     pseudotime = data.frame(
@@ -126,7 +120,7 @@ inferVECTOR.Seurat <- function(
   result <- inferVECTOR(dimension)
   selected <- which(result$P.PS != "NA")
   pseudotime <- result$P.PS[selected]
-  pseudotime <- (pseudotime - min(pseudotime)) / (max(pseudotime) - min(pseudotime))
+  pseudotime <- normalization(pseudotime)
   object <- object[, selected]
   object@meta.data$pseudotime <- pseudotime
 

@@ -4,10 +4,10 @@
 \alias{find_communities}
 \title{find_communities}
 \usage{
-find_communities(weight_table, use_weights = FALSE, directed = FALSE)
+find_communities(network_table, use_weights = FALSE, directed = FALSE)
 }
 \arguments{
-\item{weight_table}{weight_table}
+\item{network_table}{network_table}
 
 \item{use_weights}{whether or not to use edge weights (for weighted graphs)}
 

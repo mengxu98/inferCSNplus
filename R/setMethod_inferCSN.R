@@ -5,15 +5,14 @@
 #'
 #' @examples
 #' data("example_matrix")
-#' weight_table <- inferCSN(example_matrix, verbose = TRUE)
-#' head(weight_table)
+#' network_table <- inferCSN(example_matrix, verbose = TRUE)
+#' head(network_table)
 #'
-#' weight_table <- inferCSN(example_matrix, cores = 2)
-#' head(weight_table)
+#' network_table <- inferCSN(example_matrix, cores = 2)
+#' head(network_table)
 setMethod(
   f = "inferCSN",
-  signature = signature(
-    object = "matrix"),
+  signature = signature(object = "matrix"),
   definition = function(
     object,
     penalty = "L0",
@@ -21,7 +20,7 @@ setMethod(
     cross_validation = FALSE,
     seed = 1,
     n_folds = 10,
-    k_folds = NULL,
+    percent_samples = 1,
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
@@ -40,13 +39,14 @@ setMethod(
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
-      k_folds = k_folds,
+      percent_samples = percent_samples,
       r_threshold = r_threshold,
       regulators = regulators,
       targets = targets,
       regulators_num = regulators_num,
       verbose = verbose,
-      cores = cores
+      cores = cores,
+      ...
     )
 
     if (!is.null(regulators)) {
@@ -54,13 +54,14 @@ setMethod(
     } else {
       regulators <- colnames(object)
     }
-
     if (!is.null(targets)) {
       targets <- intersect(colnames(object), targets)
     } else {
       targets <- colnames(object)
     }
-
+    if (is.null(regulators_num)) {
+      regulators_num <- (ncol(object) - 1)
+    }
     names(targets) <- targets
     cores <- min(
       (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
@@ -77,7 +78,7 @@ setMethod(
           penalty = penalty,
           algorithm = algorithm,
           n_folds = n_folds,
-          k_folds = k_folds,
+          percent_samples = percent_samples,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
           verbose = verbose
@@ -86,14 +87,14 @@ setMethod(
       cores = cores,
       verbose = verbose
     )
-    weight_table <- purrr::list_rbind(weight_list)
-    weight_table <- net.format(
-      weight_table,
+    network_table <- purrr::list_rbind(weight_list)
+    network_table <- network_format(
+      network_table,
       abs_weight = FALSE
     )
     if (verbose) message("Run done.")
 
-    return(weight_table)
+    return(network_table)
   }
 )
 
@@ -103,8 +104,7 @@ setMethod(
 #' @rdname inferCSN
 setMethod(
   f = "inferCSN",
-  signature = signature(
-    object = "data.frame"),
+  signature = signature(object = "data.frame"),
   definition = function(
     object,
     penalty = "L0",
@@ -112,7 +112,7 @@ setMethod(
     cross_validation = FALSE,
     seed = 1,
     n_folds = 10,
-    k_folds = NULL,
+    percent_samples = 1,
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
@@ -131,7 +131,7 @@ setMethod(
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
-      k_folds = k_folds,
+      percent_samples = percent_samples,
       r_threshold = r_threshold,
       regulators = regulators,
       targets = targets,
@@ -168,8 +168,7 @@ setMethod(
 #' }
 setMethod(
   f = "inferCSN",
-  signature = signature(
-    object = "Seurat"),
+  signature = signature(object = "Seurat"),
   definition = function(
     object,
     penalty = "L0",
@@ -177,7 +176,7 @@ setMethod(
     cross_validation = FALSE,
     seed = 1,
     n_folds = 10,
-    k_folds = NULL,
+    percent_samples = 1,
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
@@ -201,9 +200,9 @@ setMethod(
     object$cluster <- Seurat::Idents(object)
 
     clusters <- as.character(unique(object$cluster))
-    weight_table_final_list <- list()
-    weight_table_rna_list <- list()
-    weight_table_atac_list <- list()
+    network_table_final_list <- list()
+    network_table_rna_list <- list()
+    network_table_atac_list <- list()
     for (c in seq_along(clusters)) {
       cluster <- clusters[c]
       if (verbose) {
@@ -251,14 +250,14 @@ setMethod(
 
       if ("RNA" %in% names(object_sub@assays)) {
         Seurat::DefaultAssay(object_sub) <- "RNA"
-        weight_table_rna <- inferCSN(
+        network_table_rna <- inferCSN(
           t(data_rna),
           penalty = penalty,
           algorithm = algorithm,
           cross_validation = cross_validation,
           seed = seed,
           n_folds = n_folds,
-          k_folds = k_folds,
+          percent_samples = percent_samples,
           r_threshold = r_threshold,
           regulators = regulators,
           targets = targets,
@@ -268,7 +267,7 @@ setMethod(
           ...
         )
 
-        weight_table_rna_list[[c]] <- weight_table_rna
+        network_table_rna_list[[c]] <- network_table_rna
       }
 
       if ("ATAC" %in% names(object_sub@assays)) {
@@ -313,14 +312,14 @@ setMethod(
         starts <- genome_info_used$Starts
         ends <- genome_info_used$Ends
 
-        weight_table_atac <- .inferCSN.atac(
+        network_table_atac <- .inferCSN.atac(
           peak_matrix = data_atac,
           penalty = penalty,
           algorithm = algorithm,
           cross_validation = cross_validation,
           seed = seed,
           n_folds = n_folds,
-          k_folds = k_folds,
+          percent_samples = percent_samples,
           r_threshold = r_threshold,
           regulators = targets,
           targets = targets,
@@ -335,44 +334,44 @@ setMethod(
           rescued = rescued
         )
 
-        weight_table_atac <- weight_table_atac[order(
-          abs(as.numeric(weight_table_atac$weight)),
+        network_table_atac <- network_table_atac[order(
+          abs(as.numeric(network_table_atac$weight)),
           decreasing = TRUE
         ), ]
-        weight_table_atac_list[[c]] <- weight_table_atac
-        weight_table_atac_sub <- extract.network(object_sub, cluster = clusters[c])
-        names(weight_table_atac_sub) <- c("regulator", "target", "celltype", "types")
+        network_table_atac_list[[c]] <- network_table_atac
+        network_table_atac_sub <- extract.network(object_sub, cluster = clusters[c])
+        names(network_table_atac_sub) <- c("regulator", "target", "celltype", "types")
       }
 
       if (all(c("RNA", "ATAC") %in% names(object_sub@assays))) {
-        weight_table_final <- merge(
-          weight_table_atac_sub,
-          weight_table_rna,
+        network_table_final <- merge(
+          network_table_atac_sub,
+          network_table_rna,
           by = c("regulator", "target"),
           all.x = TRUE
         )
-        weight_table_final <- na.omit(weight_table_final)[, 1:5]
-        weight_table_final$weight <- weight_table_final$weight / sum(abs(weight_table_final$weight))
-        weight_table_final <- weight_table_final[order(abs(as.numeric(weight_table_final$weight)), decreasing = TRUE), ]
-        weight_table_final_list[[c]] <- weight_table_final
+        network_table_final <- na.omit(network_table_final)[, 1:5]
+        network_table_final$weight <- network_table_final$weight / sum(abs(network_table_final$weight))
+        network_table_final <- network_table_final[order(abs(as.numeric(network_table_final$weight)), decreasing = TRUE), ]
+        network_table_final_list[[c]] <- network_table_final
       }
       if (verbose) message(paste0("Run done for cluster: ", cluster, "."))
     }
 
     if ("RNA" %in% names(object_sub@assays)) {
-      names(weight_table_rna_list) <- clusters
+      names(network_table_rna_list) <- clusters
     }
     if ("ATAC" %in% names(object_sub@assays)) {
-      names(weight_table_atac_list) <- clusters
+      names(network_table_atac_list) <- clusters
     }
     if (all(c("RNA", "ATAC") %in% names(object_sub@assays))) {
-      names(weight_table_final_list) <- clusters
+      names(network_table_final_list) <- clusters
     }
 
     # save result
-    Seurat::Misc(object, slot = "weight_table_rna_list") <- weight_table_rna_list
-    Seurat::Misc(object, slot = "weight_table_atac_list") <- weight_table_atac_list
-    Seurat::Misc(object, slot = "weight_table_final_list") <- weight_table_final_list
+    Seurat::Misc(object, slot = "network_table_rna_list") <- network_table_rna_list
+    Seurat::Misc(object, slot = "network_table_atac_list") <- network_table_atac_list
+    Seurat::Misc(object, slot = "network_table_final_list") <- network_table_final_list
 
     if (verbose) message("Run done.")
 
@@ -387,7 +386,7 @@ setMethod(
     cross_validation = FALSE,
     seed = 1,
     n_folds = 10,
-    k_folds = NULL,
+    percent_samples = 1,
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
@@ -474,7 +473,7 @@ setMethod(
           penalty = penalty,
           algorithm = algorithm,
           n_folds = n_folds,
-          k_folds = k_folds,
+          percent_samples = percent_samples,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
           verbose = verbose
@@ -523,7 +522,7 @@ setMethod(
           penalty = penalty,
           algorithm = algorithm,
           n_folds = n_folds,
-          k_folds = k_folds,
+          percent_samples = percent_samples,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
           verbose = verbose
@@ -533,22 +532,22 @@ setMethod(
     doParallel::stopImplicitCluster()
   }
 
-  weight_table <- purrr::list_rbind(weight_list)
-  weight_table <- weight_table[order(abs(as.numeric(weight_table$weight)), decreasing = TRUE), ]
-  # colnames(weight_table) <- c("Peak1", "Peak2", "weight")
+  network_table <- purrr::list_rbind(weight_list)
+  network_table <- network_table[order(abs(as.numeric(network_table$weight)), decreasing = TRUE), ]
+  # colnames(network_table) <- c("Peak1", "Peak2", "weight")
 
   # variable selection
   if (is.null(high_corr_cutoff)) {
-    high_corr_cutoff <- max(stats::quantile(weight_table$weight, 0.50), 0.001)
+    high_corr_cutoff <- max(stats::quantile(network_table$weight, 0.50), 0.001)
   }
   if (is.null(low_corr_cutoff)) {
-    low_corr_cutoff <- min(0.001, stats::quantile(weight_table$weight, 0.25))
+    low_corr_cutoff <- min(0.001, stats::quantile(network_table$weight, 0.25))
   }
 
   for (i in 1:length(weight_list)) {
     if (!is.null(weight_list[[i]])) {
-      weight_table_h <- weight_list[[i]]
-      coefficients <- weight_table_h[, 3]
+      network_table_h <- weight_list[[i]]
+      coefficients <- network_table_h[, 3]
       index1 <- which(coefficients > high_corr_cutoff)
       index2 <- intersect(which(coefficients > low_corr_cutoff), which(coefficients <= high_corr_cutoff))
       index3 <- which(coefficients <= low_corr_cutoff)
@@ -569,14 +568,14 @@ setMethod(
             CPi[p, p] <- 0
           }
           # focus on high_corr rows
-          hic_index <- which(rownames(X) %in% weight_table_h[, 2][index1])
-          other_index <- which(rownames(X) %in% weight_table_h[, 2][-index1])
+          hic_index <- which(rownames(X) %in% network_table_h[, 2][index1])
+          other_index <- which(rownames(X) %in% network_table_h[, 2][-index1])
           CPi_sub <- CPi[hic_index, other_index, drop = FALSE]
           flag_matrix <- matrix(0, nrow = nrow(CPi_sub), ncol = ncol(CPi_sub))
           flag_matrix[which(CPi_sub > 0.25)] <- 1
           correlated_index <- which(colSums(flag_matrix) > 0)
           if (!is.null(correlated_index)) {
-            function_type[weight_table_h$Peak2 %in% rownames(X)[other_index[correlated_index]]] <- "high_corr"
+            function_type[network_table_h$Peak2 %in% rownames(X)[other_index[correlated_index]]] <- "high_corr"
           }
         }
       }
@@ -588,21 +587,21 @@ setMethod(
           Ends = ends[i]
         ),
         cbind(
-          weight_table_h,
+          network_table_h,
           function_type = function_type
         )
       )
     }
   }
-  weight_table <- purrr::list_rbind(weight_list)
-  weight_table$Starts <- as.numeric(weight_table$Starts)
-  weight_table$Ends <- as.numeric(weight_table$Ends)
-  weight_table$weight <- abs(as.numeric(weight_table$weight))
+  network_table <- purrr::list_rbind(weight_list)
+  network_table$Starts <- as.numeric(network_table$Starts)
+  network_table$Ends <- as.numeric(network_table$Ends)
+  network_table$weight <- abs(as.numeric(network_table$weight))
 
-  return(weight_table)
+  return(network_table)
 }
 
-#' @param genes A character vector with the target genes to consider for GRN inference.
+#' @param genes A character vector with the target genes to consider for CSN inference.
 #' Takes all \code{VariableFeatures} in the object per default.
 #' @param network_name network_name.
 #' @param peak_to_gene_method Character specifying the method to
@@ -652,7 +651,7 @@ setMethod(
     cross_validation = FALSE,
     seed = 1,
     n_folds = 10,
-    k_folds = NULL,
+    percent_samples = 1,
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
@@ -753,7 +752,7 @@ fit_models.CSNObject <- function(
   if (is.null(gene_annot)) {
     stop("Please provide a gene annotation for the ChromatinAssay.")
   }
-  # Select target genes for GRN inference
+  # Select target genes for CSN inference
   if (is.null(genes)) {
     genes <- VariableFeatures(object, assay = params$rna_assay)
     if (is.null(genes)) {
@@ -991,3 +990,89 @@ fit_models.CSNObject <- function(
 
   return(object)
 }
+
+#' @param clusters clusters.
+#' @return A CSNObject_list.
+#'
+#' @rdname inferCSN
+#' @method inferCSN CSNObjectList
+#' @export
+setMethod(
+  f = "inferCSN",
+  signature = signature(object = "CSNObjectList"),
+  definition = function(
+    object,
+    penalty = "L0",
+    algorithm = "CD",
+    cross_validation = FALSE,
+    seed = 1,
+    n_folds = 10,
+    percent_samples = 1,
+    r_threshold = 0,
+    regulators = NULL,
+    targets = NULL,
+    regulators_num = NULL,
+    cores = 1,
+    verbose = TRUE,
+    genes = NULL,
+    network_name = paste0(method, "_network"),
+    peak_to_gene_method = c("Signac", "GREAT"),
+    upstream = 100000,
+    downstream = 0,
+    extend = 1000000,
+    only_tss = FALSE,
+    peak_to_gene_domains = NULL,
+    tf_cor = 0.1,
+    peak_cor = 0.,
+    aggregate_rna_col = NULL,
+    aggregate_peaks_col = NULL,
+    method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
+    alpha = 0.5,
+    family = "gaussian",
+    interaction_term = ":",
+    adjust_method = "fdr",
+    scale = FALSE,
+    clusters = NULL,
+    ...) {
+    method <- match.arg(method)
+    peak_to_gene_method <- match.arg(peak_to_gene_method)
+
+    if (is.null(clusters)) {
+      clusters <- names(object@data)
+    }
+
+    objects_list <- purrr::map(
+      clusters, function(x) {
+        log_message("Running for cluster: ", x, verbose = verbose)
+
+        inferCSN(
+          object = object@data[[x]],
+          genes = genes,
+          network_name = network_name,
+          peak_to_gene_method = peak_to_gene_method,
+          upstream = upstream,
+          downstream = downstream,
+          extend = extend,
+          only_tss = only_tss,
+          peak_to_gene_domains = peak_to_gene_domains,
+          tf_cor = tf_cor,
+          peak_cor = peak_cor,
+          aggregate_rna_col = aggregate_rna_col,
+          aggregate_peaks_col = aggregate_peaks_col,
+          method = method,
+          alpha = alpha,
+          family = family,
+          interaction_term = interaction_term,
+          adjust_method = adjust_method,
+          scale = scale,
+          verbose = verbose,
+          cores = cores,
+          ...
+        )
+      }
+    )
+    names(objects_list) <- clusters
+
+    return(objects_list)
+  }
+)

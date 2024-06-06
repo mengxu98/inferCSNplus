@@ -1,6 +1,6 @@
 #' ##' Plot links of inferCSN on focused genes
 #' #'
-#' #' @param weight_table inferCSN result
+#' #' @param network_table inferCSN result
 #' #' @param gene_anno the genome annotation
 #' #' @param marker the focused gene
 #' #' @param cutoff the cutoff of importance scores.
@@ -11,7 +11,7 @@
 #' #' @return ggplot2 object
 #' #' @export
 #' connections.plot <- function(
-#'     weight_table,
+#'     network_table,
 #'     gene_anno = NULL,
 #'     marker,
 #'     cutoff = NULL,
@@ -40,9 +40,9 @@
 #'     )
 #'   }
 #'   # take out the result of marker
-#'   if (length(which(weight_table$gene %in% marker)) > 0) {
-#'     weight_table <- weight_table[which(weight_table$gene %in% marker), , drop = FALSE]
-#'     conns <- weight_table[, 5:7]
+#'   if (length(which(network_table$gene %in% marker)) > 0) {
+#'     network_table <- network_table[which(network_table$gene %in% marker), , drop = FALSE]
+#'     conns <- network_table[, 5:7]
 #'     names(conns) <- c("Peak1", "Peak2", "coaccess")
 #'     rownames(conns) <- NULL
 #'
@@ -50,14 +50,14 @@
 #'     conns$coaccess <- log10(abs(as.numeric(conns$coaccess)) * 100)
 #'     if (is.null(cutoff)) {
 #'       cutoff <- max(
-#'         0, max(conns$coaccess[which(weight_table$function_type == "MC")])
+#'         0, max(conns$coaccess[which(network_table$function_type == "MC")])
 #'       )
 #'     }
 #'     cicero::plot_connections(
 #'       conns,
-#'       weight_table$Chr[1],
-#'       as.numeric(weight_table$Starts[1]) - upstream,
-#'       as.numeric(weight_table$Starts[1]) + downstream,
+#'       network_table$Chr[1],
+#'       as.numeric(network_table$Starts[1]) - upstream,
+#'       as.numeric(network_table$Starts[1]) + downstream,
 #'       gene_model = gene_anno,
 #'       coaccess_cutoff = cutoff,
 #'       collapseTranscripts = "longest",

@@ -4,12 +4,16 @@
 \alias{log_message}
 \title{Print diagnostic message}
 \usage{
-log_message(..., verbose = TRUE)
+log_message(..., verbose = TRUE, method = "message", appendLF = FALSE)
 }
 \arguments{
 \item{...}{Text to print}
 
 \item{verbose}{Display messages}
+
+\item{method}{method used to print messages}
+
+\item{appendLF}{appendLF messages}
 }
 \description{
 Print diagnostic message

@@ -1,9 +1,54 @@
+#' @title Apply function over a List or Vector
+#'
+#' @param x A vector or list to apply over.
+#' @param fun The function to be applied to each element.
+#' @param cores cores.
+#' @param export_fun export_fun.
+#' @param verbose Logical. Whether to print progress bar.
+#' Only works in sequential mode.
+#'
+#' @return A list.
+#'
+#' @export
+parallelize_fun <- function(
+    x,
+    fun,
+    cores = 1,
+    export_fun = NULL,
+    verbose = TRUE) {
+  if (cores == 1 && verbose) {
+    return(pbapply::pblapply(X = x, FUN = fun))
+  }
+  if (cores == 1 && !verbose) {
+    return(base::lapply(X = x, FUN = fun))
+  }
+  if (cores > 1) {
+    doParallel::registerDoParallel(cores = cores)
+    if (verbose) {
+      message("Using ", foreach::getDoParWorkers(), " cores.")
+    }
+
+    "%dopar%" <- foreach::"%dopar%"
+    output_list <- foreach::foreach(
+      i = 1:length(x),
+      .export = export_fun
+    ) %dopar% {
+      fun(x[[i]])
+    }
+    names(output_list) <- names(x)
+
+    doParallel::stopImplicitCluster()
+
+    return(output_list)
+  }
+}
+
 #' @title Check input parameters
 #'
 #' @param matrix An expression matrix, cells by genes
 #' @inheritParams inferCSN
 #'
-#' @return No return value, called for check input parameters
+#' @return Not return value, called for check input parameters
 #' @export
 check.parameters <- function(
     matrix,
@@ -12,13 +57,14 @@ check.parameters <- function(
     cross_validation,
     seed,
     n_folds,
-    k_folds,
+    percent_samples,
     r_threshold,
     regulators,
     targets,
     regulators_num,
     verbose,
-    cores) {
+    cores,
+    ...) {
   if (verbose) {
     message("Checking input parameters.")
   }
@@ -47,10 +93,8 @@ check.parameters <- function(
     }
   }
 
-  if (!is.null(k_folds)) {
-    if (!(is.numeric(k_folds) && k_folds > 0 && k_folds <= 1)) {
-      stop("Please set `k_folds` value between: (0, 1].")
-    }
+  if (!(is.numeric(percent_samples) && percent_samples > 0 && percent_samples <= 1)) {
+    stop("Please set `percent_samples` value between: (0, 1].")
   }
 
   if (!is.null(targets)) {
@@ -97,84 +141,38 @@ check.parameters <- function(
   }
 }
 
-#' @title Apply function over a List or Vector
-#'
-#' @param x A vector or list to apply over.
-#' @param fun The function to be applied to each element.
-#' @param cores cores.
-#' @param export_fun export_fun.
-#' @param verbose Logical. Whether to print progress bar.
-#' Only works in sequential mode.
-#'
-#' @return A list.
-#'
-#' @export
-parallelize_fun <- function(
-    x,
-    fun,
-    cores = 1,
-    export_fun = NULL,
-    verbose = TRUE) {
-  if (cores == 1 && verbose) {
-    return(pbapply::pblapply(X = x, FUN = fun))
-  }
-  if (cores == 1 && !verbose) {
-    return(base::lapply(X = x, FUN = fun))
-  }
-  if (cores > 1) {
-    doParallel::registerDoParallel(cores = cores)
-    if (verbose) {
-      message("Using ", foreach::getDoParWorkers(), " cores.")
-    }
-
-    "%dopar%" <- foreach::"%dopar%"
-    output_list <- foreach::foreach(
-      i = 1:length(x),
-      .export = export_fun
-    ) %dopar% {
-      fun(x[[i]])
-    }
-    names(output_list) <- names(x)
-
-    doParallel::stopImplicitCluster()
-
-    return(output_list)
-  }
-}
-
 #' @title Switch weight table to matrix
 #'
-#' @param weight_table The weight data table of network.
-#' @inheritParams net.format
+#' @param network_table The weight data table of network.
+#' @inheritParams network_format
 #'
 #' @return Weight matrix
 #' @export
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
-#' weight_table <- inferCSN(example_matrix)
-#' head(weight_table)
+#' network_table <- inferCSN(example_matrix)
+#' head(network_table)
 #'
-#' table.to.matrix(weight_table)[1:6, 1:6]
+#' table.to.matrix(network_table)[1:6, 1:6]
 #'
 #' table.to.matrix(
-#'   weight_table,
+#'   network_table,
 #'   regulators = c("g1", "g2"),
 #'   targets = c("g3", "g4")
 #' )
 table.to.matrix <- function(
-    weight_table,
+    network_table,
     regulators = NULL,
     targets = NULL) {
-  weight_table <- net.format(
-    weight_table,
+  network_table <- network_format(
+    network_table,
     abs_weight = FALSE
   )
   weight_matrix <- .Call(
     "_inferCSN_table_to_matrix",
     PACKAGE = "inferCSN",
-    weight_table
+    network_table
   )
   weight_matrix <- filter_sort_matrix(
     weight_matrix,
@@ -188,7 +186,7 @@ table.to.matrix <- function(
 #' @title Filter and sort matrix
 #'
 #' @param weight_matrix The matrix of network weight.
-#' @inheritParams net.format
+#' @inheritParams network_format
 #'
 #' @return Filtered and sorted matrix
 #' @export
@@ -196,8 +194,8 @@ table.to.matrix <- function(
 #' @examples
 #' library(inferCSN)
 #' data("example_matrix")
-#' weight_table <- inferCSN(example_matrix)
-#' weight_matrix <- table.to.matrix(weight_table)
+#' network_table <- inferCSN(example_matrix)
+#' weight_matrix <- table.to.matrix(network_table)
 #' filter_sort_matrix(weight_matrix)[1:6, 1:6]
 #'
 #' filter_sort_matrix(
@@ -230,7 +228,7 @@ filter_sort_matrix <- function(
 
 #' @title Format weight table
 #'
-#' @param weight_table The weight data table of network.
+#' @param network_table The weight data table of network.
 #' @param regulators Regulators list.
 #' @param targets Targets list.
 #' @param abs_weight Logical value, whether to perform absolute value on weights,
@@ -241,67 +239,66 @@ filter_sort_matrix <- function(
 #' @export
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
-#' weight_table <- inferCSN(example_matrix)
+#' network_table <- inferCSN(example_matrix)
 #'
-#' net.format(
-#'   weight_table,
+#' network_format(
+#'   network_table,
 #'   regulators = c("g1")
 #' )
 #'
-#' net.format(
-#'   weight_table,
+#' network_format(
+#'   network_table,
 #'   regulators = c("g1"),
 #'   abs_weight = FALSE
 #' )
 #'
-#' net.format(
-#'   weight_table,
+#' network_format(
+#'   network_table,
 #'   targets = c("g3")
 #' )
 #'
-#' net.format(
-#'   weight_table,
+#' network_format(
+#'   network_table,
 #'   regulators = c("g1", "g3"),
 #'   targets = c("g3", "g5")
 #' )
-net.format <- function(
-    weight_table,
+network_format <- function(
+    network_table,
     regulators = NULL,
     targets = NULL,
     abs_weight = TRUE) {
-  colnames(weight_table) <- c("regulator", "target", "weight")
-  weight_table$weight <- as.numeric(weight_table$weight)
-  weight_table <- dplyr::filter(weight_table, weight != 0)
+  colnames(network_table) <- c("regulator", "target", "weight")
+  network_table$weight <- as.numeric(network_table$weight)
+  network_table <- dplyr::filter(network_table, weight != 0)
   if (!is.null(regulators)) {
-    weight_table <- purrr::map_dfr(
+    network_table <- purrr::map_dfr(
       unique(regulators), function(x) {
-        dplyr::filter(weight_table, regulator == x)
+        dplyr::filter(network_table, regulator == x)
       }
     )
   }
   if (!is.null(targets)) {
-    weight_table <- purrr::map_dfr(
+    network_table <- purrr::map_dfr(
       unique(targets), function(x) {
-        dplyr::filter(weight_table, target == x)
+        dplyr::filter(network_table, target == x)
       }
     )
   }
 
   if (abs_weight) {
-    weight_table$Interaction <- ifelse(
-      weight_table$weight < 0, "Repression", "Activation"
+    network_table$Interaction <- ifelse(
+      network_table$weight < 0, "Repression", "Activation"
     )
-    weight_table$weight <- abs(weight_table$weight)
+    network_table$weight <- abs(network_table$weight)
   }
 
-  weight_table <- weight_table[order(
-    abs(as.numeric(weight_table$weight)),
+  network_table <- network_table[order(
+    abs(as.numeric(network_table$weight)),
     decreasing = TRUE
   ), ]
 
-  return(weight_table)
+  return(network_table)
 }
 
 #' @title Extracts a specific solution in the regularization path
@@ -503,4 +500,34 @@ normalization <- function(
   result <- softmax_values * sign(x)
 
   return(result)
+}
+
+.rmse <- function(
+    true,
+    pred) {
+  sqrt(mean((true - pred)^2))
+}
+
+#' Sum of Squared Errors
+#'
+#' @param y_true A numeric vector with ground truth values.
+#' @param y_pred A numeric vector with predicted values.
+sse <- function(y_true, y_pred) {
+  return(sum((y_true - y_pred)**2))
+}
+
+#' Relative Squared Error
+#'
+#' @param y_true A numeric vector with ground truth values.
+#' @param y_pred A numeric vector with predicted values.
+rse <- function(y_true, y_pred) {
+  return(sse(y_true, y_pred) / sse(y_true, mean(y_true)))
+}
+
+#' @title \eqn{R^2} (coefficient of determination)
+#'
+#' @param y_true A numeric vector with ground truth values.
+#' @param y_pred A numeric vector with predicted values.
+r_square <- function(y_true, y_pred) {
+  1 - rse(y_true, y_pred)
 }

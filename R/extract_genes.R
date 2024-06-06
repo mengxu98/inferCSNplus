@@ -37,7 +37,7 @@ extract_genes <- function(
 
         targets_list <- purrr::map_dfr(
           regulators, function(g) {
-            x_g <- net.format(
+            x_g <- network_format(
               x,
               regulators = g,
               targets = targets,

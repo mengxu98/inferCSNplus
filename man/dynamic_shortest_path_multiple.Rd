@@ -13,7 +13,7 @@ dynamic_shortest_path_multiple(grn, from, to, weight_column = "weight")
 
 \item{to}{the end TFs}
 
-\item{weight_column}{column name in weight_table with edge weights that will be converted to distances}
+\item{weight_column}{column name in network_table with edge weights that will be converted to distances}
 }
 \value{
 dataframe with shortest path, distance, normalized distance, and action

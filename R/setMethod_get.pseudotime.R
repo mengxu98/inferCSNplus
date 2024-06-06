@@ -3,6 +3,9 @@
 #' @param cluster_by choose column used for `slingshot`
 #' @param cores CPU cores used for umap
 #' @param seed random seed for umap
+#' @param start_cluster start_cluster
+#' @param end_cluster end_cluster
+#' @param verbose verbose
 #'
 #' @return A list with a matrix and new meta data
 #' @export
@@ -12,7 +15,6 @@
 #' @rdname get.pseudotime
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
 #' result <- get.pseudotime(example_matrix)
 get.pseudotime.default <- function(
@@ -22,6 +24,9 @@ get.pseudotime.default <- function(
     cluster_by = "cluster",
     cores = 1,
     seed = 1,
+    start_cluster = NULL,
+    end_cluster = NULL,
+    verbose = TRUE,
     ...) {
   if (is.null(meta_data)) {
     cells <- rownames(object)
@@ -48,9 +53,12 @@ get.pseudotime.default <- function(
     )
   }
 
+  log_message("Running `slingshot`", verbose = verbose)
   slingshot_res <- slingshot::slingshot(
     embeddings,
-    clusterLabels = meta_data$cluster
+    clusterLabels = meta_data$cluster,
+    start.clus = start_cluster,
+    end.clus = end_cluster
   )
   pseudotime_res <- slingshot::slingPseudotime(slingshot_res)
   pseudotime_res <- apply(
@@ -85,16 +93,20 @@ get.pseudotime.Seurat <- function(
     assay = "RNA",
     cluster_by = "cluster",
     slot = "data",
+    start_cluster = NULL,
+    end_cluster = NULL,
     ...) {
-  matrix <- Seurat::GetAssay(object, assay = assay)[slot]
+  data <- Seurat::GetAssay(object, assay = assay)[slot]
   embeddings <- Seurat::Embeddings(object, reduction = "umap")
   meta_data <- object@meta.data
 
   result <- get.pseudotime(
-    matrix,
+    data,
     meta_data = meta_data,
     embeddings = embeddings,
     cluster_by = cluster_by,
+    start_cluster = start_cluster,
+    end_cluster = end_cluster,
     ...
   )
   meta_data <- result$meta_data[colnames(object), ]
