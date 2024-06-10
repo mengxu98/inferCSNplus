@@ -85,7 +85,6 @@ setGeneric(
 #' @rdname inferVECTOR
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
 #' dimensional_information <- inferVECTOR(example_matrix)
 setGeneric(

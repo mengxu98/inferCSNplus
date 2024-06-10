@@ -28,6 +28,7 @@ Imports:
     progress,
     purrr,
     Rcpp,
+    RcppArmadillo,
     sparseMatrixStats,
     slam,
     Signac,
@@ -81,7 +82,12 @@ Suggests:
     tibble,
     tidyr,
     stringi,
-    stringr
+    stringr,
+    fields,
+    ggExtra,
+    ggpubr,
+    modeltools,
+    topicmodels
 LinkingTo: 
     Rcpp,
     RcppArmadillo

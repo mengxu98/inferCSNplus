@@ -115,7 +115,6 @@ reference:
   - diffnet_community_detection
   - dynamic.genes
   - dynamic.genes_new
-  - dynamic.networks
   - dynamic.windowing
   - dynamic_difference_network
   - dynamic_shortest_path
@@ -172,6 +171,10 @@ reference:
   - hm_dyn_clust
   - hm_dyn_epoch
 
+- subtitle: "Plotting functions"
+- contents:
+  - plot_scatter
+
 - subtitle: "Network evaluation"
 - contents:
   - auc.calculate
@@ -208,7 +211,7 @@ reference:
   - coef.SRM_fit_CV
   - coef.CSNObject
   - crossweight
-  - net.format
+  - network_format
   - normalization
   - table.to.matrix
   - filter_sort_matrix
@@ -254,7 +257,7 @@ reference:
   - ig_scaleV
   - ig_tabToIgraph
   - log_message
-  - r2
+  - r_square
   - rse
   - sse
   - sparse_covcor

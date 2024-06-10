@@ -1,8 +1,11 @@
 #' @import Matrix ggplot2 ggraph tidygraph
 #'
+#' @importFrom grDevices dev.off pdf
+#' @importFrom graphics axis barplot par
 #' @importFrom Rcpp evalCpp
+#' @importFrom RcppArmadillo armadillo_version
 #' @importFrom stats coef predict cor na.omit sd
-#' @importFrom utils methods
+#' @importFrom utils methods write.table
 #' @importFrom stats family gaussian na.pass
 #' @importFrom methods as is new
 #' @importClassesFrom Signac Motif
@@ -46,6 +49,7 @@ utils::globalVariables(
     "findTop",
     "from",
     "from_node",
+    "lda_data",
     "g",
     "gain",
     "gene",
@@ -73,6 +77,7 @@ utils::globalVariables(
     "penalty",
     "pseudotime",
     "pval",
+    "r2",
     "region",
     "region_",
     "regulator",

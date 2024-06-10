@@ -37,7 +37,6 @@ vector result
 infer VECTOR
 }
 \examples{
-library(inferCSN)
 data("example_matrix")
 dimensional_information <- inferVECTOR(example_matrix)
 library(inferCSN)
