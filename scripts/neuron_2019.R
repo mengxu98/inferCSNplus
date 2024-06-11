@@ -149,7 +149,7 @@ dynamic_genes <- intersect(dynamic_genes, coding_genes)
 dynamic_genes2 <- intersect(dynamic_genes, genes)
 
 
-save(list=ls(), file = "../neuron_2019/current_environment_data.Rdata")
+save(list = ls(), file = "../neuron_2019/current_environment_data.Rdata")
 load(file = "../neuron_2019/current_environment_data.Rdata")
 
 grn_list <- purrr::map2(
@@ -254,7 +254,7 @@ grn_list2_0.5k_0.5r <- purrr::map2(
 )
 r2()
 
-save(list=ls(), file = "../neuron_2019/current_environment_data.Rdata")
+save(list = ls(), file = "../neuron_2019/current_environment_data.Rdata")
 load(file = "../neuron_2019/current_environment_data.Rdata")
 
 grn_list_top <- grn_list2_0.5k_0.5r
@@ -268,10 +268,17 @@ grn_list_top <- purrr::map(
   }
 )
 colnames_order <- gtools::mixedsort(names(grn_list_top))
-lda_data <- construct_lda_data(grn_list_top, celltypes_order = colnames_order)
+lda_data <- construct_lda_data(
+  grn_list_top,
+  celltypes_order = colnames_order[1:3],
+  combine_method = "i"
+)
+
 lda_result <- lda_analysis(
-  lda_data, k = 10, path = "../neuron_2019/lda/", ntop = 30 ,
-  binary = TRUE,
+  lda_data,
+  k = 10,
+  path = "../neuron_2019/lda/",
+  ntop = 30,
   binary_threshold = 0
 ) # , binary = TRUE
 
