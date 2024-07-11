@@ -87,7 +87,10 @@ Suggests:
     ggExtra,
     ggpubr,
     modeltools,
-    topicmodels
+    topicmodels,
+    RTransferEntropy,
+    proxy,
+    RANN
 LinkingTo: 
     Rcpp,
     RcppArmadillo

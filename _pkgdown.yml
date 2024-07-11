@@ -92,6 +92,7 @@ reference:
 
 - subtitle: "Network processing"
 - contents:
+  - network_sift
   - add_interaction_type
   - add_type
   - DefaultNetwork
@@ -174,6 +175,8 @@ reference:
 - subtitle: "Plotting functions"
 - contents:
   - plot_scatter
+  - plot_embedding
+  - plot_weight_distribution
 
 - subtitle: "Network evaluation"
 - contents:
@@ -227,7 +230,6 @@ reference:
   - get.tf.gene
   - transcript.mode
   - is.sparse
-  - weight_filter
   - parallelize_fun
   - mean_module_expression
   - mean_subnetwork_expression

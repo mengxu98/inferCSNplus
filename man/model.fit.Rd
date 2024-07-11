@@ -110,8 +110,8 @@ Computes the regularization path for the specified loss function and penalty fun
 \examples{
 data("example_matrix")
 fit <- model.fit(
-example_matrix[, -1],
-example_matrix[, 1]
+  example_matrix[, -1],
+  example_matrix[, 1]
 )
 head(coef(fit))
 }

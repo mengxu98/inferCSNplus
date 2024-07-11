@@ -123,7 +123,7 @@ setMethod(
     if (verbose) {
       message("Converting the class type of input data from <data.frame> to <matrix>.")
     }
-    object <- as.matrix(object)
+    object <- as_matrix(object)
     inferCSN(
       object,
       penalty = penalty,
@@ -233,18 +233,18 @@ setMethod(
         }
 
         if ("RNA" %in% names(agg_data)) {
-          data_rna <- as.matrix(agg_data$RNA)
+          data_rna <- as_matrix(agg_data$RNA)
         }
 
         if ("ATAC" %in% names(agg_data)) {
-          data_atac <- as.matrix(agg_data$ATAC)
+          data_atac <- as_matrix(agg_data$ATAC)
         }
       } else {
         if ("RNA" %in% names(object_sub@assays)) {
-          data_rna <- Matrix::as.matrix(object_sub@assays$RNA$data)
+          data_rna <- as_matrix(object_sub@assays$RNA$data)
         }
         if ("ATAC" %in% names(object_sub@assays)) {
-          data_atac <- Matrix::as.matrix(object_sub@assays$ATAC$data)
+          data_atac <- as_matrix(object_sub@assays$ATAC$data)
         }
       }
 
@@ -339,7 +339,7 @@ setMethod(
           decreasing = TRUE
         ), ]
         network_table_atac_list[[c]] <- network_table_atac
-        network_table_atac_sub <- extract.network(object_sub, cluster = clusters[c])
+        network_table_atac_sub <- extract_network(object_sub, cluster = clusters[c])
         names(network_table_atac_sub) <- c("regulator", "target", "celltype", "types")
       }
 
@@ -401,7 +401,7 @@ setMethod(
     rescued = TRUE,
     ...) {
   cores <- 1
-  matrix <- as.matrix(peak_matrix)
+  matrix <- as_matrix(peak_matrix)
   rm(peak_matrix)
   peaks <- rownames(matrix)
 
@@ -455,13 +455,13 @@ setMethod(
         if (length(id1) > 1) {
           Y <- colSums(Y)
         }
-        Y <- t(as.matrix(Y))
+        Y <- t(as_matrix(Y))
         rownames(Y) <- peaks[id1[1]]
         promoters_matrix_list[[i]] <- Y
         if (ncol(X) == 1) {
           X <- t(X)
         }
-        Y <- as.matrix(Y)
+        Y <- as_matrix(Y)
         target <- rownames(Y)
         regulators <- rownames(X)
         weight_list[[i]] <- single.network(
@@ -504,13 +504,13 @@ setMethod(
         if (length(id1) > 1) {
           Y <- colSums(Y)
         }
-        Y <- t(as.matrix(Y))
+        Y <- t(as_matrix(Y))
         rownames(Y) <- peaks[id1[1]]
         promoters_matrix_list[[i]] <- Y
         if (ncol(X) == 1) {
           X <- t(X)
         }
-        Y <- as.matrix(Y)
+        Y <- as_matrix(Y)
         target <- rownames(Y)
         regulators <- rownames(X)
         single.network(
@@ -931,7 +931,7 @@ fit_models.CSNObject <- function(
       gene_tfs <- purrr::reduce(purrr::map(frml_string, function(x) x$tfs), union)
       gene_x <- gene_data[gene_groups, union(g, gene_tfs), drop = FALSE]
       model_mat <- as.data.frame(cbind(gene_x, peak_x))
-      if (scale) model_mat <- as.data.frame(scale(as.matrix(model_mat)))
+      if (scale) model_mat <- as.data.frame(scale(as_matrix(model_mat)))
       colnames(model_mat) <- stringr::str_replace_all(colnames(model_mat), "-", "_")
 
       log_message("Fitting model with ", nfeats, " variables for ", g, verbose = verbose == 2)

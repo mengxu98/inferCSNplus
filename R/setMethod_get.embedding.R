@@ -31,7 +31,6 @@ get.dimensional.default <- function(
   return(dimensional)
 }
 
-
 #' @export
 #'
 #' @method get.dimensional Seurat

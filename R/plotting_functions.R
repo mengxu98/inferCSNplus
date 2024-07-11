@@ -77,14 +77,21 @@ plot_scatter <- function(
     facet = FALSE,
     se = FALSE,
     pointdensity = TRUE) {
-  smoothing_method <- match.arg(smoothing_method, c("lm", "loess"))
+  smoothing_method <- match.arg(
+    smoothing_method,
+    c("lm", "loess")
+  )
   compute_correlation_method <- match.arg(
-    compute_correlation_method, c("pearson", "spearman")
+    compute_correlation_method,
+    c("pearson", "spearman")
   )
 
   if (ncol(data) == 3) {
     colnames(data) <- c("x", "y", "cluster")
-    p <- ggplot(data, aes(x = x, y = y, color = cluster)) +
+    p <- ggplot(
+      data,
+      aes(x = x, y = y, color = cluster)
+    ) +
       scale_color_manual(values = group_colors) +
       geom_point() +
       geom_smooth(
@@ -118,7 +125,8 @@ plot_scatter <- function(
   p <- p + theme_bw()
 
   if (compute_correlation) {
-    p <- p + ggpubr::stat_cor(method = compute_correlation_method)
+    p <- p +
+      ggpubr::stat_cor(method = compute_correlation_method)
   }
 
   p <- p +
@@ -144,7 +152,10 @@ plot_scatter <- function(
   }
 
   if (!is.null(marginal_type)) {
-    marginal_type <- match.arg(marginal_type, c("density", "histogram", "boxplot", "violin", "densigram"))
+    marginal_type <- match.arg(
+      marginal_type,
+      c("density", "histogram", "boxplot", "violin", "densigram")
+    )
     margins <- match.arg(margins, c("both", "x", "y"))
 
     p <- suppressMessages(
@@ -160,6 +171,137 @@ plot_scatter <- function(
       )
     )
   }
+
+  return(p)
+}
+
+#' @title plot_weight_distribution
+#'
+#' @param net_table Input data frame.
+#'
+#' @return ggplot object
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' net_table <- inferCSN(example_matrix)
+#' plot_weight_distribution(net_table)
+plot_weight_distribution <- function(net_table) {
+  ggplot(net_table, aes(x = weight)) +
+    geom_histogram(
+      aes(fill = after_stat(count)),
+      binwidth = 0.01
+    ) +
+    viridis::scale_fill_viridis(
+      begin = 0,
+      end = 0.3,
+      direction = -1
+    ) +
+    scale_x_continuous(name = "Weight") +
+    scale_y_continuous(name = "Count") +
+    theme_bw()
+}
+
+#' @title plot_embedding
+#' @description
+#'  Plot embedding of the expression matrix.
+#'
+#' @param expression_matrix Input data frame.
+#' @param labels Input data frame.
+#' @param method Method to use for dimensionality reduction.
+#' @param colors Colors to use for the plot.
+#' @param point_size Size of the points.
+#' @param seed Seed for the random number generator.
+#'
+#' @return ggplot object
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' samples_use <- 1:200
+#' labels <- sample(
+#'   c("A", "B", "C", "D", "E"),
+#'   nrow(example_matrix[samples_use, ]),
+#'   replace = TRUE
+#' )
+#'
+#' plot_embedding(
+#'   example_matrix[samples_use, ],
+#'   point_size = 2
+#' )
+#'
+#' plot_embedding(
+#'   example_matrix[samples_use, ],
+#'   labels,
+#'   point_size = 2
+#' )
+#'
+#' plot_embedding(
+#'   example_matrix[samples_use, ],
+#'   labels,
+#'   method = "pca",
+#'   point_size = 2
+#' )
+plot_embedding <- function(
+    expression_matrix,
+    labels = NULL,
+    method = "tsne",
+    colors = RColorBrewer::brewer.pal(length(unique(labels)), "Set1"),
+    seed = 1,
+    point_size = 1) {
+  method <- match.arg(method, c("umap", "tsne", "pca"))
+
+  set.seed(seed)
+  result <- switch(method,
+                   "umap" = {
+                     uwot::umap(expression_matrix, n_components = 3)
+                   },
+                   "tsne" = {
+                     Rtsne::Rtsne(expression_matrix, dims = 3)$Y
+                   },
+                   "pca" = {
+                     stats::prcomp(expression_matrix, rank. = 3)$x
+                   }
+  )
+
+  result_df <- as.data.frame(result)
+  colnames(result_df) <- c("Dim1", "Dim2", "Dim3")
+
+  if (!is.null(labels)) {
+    result_df$label <- labels
+
+    p <- plotly::plot_ly(
+      data = result_df,
+      x = ~Dim1,
+      y = ~Dim2,
+      z = ~Dim3,
+      color = ~label,
+      colors = colors,
+      type = "scatter3d",
+      mode = "markers",
+      marker = list(size = point_size)
+    )
+  } else {
+    p <- plotly::plot_ly(
+      data = result_df,
+      x = ~Dim1,
+      y = ~Dim2,
+      z = ~Dim3,
+      type = "scatter3d",
+      mode = "markers",
+      marker = list(size = point_size)
+    )
+  }
+
+  p <- plotly::layout(
+    p,
+    scene = list(
+      xaxis = list(title = paste0(toupper(method), "_1")),
+      yaxis = list(title = paste0(toupper(method), "_2")),
+      zaxis = list(title = paste0(toupper(method), "_3"))
+    ),
+    title = paste0("3D ", toupper(method), " Visualization")
+  )
 
   return(p)
 }

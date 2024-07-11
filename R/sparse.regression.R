@@ -43,7 +43,7 @@ single.network <- function(
       data.frame(
         regulator = regulators,
         target = target,
-        weight = stats::cor(x, y, method = "pearson")
+        weight = stats::cor(x, y, method = "spearman")
       )
     )
   }
@@ -197,8 +197,7 @@ sparse.regression <- function(
   if (length(test_y) == length(pred_y)) {
     if (stats::var(test_y) != 0 && stats::var(pred_y) != 0) {
       computation_method <- match.arg(computation_method, c("r_square", "cor"))
-      r <- switch(
-        computation_method,
+      r <- switch(computation_method,
         "cor" = stats::cor(test_y, pred_y),
         "r_square" = r_square(test_y, pred_y)
       )
@@ -248,8 +247,8 @@ sparse.regression <- function(
 #' @examples
 #' data("example_matrix")
 #' fit <- model.fit(
-#' example_matrix[, -1],
-#' example_matrix[, 1]
+#'   example_matrix[, -1],
+#'   example_matrix[, 1]
 #' )
 #' head(coef(fit))
 model.fit <- function(
