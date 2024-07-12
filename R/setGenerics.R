@@ -60,17 +60,12 @@ setGeneric(
 #' @return Dimensional information
 #' @export
 #'
-#' @rdname get.dimensional
-#'
-#' @examples
-#' library(inferCSN)
-#' data("example_matrix")
-#' dimensional_information <- get.dimensional(example_matrix)
+#' @rdname get_embedding
 setGeneric(
-  "get.dimensional",
+  "get_embedding",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "get.dimensional", object = object)
+    UseMethod(generic = "get_embedding", object = object)
   }
 )
 
@@ -82,16 +77,12 @@ setGeneric(
 #' @return Dimensional information
 #' @export
 #'
-#' @rdname inferVECTOR
-#'
-#' @examples
-#' data("example_matrix")
-#' dimensional_information <- inferVECTOR(example_matrix)
+#' @rdname infer_vector
 setGeneric(
-  "inferVECTOR",
+  "infer_vector",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "inferVECTOR", object = object)
+    UseMethod(generic = "infer_vector", object = object)
   }
 )
 
@@ -100,7 +91,7 @@ setGeneric(
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
 #'
-#' @return Dimensional information
+#' @return A new object with dynamic genes
 #' @export
 #'
 #' @rdname dynamic.genes
@@ -118,14 +109,14 @@ setGeneric(
 #' @param ... Arguments for other methods
 #'
 #' @return Dimensional information
-#' @export get.pseudotime
+#' @export get_pseudotime
 #'
-#' @rdname get.pseudotime
+#' @rdname get_pseudotime
 setGeneric(
-  "get.pseudotime",
+  "get_pseudotime",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "get.pseudotime", object = object)
+    UseMethod(generic = "get_pseudotime", object = object)
   }
 )
 

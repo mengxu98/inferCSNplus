@@ -3,16 +3,15 @@
 #' @param ... Text to print
 #' @param verbose Display messages
 #' @param method method used to print messages
-#' @param appendLF appendLF messages
+#' @param append appendLF messages
 log_message <- function(
     ...,
     verbose = TRUE,
     method = "message",
-    appendLF = FALSE) {
+    append = FALSE) {
   if (verbose) {
-    switch(
-      method,
-      "message" = message(paste0(...), appendLF = appendLF),
+    switch(method,
+      "message" = message(paste0(...), appendLF = append),
       "cat" = cat(paste0(...))
     )
   }
@@ -209,9 +208,12 @@ find_modules.Network <- function(
     "regions_neg" = regions_neg
   )
 
-  log_message(paste0("Found ", length(unique(modules$tf)), " TF modules"), verbose = verbose)
+  log_message(
+    paste0("Found ", length(unique(modules$tf)), " TF modules"),
+    verbose = verbose
+  )
 
-  module_meta <- dplyr::select(modules, tf, target, everything())
+  module_meta <- dplyr::select(modules, tf, target, tidyselect::everything())
   object@modules@meta <- module_meta
   object@modules@features <- module_feats
   object@modules@params <- list(
@@ -252,7 +254,9 @@ find_modules.CSNObject <- function(
   )
   modules <- NetworkModules(net_obj)
 
-  reg2peaks <- rownames(GetAssay(object, assay = params$peak_assay))[regions@peaks]
+  reg2peaks <- rownames(
+    GetAssay(object, assay = params$peak_assay)
+  )[regions@peaks]
   names(reg2peaks) <- Signac::GRangesToString(regions@ranges)
   peaks_pos <- modules@features$regions_pos %>% purrr::map(function(x) unique(reg2peaks[x]))
   peaks_neg <- modules@features$regions_neg %>% purrr::map(function(x) unique(reg2peaks[x]))
@@ -294,7 +298,6 @@ find_peaks_near_genes <- function(
     extend = 1000000,
     only_tss = FALSE,
     verbose = TRUE) {
-  # Match arg
   method <- match.arg(method)
 
   if (method == "Signac") {
@@ -331,13 +334,13 @@ find_peaks_near_genes <- function(
     gene_annot_use <- EnsDb.Hsapiens.v93.annot.UCSC.hg38[
       which(EnsDb.Hsapiens.v93.annot.UCSC.hg38$gene_name %in% genes$gene_name),
     ]
-    gene_annot_tss <- select(
-      as_tibble(gene_annot_use), seqnames,
+    gene_annot_tss <- dplyr::select(
+      tibble::as_tibble(gene_annot_use), seqnames,
       "start" = tss, "end" = tss, strand
     )
 
     # Create GRanges object storing the TSS information
-    tss <- GRanges(gene_annot_use)
+    tss <- GenomicRanges::GRanges(gene_annot_use)
 
     # Define basal regulatory region (promoter region)
     # as 5 kb upstream + 1 kb downstream of the TSS
@@ -362,17 +365,18 @@ find_peaks_near_genes <- function(
 
     peak_all <- Signac::GRangesToString(grange = peaks, sep = sep)
     basal_peak_mapped_idx <- S4Vectors::queryHits(basal_overlaps)
-    basal_mapped_peaks <- unique(peak_all[basal_peak_mapped_idx])
-    n1 <- length(basal_mapped_peaks)
+    # basal_mapped_peaks <- unique(peak_all[basal_peak_mapped_idx])
+    # n1 <- length(basal_mapped_peaks)
 
     # Step 2: for the peaks not overlapped with basal regulatory regions,
     # check whether they located within gene body of any genes
-    peak_unmapped_idx <- setdiff(seq(length(peak_all)), basal_peak_mapped_idx)
+    # peak_unmapped_idx <- setdiff(seq(length(peak_all)), basal_peak_mapped_idx)
+    peak_unmapped_idx <- setdiff(seq_along(peak_all), basal_peak_mapped_idx)
     peak_unmapped <- peak_all[peak_unmapped_idx]
     peak_unmapped_region <- Signac::StringToGRanges(peak_unmapped)
 
     # Create GRanges object storing annotated gene boundary
-    gene_bound <- GRanges(gene_annot_use)
+    gene_bound <- GenomicRanges::GRanges(gene_annot_use)
     body_overlaps <- IRanges::findOverlaps(
       query = peak_unmapped_region,
       subject = gene_bound,
@@ -381,19 +385,20 @@ find_peaks_near_genes <- function(
       minoverlap = 2
     )
     body_peak_mapped_idx <- peak_unmapped_idx[S4Vectors::queryHits(body_overlaps)]
-    body_mapped_peaks <- unique(peak_all[body_peak_mapped_idx])
-    n2 <- length(body_mapped_peaks)
+    # body_mapped_peaks <- unique(peak_all[body_peak_mapped_idx])
+    # n2 <- length(body_mapped_peaks)
     peak_mapped_idx <- c(basal_peak_mapped_idx, body_peak_mapped_idx)
 
     # Step 3: for the peaks not overlapped with basal regulatory regions of any genes,
     # check whether they overlap with extended regulatory region. i.e. +/- 1MB of basal regulatory region
-    peak_unmapped_idx <- setdiff(seq(length(peak_all)), peak_mapped_idx)
+    peak_unmapped_idx <- setdiff(seq_along(peak_all), peak_mapped_idx)
     peak_unmapped <- peak_all[peak_unmapped_idx]
     peak_unmapped_region <- Signac::StringToGRanges(peak_unmapped)
     extend_reg <- suppressWarnings(
       expr = Signac::Extend(
         basal_reg,
-        upstream = extend, downstream = extend
+        upstream = extend,
+        downstream = extend
       )
     )
 
@@ -408,8 +413,8 @@ find_peaks_near_genes <- function(
       )
     )
     extended_peak_mapped_idx <- peak_unmapped_idx[S4Vectors::queryHits(extended_overlaps)]
-    extended_mapped_peaks <- unique(peak_all[extended_peak_mapped_idx])
-    n3 <- length(extended_mapped_peaks)
+    # extended_mapped_peaks <- unique(peak_all[extended_peak_mapped_idx])
+    # n3 <- length(extended_mapped_peaks)
 
     hit_matrix <- Matrix::sparseMatrix(
       i = c(
@@ -428,6 +433,7 @@ find_peaks_near_genes <- function(
     rownames(hit_matrix) <- peak_all
     colnames(hit_matrix) <- c(basal_reg$gene_name)
   }
+
   return(hit_matrix)
 }
 
@@ -470,7 +476,9 @@ fast_aggregate <- function(
   if (fun == "mean") {
     result@x <- result@x / (fast_aggregate(x, groupings2, fun = "count"))@x
   }
-  attr(result, "crosswalk") <- grr::extract(groupings, match(rownames(result), groupings2$A))
+  attr(result, "crosswalk") <- grr::extract(
+    groupings, match(rownames(result), groupings2$A)
+  )
   return(result)
 }
 
@@ -501,8 +509,7 @@ dMcast <- function(
   alltms <- stats::terms(formula, data = data)
   response <- rownames(attr(alltms, "factors"))[attr(alltms, "response")]
   tm <- attr(alltms, "term.labels")
-  interactionsIndex <- grep(":", tm)
-  interactions <- tm[interactionsIndex]
+  interactions <- tm[grep(":", tm)]
   simple <- setdiff(tm, interactions)
   i2 <- strsplit(interactions, ":")
   newterms <- unlist(
@@ -513,7 +520,9 @@ dMcast <- function(
     )
   )
   newterms <- c(simple, newterms)
-  newformula <- stats::as.formula(paste("~0+", paste(newterms, collapse = "+")))
+  newformula <- stats::as.formula(
+    paste("~0+", paste(newterms, collapse = "+"))
+  )
   allvars <- all.vars(alltms)
   data <- data[, c(allvars), drop = FALSE]
   if (as.factors) {
@@ -566,7 +575,9 @@ dMcast <- function(
 
   result <- result * values
   if (isTRUE(response > 0)) {
-    responses <- all.vars(stats::terms(stats::as.formula(paste(response, "~0"))))
+    responses <- all.vars(
+      stats::terms(stats::as.formula(paste(response, "~0")))
+    )
     result <- fast_aggregate(
       result,
       data[, responses, drop = FALSE],
@@ -575,7 +586,6 @@ dMcast <- function(
   }
   return(result)
 }
-
 
 #' Aggregate matrix over groups
 #'
@@ -590,7 +600,7 @@ aggregate_matrix <- function(
     x,
     groups = NULL,
     fun = "mean") {
-  if (length(groups) == nrow(x) & "character" %in% class(fun)) {
+  if (length(groups) == nrow(x) && "character" %in% class(fun)) {
     if (fun %in% c("count", "sum")) {
       agg_mat <- fast_aggregate(x = x, groupings = groups, fun = fun)
       return(agg_mat)
@@ -648,7 +658,9 @@ aggregate_assay <- function(
     fun = "mean",
     assay = "RNA",
     slot = "data") {
-  ass_mat <- Matrix::t(Seurat::GetAssayData(object, assay = assay, slot = slot))
+  ass_mat <- Matrix::t(
+    Seurat::GetAssayData(object, assay = assay, slot = slot)
+  )
   groups <- as.character(object@meta.data[[group_name]])
   agg_mat <- aggregate_matrix(ass_mat, groups = groups, fun = fun)
   if (is.null(object@assays[[assay]]@misc$summary)) {
@@ -670,8 +682,8 @@ sparse_covcor <- function(x, y = NULL) {
   }
   if (is.null(y)) {
     n <- nrow(x)
-    muX <- colMeans(x)
-    covmat <- (as.matrix(crossprod(x)) - n * tcrossprod(muX)) / (n - 1)
+    mu_x <- colMeans(x)
+    covmat <- (as.matrix(crossprod(x)) - n * tcrossprod(mu_x)) / (n - 1)
     sdvec <- sqrt(diag(covmat))
     cormat <- covmat / tcrossprod(sdvec)
     return(list(cov = covmat, cor = cormat))
@@ -679,11 +691,11 @@ sparse_covcor <- function(x, y = NULL) {
     if (!is(y, "dgCMatrix")) stop("y should be a dgCMatrix")
     if (nrow(x) != nrow(y)) stop("x and y should have the same number of rows")
     n <- nrow(x)
-    muY <- colMeans(y)
-    muX <- colMeans(x)
-    covmat <- (as.matrix(crossprod(x, y)) - n * tcrossprod(muX, muY)) / (n - 1)
-    sdvecX <- sqrt((colSums(x^2) - n * muX^2) / (n - 1))
-    sdvecY <- sqrt((colSums(y^2) - n * muY^2) / (n - 1))
+    mu_y <- colMeans(y)
+    mu_x <- colMeans(x)
+    covmat <- (as.matrix(crossprod(x, y)) - n * tcrossprod(mu_x, mu_y)) / (n - 1)
+    sdvecX <- sqrt((colSums(x^2) - n * mu_x^2) / (n - 1))
+    sdvecY <- sqrt((colSums(y^2) - n * mu_y^2) / (n - 1))
     cormat <- covmat / tcrossprod(sdvecX, sdvecY)
     return(list(cov = covmat, cor = cormat))
   }

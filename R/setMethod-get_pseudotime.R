@@ -10,14 +10,16 @@
 #' @return A list with a matrix and new meta data
 #' @export
 #'
-#' @method get.pseudotime default
+#' @method get_pseudotime default
 #'
-#' @rdname get.pseudotime
+#' @rdname get_pseudotime
 #'
 #' @examples
+#' \dontrun{
 #' data("example_matrix")
-#' result <- get.pseudotime(example_matrix)
-get.pseudotime.default <- function(
+#' result <- get_pseudotime(example_matrix)
+#' }
+get_pseudotime.default <- function(
     object,
     meta_data = NULL,
     embeddings = NULL,
@@ -85,10 +87,10 @@ get.pseudotime.default <- function(
 #' @return Seurat object
 #' @export
 #'
-#' @method get.pseudotime Seurat
+#' @method get_pseudotime Seurat
 #'
-#' @rdname get.pseudotime
-get.pseudotime.Seurat <- function(
+#' @rdname get_pseudotime
+get_pseudotime.Seurat <- function(
     object,
     assay = "RNA",
     cluster_by = "cluster",
@@ -100,7 +102,7 @@ get.pseudotime.Seurat <- function(
   embeddings <- Seurat::Embeddings(object, reduction = "umap")
   meta_data <- object@meta.data
 
-  result <- get.pseudotime(
+  result <- get_pseudotime(
     data,
     meta_data = meta_data,
     embeddings = embeddings,

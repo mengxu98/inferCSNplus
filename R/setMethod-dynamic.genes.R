@@ -1,5 +1,3 @@
-#' @title Select dynamic genes
-#'
 #' @param object Expression object.
 #' @param pseudotime Pseudotime
 #' @param fdr_threshold Threshold of fdr.
@@ -13,12 +11,14 @@
 #' @rdname dynamic.genes
 #'
 #' @examples
+#' \dontrun{
 #' data("example_matrix")
-#' vector_result <- inferVECTOR(example_matrix)
+#' vector_result <- infer_vector(example_matrix)
 #' dynamic.genes(
 #'   object = t(vector_result$matrix),
 #'   pseudotime = vector_result$pseudotime[, 2]
 #' )
+#' }
 dynamic.genes.default <- function(
     object,
     pseudotime = NULL,
@@ -60,6 +60,7 @@ dynamic.genes.default <- function(
   if (length(genes) < 3) {
     genes <- sorted_genes
   }
+
   return(genes)
 }
 
