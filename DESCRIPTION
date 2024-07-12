@@ -75,6 +75,7 @@ Suggests:
     tidyselect,
     uwot,
     RColorBrewer,
+    Rtsne,
     IRanges,
     S4Vectors,
     ggpointdensity,
