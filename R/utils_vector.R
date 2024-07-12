@@ -1,45 +1,42 @@
-#' rankPCA
+#' @title rank umap
 #'
-#' @param PCA input
+#' @param umap input
 #'
 #' @return output
 #' @export
-vector.rankPCA <- function(PCA) {
-  R.PCA <- apply(PCA, 2, rank)
-  PCA.OUT <- gmodels::fast.prcomp(
-    R.PCA,
+vector_rank_pca <- function(umap) {
+  pca_out <- gmodels::fast.prcomp(
+    apply(umap, 2, rank),
     retx = TRUE,
     center = TRUE,
     scale. = TRUE,
     tol = NULL
   )
-  N.PCA <- PCA.OUT$x
 
-  return(N.PCA)
+  return(pca_out$x)
 }
 
 #' Title
 #'
-#' @param VEC VEC
+#' @param vector vector
 #' @param N N
 #' @param plot plot
-#' @param COL COL
+#' @param colors colors
 #'
 #' @return output
 #' @export
-vector.buildGrid <- function(
-    VEC,
+vector_build_grid <- function(
+    vector,
     N = 30,
     plot = TRUE,
-    COL = "grey70") {
-  VEC.E <- VEC
+    colors = "grey70") {
+  vector_e <- vector
   delta <- 0.000001
-  N <- N
 
   if (plot == TRUE) {
     graphics::plot(
-      VEC.E,
-      col = COL,
+      vector_e,
+      col = colors,
       pch = 16,
       cex = 0.2,
       xlab = "",
@@ -56,28 +53,36 @@ vector.buildGrid <- function(
     )
   }
 
-  X <- VEC[, 1]
-  Y <- VEC[, 2]
+  X <- vector[, 1]
+  Y <- vector[, 2]
 
   this_step_x <- (max(X) - min(X) - delta) / N
   this_step_y <- (max(Y) - min(Y) - delta) / N
   NUM_CUT <- 1
 
-  INDEX_LIST <- list()
-  CENTER_LIST <- list()
+  index_list <- list()
+  center_list <- list()
 
   this_x <- min(X)
   while (this_x < max(X)) {
     this_y <- min(Y)
     while (this_y < max(Y)) {
-      this_in_index <- which(VEC.E[, 1] >= this_x & VEC.E[, 1] < this_x + this_step_x &
-        VEC.E[, 2] >= this_y & VEC.E[, 2] < this_y + this_step_y)
+      this_in_index <- which(
+        vector_e[, 1] >= this_x & vector_e[, 1] < this_x + this_step_x &
+          vector_e[, 2] >= this_y & vector_e[, 2] < this_y + this_step_y
+      )
       this_center <- c(this_x + this_step_x / 2, this_y + this_step_y / 2)
       if (length(this_in_index) >= NUM_CUT) {
-        INDEX_LIST <- c(INDEX_LIST, list(this_in_index))
-        CENTER_LIST <- c(CENTER_LIST, list(this_center))
+        index_list <- c(index_list, list(this_in_index))
+        center_list <- c(center_list, list(this_center))
         if (plot == TRUE) {
-          graphics::points(this_center[1], this_center[2], col = "black", pch = 16, cex = 0.5)
+          graphics::points(
+            this_center[1],
+            this_center[2],
+            col = "black",
+            pch = 16,
+            cex = 0.5
+          )
         }
       }
       this_y <- this_y + this_step_y
@@ -85,41 +90,41 @@ vector.buildGrid <- function(
     this_x <- this_x + this_step_x
   }
 
-  OUT <- list()
-  OUT$VEC <- VEC.E
-  OUT$INDEX_LIST <- INDEX_LIST
-  OUT$CENTER_LIST <- CENTER_LIST
-  OUT$this_step_x <- this_step_x
-  OUT$this_step_y <- this_step_y
+  out <- list()
+  out$vector <- vector_e
+  out$index_list <- index_list
+  out$center_list <- center_list
+  out$this_step_x <- this_step_x
+  out$this_step_y <- this_step_y
 
-  return(OUT)
+  return(out)
 }
 
 #' Title
 #'
-#' @param OUT OUT
+#' @param out out
 #' @param CUT CUT
 #' @param plot plot
-#' @param COL COL
+#' @param colors colors
 #'
 #' @return output
 #' @export
-vector.buildNet <- function(
-    OUT,
+vector_build_net <- function(
+    out,
     CUT = 1,
     plot = TRUE,
-    COL = "grey70") {
-  VEC <- OUT$VEC
-  INDEX_LIST <- OUT$INDEX_LIST
-  CENTER_LIST <- OUT$CENTER_LIST
-  this_step_x <- OUT$this_step_x
-  this_step_y <- OUT$this_step_y
+    colors = "grey70") {
+  vector <- out$vector
+  index_list <- out$index_list
+  center_list <- out$center_list
+  this_step_x <- out$this_step_x
+  this_step_y <- out$this_step_y
   delta <- 0.00001
 
   if (plot == TRUE) {
     graphics::plot(
-      VEC,
-      col = COL,
+      vector,
+      col = colors,
       pch = 16,
       cex = 0.2,
       xlab = "",
@@ -136,36 +141,36 @@ vector.buildNet <- function(
     )
   }
 
-  CENTER_VEC <- c()
+  center_vector <- c()
   i <- 1
-  while (i <= length(CENTER_LIST)) {
-    CENTER_VEC <- cbind(CENTER_VEC, CENTER_LIST[[i]])
+  while (i <= length(center_list)) {
+    center_vector <- cbind(center_vector, center_list[[i]])
     i <- i + 1
   }
-  CENTER_VEC <- t(CENTER_VEC)
-  OUT$CENTER_VEC <- CENTER_VEC
+  center_vector <- t(center_vector)
+  out$center_vector <- center_vector
 
   p1 <- c()
   p2 <- c()
 
-  CNUM <- length(CENTER_LIST)
+  CNUM <- length(center_list)
   i <- 1
   while (i <= CNUM) {
-    this_p1_loc <- CENTER_LIST[[i]]
+    this_p1_loc <- center_list[[i]]
     this_p1 <- paste0("P", as.character(i))
 
     used_j <- which(
-      (abs(CENTER_VEC[, 1] - this_p1_loc[1]) <= this_step_x + delta) &
-        (abs(CENTER_VEC[, 2] - this_p1_loc[2]) <= this_step_y + delta)
+      (abs(center_vector[, 1] - this_p1_loc[1]) <= this_step_x + delta) &
+        (abs(center_vector[, 2] - this_p1_loc[2]) <= this_step_y + delta)
     )
 
     for (j in used_j) {
       this_p2 <- paste0("P", as.character(j))
 
-      this_p2_loc <- CENTER_LIST[[j]]
+      this_p2_loc <- center_list[[j]]
 
-      if (length(INDEX_LIST[[i]]) >= CUT &&
-        length(INDEX_LIST[[j]]) >= CUT &&
+      if (length(index_list[[i]]) >= CUT &&
+        length(index_list[[j]]) >= CUT &&
         this_p1 != this_p2) {
         p1 <- c(p1, this_p1)
         p2 <- c(p2, this_p2)
@@ -203,15 +208,15 @@ vector.buildNet <- function(
     i <- i + 1
   }
 
-  OUT$p1 <- p1
-  OUT$p2 <- p2
+  out$p1 <- p1
+  out$p2 <- p2
   NET <- cbind(p1, p2)
   g <- igraph::make_graph(t(NET), directed = FALSE)
   ALLNAME <- paste0("P", 1:CNUM)
   ADD <- ALLNAME[which(!ALLNAME %in% igraph::as_ids(igraph::V(g)))]
   g <- g + ADD
 
-  DIST <- igraph::distances(
+  dist <- igraph::distances(
     g,
     v = igraph::V(g),
     to = igraph::V(g),
@@ -219,93 +224,93 @@ vector.buildNet <- function(
   )
 
   DIST.NUM <- as.numeric(
-    stringr::str_replace(colnames(DIST), "P", "")
+    stringr::str_replace(colnames(dist), "P", "")
   )
-  DIST <- DIST[order(DIST.NUM), order(DIST.NUM)]
+  dist <- dist[order(DIST.NUM), order(DIST.NUM)]
 
   CPT <- igraph::components(g)
   MAXC <- which(CPT$csize == max(CPT$csize))[1]
 
-  USED_NAME <- names(which(CPT$membership == MAXC))
-  USED <- as.numeric(
-    stringr::str_replace(USED_NAME, "P", "")
+  used_name <- names(which(CPT$membership == MAXC))
+  used <- as.numeric(
+    stringr::str_replace(used_name, "P", "")
   )
 
-  USED_NAME <- USED_NAME[order(USED)]
-  USED <- USED[order(USED)]
+  used_name <- used_name[order(used)]
+  used <- used[order(used)]
   if (plot == TRUE) {
-    graphics::points(OUT$CENTER_VEC[USED, ], col = "red", pch = 16, cex = 0.5)
+    graphics::points(out$center_vector[used, ], col = "red", pch = 16, cex = 0.5)
   }
   USED_INDEX <- c()
   i <- 1
-  while (i <= length(USED)) {
-    USED_INDEX <- c(USED_INDEX, INDEX_LIST[[USED[i]]])
+  while (i <= length(used)) {
+    USED_INDEX <- c(USED_INDEX, index_list[[used[i]]])
     i <- i + 1
   }
 
-  OUT$GRAPH <- g
-  OUT$DIST <- DIST
-  OUT$USED <- USED
-  OUT$USED_NAME <- USED_NAME
-  OUT$USED_INDEX <- USED_INDEX
+  out$graph <- g
+  out$dist <- dist
+  out$used <- used
+  out$used_name <- used_name
+  out$USED_INDEX <- USED_INDEX
 
-  return(OUT)
+  return(out)
 }
 
 #' Title
 #'
-#' @param OUT OUT
-#' @param PCA PCA
+#' @param out out
+#' @param umap umap
 #' @param plot plot
 #'
 #' @return output
 #' @export
-vector.getValue <- function(OUT, PCA, plot = TRUE) {
-  VALUE.OUT <- vector.calValue(PCA)
+vector_build_value <- function(out, umap, plot = TRUE) {
+  VALUE.OUT <- vector.calValue(umap)
 
-  OUT$VALUE <- VALUE.OUT$VALUE
-  OUT$PCA <- PCA
-  OUT$PCA.RC <- VALUE.OUT$PCA.RC
+  out$value <- VALUE.OUT$value
+  out$umap <- umap
+  out$PCA.RC <- VALUE.OUT$PCA.RC
 
   if (plot == TRUE) {
-    vector.showValue(OUT)
+    vector.showValue(out)
   }
 
-  return(OUT)
+  return(out)
 }
 
 #' Title
 #'
-#' @param OUT OUT
+#' @param out out
 #' @param plot plot
 #'
 #' @return output
 #' @export
-vector.gridValue <- function(OUT, plot = TRUE) {
-  INDEX_LIST <- OUT$INDEX_LIST
-  VALUE <- OUT$VALUE
+vector_grid_value <- function(out, plot = TRUE) {
+  index_list <- out$index_list
+  value <- out$value
   plot <- plot
-  USED <- OUT$USED
+  used <- out$used
 
-  CENTER_VALUE <- c()
+  center_value <- c()
   i <- 1
-  while (i <= length(INDEX_LIST)) {
-    this_value <- mean(VALUE[INDEX_LIST[[i]]])
-    CENTER_VALUE <- c(CENTER_VALUE, this_value)
+  while (i <= length(index_list)) {
+    this_value <- mean(value[index_list[[i]]])
+    center_value <- c(center_value, this_value)
     i <- i + 1
   }
-  # CENTER_VEC <- OUT$CENTER_VEC
+  # center_vector <- out$center_vector
 
-  N.VALUE <- (VALUE - min(VALUE)) / (max(VALUE) - min(VALUE))
-  VALUE.COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
+  value_norm <- normalization(value)
+  VALUE.COL <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
-  VALUE <- CENTER_VALUE
-  N.VALUE <- (VALUE - min(VALUE)) / (max(VALUE) - min(VALUE))
-  COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
+  value <- center_value
+  value_norm <- normalization(value)
+  colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
   if (plot == TRUE) {
     graphics::plot(
-      OUT$VEC,
+      out$vector,
       col = "grey80",
       pch = 16,
       cex = 0.5,
@@ -321,130 +326,136 @@ vector.gridValue <- function(OUT, plot = TRUE) {
       col = NA,
       border = "black"
     )
-    # graphics::points(OUT$CENTER_VEC,col=COL,pch=16)
-    graphics::points(OUT$CENTER_VEC[USED, ], col = COL[USED], pch = 15, cex = 1.5)
+    # graphics::points(out$center_vector,col=colors,pch=16)
+    graphics::points(
+      out$center_vector[used, ],
+      col = colors[used],
+      pch = 15,
+      cex = 1.5
+    )
   }
-  OUT$CENTER_VALUE <- CENTER_VALUE
-  OUT$ORIG.CENTER.COL <- COL
-  OUT$VALUE.COL <- VALUE.COL
+  out$center_value <- center_value
+  out$ORIG.CENTER.COL <- colors
+  out$VALUE.COL <- VALUE.COL
 
-  return(OUT)
+  return(out)
 }
 
 #' Title
 #'
-#' @param OUT OUT
-#' @param UP UP
+#' @param out out
+#' @param up_value up_value
 #' @param plot plot
 #'
 #' @return output
 #' @export
-vector.autoCenter <- function(
-    OUT,
-    UP = 0.9,
+vector_auto_center <- function(
+    out,
+    up_value = 0.9,
     plot = TRUE) {
-  DIST <- OUT$DIST
-  USED <- OUT$USED
-  USED_NAME <- OUT$USED_NAME
-  CENTER_VALUE <- OUT$CENTER_VALUE
-  CENTER_VEC <- OUT$CENTER_VEC
-  # CENTER_INDEX <- OUT$CENTER_INDEX
-  INDEX_LIST <- OUT$INDEX_LIST
+  dist <- out$dist
+  used <- out$used
+  used_name <- out$used_name
+  center_value <- out$center_value
+  center_vector <- out$center_vector
+  # center_index <- out$center_index
+  index_list <- out$index_list
 
-  USED_CENTER_VALUE <- CENTER_VALUE[USED]
-  # USED_CENTER_VEC <- CENTER_VEC[USED, ]
+  used_center_value <- center_value[used]
+  # USED_CENTER_VEC <- center_vector[used, ]
 
-  HIGH <- USED[which(USED_CENTER_VALUE >= stats::quantile(USED_CENTER_VALUE, UP))]
-  HIGH_NAME <- USED_NAME[which(USED_CENTER_VALUE >= stats::quantile(USED_CENTER_VALUE, UP))]
-  # LOW_NAME <- USED_NAME[which(USED_CENTER_VALUE < stats::quantile(USED_CENTER_VALUE, UP))]
-  # plot(OUT$CENTER_VEC[USED,])
-  # graphics::points(CENTER_VEC[HIGH,], col='red',pch=16)
-  # plot(CENTER_VEC[HIGH,], col='red')
+  high <- used[which(used_center_value >= stats::quantile(used_center_value, up_value))]
+  high_name <- used_name[which(used_center_value >= stats::quantile(used_center_value, up_value))]
+  # LOW_NAME <- used_name[which(used_center_value < stats::quantile(used_center_value, up_value))]
+  # plot(out$center_vector[used,])
+  # graphics::points(center_vector[high,], col='red',pch=16)
+  # plot(center_vector[high,], col='red')
 
-  SUB <- igraph::induced_subgraph(OUT$GRAPH, HIGH_NAME)
-  SUB_CPT <- igraph::components(SUB)
-  CLUSTER <- list()
-  LENGTH <- c()
-  PCH <- rep(1, length(HIGH))
-  DIST_COR <- c()
-  DIST_MEAN <- c()
+  sub_graph <- igraph::induced_subgraph(out$graph, high_name)
+  sub_cpt <- igraph::components(sub_graph)
+  cluster <- list()
+  length <- c()
+  pch <- rep(1, length(high))
+  dist_cor <- c()
+  dist_mean <- c()
 
   i <- 1
-  while (i <= SUB_CPT$no) {
-    this_name <- names(which(SUB_CPT$membership == i))
+  while (i <= sub_cpt$no) {
+    this_name <- names(which(sub_cpt$membership == i))
     this_index <- as.numeric(stringr::str_replace(this_name, "P", ""))
-    PCH[which(HIGH %in% this_index)] <- as.character(i)
-    LENGTH <- c(LENGTH, length(this_index))
+    pch[which(high %in% this_index)] <- as.character(i)
+    length <- c(length, length(this_index))
     if (length(this_index) == 1) {
-      this_dist <- DIST[USED, this_index]
+      this_dist <- dist[used, this_index]
     } else {
-      this_dist <- apply(DIST[USED, this_index], 1, mean)
+      this_dist <- apply(dist[used, this_index], 1, mean)
     }
-    this_cor <- cor(this_dist, CENTER_VALUE[USED], method = "spearman")
-    DIST_COR <- c(DIST_COR, this_cor)
+    this_cor <- cor(this_dist, center_value[used], method = "spearman")
+    dist_cor <- c(dist_cor, this_cor)
 
-    DIST_MEAN <- c(DIST_MEAN, mean(this_dist))
-    CLUSTER <- c(CLUSTER, list(this_index))
+    dist_mean <- c(dist_mean, mean(this_dist))
+    cluster <- c(cluster, list(this_index))
     i <- i + 1
   }
 
-  # SELECT=which(DIST_COR==min(DIST_COR))[1]
-  # SELECT=which(rank(DIST_MEAN)*rank(DIST_COR) == min(rank(DIST_MEAN)*rank(DIST_COR)) )
+  # select=which(dist_cor==min(dist_cor))[1]
+  # select=which(rank(dist_mean)*rank(dist_cor) == min(rank(dist_mean)*rank(dist_cor)) )
 
-  TMP <- 10^LENGTH - DIST_COR
-  # TMP=rank(-DIST_COR) * rank(LENGTH )
-  SELECT <- which(TMP == max(TMP))[1]
-  # SELECT=which(LENGTH==max(LENGTH))[1]
-  # SELECT=which( rank(-DIST_COR) * rank(LENGTH) == max( rank(-DIST_COR) * rank(LENGTH)  ) )[1]
+  tmp <- 10^length - dist_cor
+  # tmp=rank(-dist_cor) * rank(length )
+  select <- which(tmp == max(tmp))[1]
+  # select=which(length==max(length))[1]
+  # select=which( rank(-dist_cor) * rank(length) == max( rank(-dist_cor) * rank(length)  ) )[1]
 
-  SUMMIT <- CLUSTER[[SELECT]]
-  # print(SELECT)
-  # plot(OUT$CENTER_VEC[USED,])
-  # graphics::points(OUT$CENTER_VEC[CLUSTER[[9]],],pch=16,col='red')
+  summit <- cluster[[select]]
+  # graphics::points(out$center_vector[cluster[[9]],],pch=16,col='red')
 
-  SCORE <- c()
+  score <- c()
   PS <- c()
   i <- 1
-  while (i <= length(USED_NAME)) {
-    this_name <- USED_NAME[i]
-    this_dist <- DIST[
-      which(colnames(DIST) == this_name),
-      which(rownames(DIST) %in% paste0("P", SUMMIT))
+  while (i <= length(used_name)) {
+    this_name <- used_name[i]
+    this_dist <- dist[
+      which(colnames(dist) == this_name),
+      which(rownames(dist) %in% paste0("P", summit))
     ]
-    # this_value=CENTER_VALUE[USED]
+    # this_value=center_value[used]
     this_score <- min(this_dist) # sum(rank(-this_dist) * rank(this_value))
     # this_cor=cor(-this_value, this_dist)#,method='spearman')
-    SCORE <- c(SCORE, this_score)
+    score <- c(score, this_score)
     PS <- c(PS, this_score)
     i <- i + 1
   }
-  SCORE <- max(SCORE) - SCORE
+  score <- max(score) - score
 
-  VALUE <- SCORE
-  # plot(OUT$VEC, col='grey70',pch=16)
-  N.VALUE <- (VALUE - min(VALUE)) / (max(VALUE) - min(VALUE))
-  # COL=vector.vcol(N.VALUE, c(0,0.5,1),c('#009FFF','#FFF200','#ec2F4B')) # too strong
-  # COL=vector.vcol(N.VALUE,c(0,0.5,1),c('#009FFF','#FFF200','#ffdde1')) # too weak
-  COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ee9ca7"))
+  value <- score
+  # plot(out$vector, col='grey70',pch=16)
+  value_norm <- normalization(value)
+  colors <- vector_vcol(
+    value_norm,
+    c(0, 0.5, 1),
+    c("#009FFF", "#FFF200", "#ec2F4B")
+  ) # too strong
+  # colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ee9ca7"))
 
-  OUT$COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$ORIG.COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$P.SCORE <- rep(0, nrow(OUT$VEC))
-  OUT$P.PS <- rep(NA, nrow(OUT$VEC))
+  out$colors <- rep("grey70", nrow(out$vector))
+  out$ORIG.COL <- rep("grey70", nrow(out$vector))
+  out$p_score <- rep(0, nrow(out$vector))
+  out$P.PS <- rep(NA, nrow(out$vector))
   i <- 1
-  while (i <= length(USED)) {
-    this_index <- INDEX_LIST[[USED[i]]]
-    OUT$COL[this_index] <- COL[i]
-    OUT$ORIG.COL[this_index] <- OUT$ORIG.CENTER.COL[USED][i]
-    OUT$P.SCORE[this_index] <- SCORE[i]
-    OUT$P.PS[this_index] <- PS[i]
+  while (i <= length(used)) {
+    this_index <- index_list[[used[i]]]
+    out$colors[this_index] <- colors[i]
+    out$ORIG.COL[this_index] <- out$ORIG.CENTER.COL[used][i]
+    out$p_score[this_index] <- score[i]
+    out$P.PS[this_index] <- PS[i]
     i <- i + 1
   }
 
   if (plot == TRUE) {
     graphics::plot(
-      OUT$VEC,
-      col = OUT$ORIG.COL,
+      out$vector,
+      col = out$ORIG.COL,
       pch = 16,
       cex = 0.5,
       xlab = "",
@@ -460,56 +471,56 @@ vector.autoCenter <- function(
       border = "black"
     )
     graphics::text(
-      CENTER_VEC[HIGH, 1],
-      CENTER_VEC[HIGH, 2],
-      labels = PCH,
+      center_vector[high, 1],
+      center_vector[high, 2],
+      labels = pch,
       cex = 1,
       pos = 2
     )
     graphics::points(
-      CENTER_VEC[HIGH, 1],
-      CENTER_VEC[HIGH, 2],
+      center_vector[high, 1],
+      center_vector[high, 2],
       col = "black",
       pch = 16,
       cex = 1
     )
     graphics::points(
-      CENTER_VEC[SUMMIT, 1],
-      CENTER_VEC[SUMMIT, 2],
+      center_vector[summit, 1],
+      center_vector[summit, 2],
       col = "black",
       pch = 16,
       cex = 1.5
     )
     graphics::points(
-      CENTER_VEC[SUMMIT, 1],
-      CENTER_VEC[SUMMIT, 2],
+      center_vector[summit, 1],
+      center_vector[summit, 2],
       col = "red",
       pch = 16,
       cex = 1
     )
   }
 
-  OUT$SCORE <- SCORE
-  OUT$SUMMIT <- SUMMIT
-  OUT$CLUSTER <- CLUSTER
-  OUT$LENGTH <- LENGTH
-  OUT$PCH <- PCH
-  OUT$DIST_COR <- DIST_COR
-  OUT$PS <- PS
-  # OUT$DIST_MEAN=DIST_MEAN
+  out$score <- score
+  out$summit <- summit
+  out$cluster <- cluster
+  out$length <- length
+  out$pch <- pch
+  out$dist_cor <- dist_cor
+  out$PS <- PS
+  # out$dist_mean=dist_mean
 
-  return(OUT)
+  return(out)
 }
 
 #' Title
 #'
-#' @param OUT OUT
+#' @param out out
 #' @param P P
 #' @param plot plot
-#' @param COL COL
+#' @param colors colors
 #' @param OL OL
 #' @param arrow_length2 arrow_length2
-#' @param CEX CEX
+#' @param cex_value cex_value
 #' @param arrow_width arrow_width
 #' @param BD BD
 #' @param arrow_color arrow_color
@@ -517,25 +528,25 @@ vector.autoCenter <- function(
 #'
 #' @return output
 #' @export
-vector.drawArrow <- function(
-    OUT,
+vector_draw_arrow <- function(
+    out,
     P = 0.9,
     plot = TRUE,
-    COL = "grey70",
+    colors = "grey70",
     OL = 1.5,
     arrow_length2 = 70,
-    CEX = 0.5,
+    cex_value = 0.5,
     arrow_width = 1,
     BD = TRUE,
     arrow_color = "grey30",
     plot.SUMMIT = TRUE) {
-  USED <- OUT$USED
-  DIST <- OUT$DIST
-  ALL_VEC <- OUT$VEC
-  USED_NAME <- OUT$USED_NAME
-  USED_CENTER_VEC <- OUT$CENTER_VEC[USED, ]
-  USED_DIST <- OUT$DIST[which(rownames(DIST) %in% USED_NAME), which(rownames(DIST) %in% USED_NAME)]
-  SCORE <- OUT$SCORE
+  used <- out$used
+  dist <- out$dist
+  ALL_VEC <- out$vector
+  used_name <- out$used_name
+  USED_CENTER_VEC <- out$center_vector[used, ]
+  USED_DIST <- out$dist[which(rownames(dist) %in% used_name), which(rownames(dist) %in% used_name)]
+  score <- out$score
 
   one <- min(stats::dist(USED_CENTER_VEC)) * OL
 
@@ -545,9 +556,9 @@ vector.drawArrow <- function(
     if (BD == TRUE) {
       graphics::plot(
         ALL_VEC,
-        col = COL,
+        col = colors,
         pch = 16,
-        cex = CEX,
+        cex = cex_value,
         xlim = c(min(ALL_VEC[, 1]) - one, max(ALL_VEC[, 1]) + one),
         ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one),
         xlab = "",
@@ -565,9 +576,9 @@ vector.drawArrow <- function(
     } else {
       graphics::plot(
         ALL_VEC,
-        col = COL,
+        col = colors,
         pch = 16,
-        cex = CEX,
+        cex = cex_value,
         xlim = c(min(ALL_VEC[, 1]) - one, max(ALL_VEC[, 1]) + one),
         ylim = c(min(ALL_VEC[, 2]) - one, max(ALL_VEC[, 2]) + one),
         yaxt = "n",
@@ -586,8 +597,8 @@ vector.drawArrow <- function(
       )
     }
   }
-  N.SCORE <- normalization(SCORE)
-  SCORE.COL <- vector.vcol(
+  N.SCORE <- normalization(score)
+  SCORE.COL <- vector_vcol(
     N.SCORE,
     c(0, 0.5, 1),
     c("#009FFF", "#FFF200", "#ec2F4B")
@@ -598,14 +609,14 @@ vector.drawArrow <- function(
   A_LENGTH <- c()
 
   i <- 1
-  while (i <= length(USED)) {
+  while (i <= length(used)) {
     this_p1_loc <- USED_CENTER_VEC[i, ]
 
     vector_list <- cbind(USED_CENTER_VEC[, 1] - this_p1_loc[1], USED_CENTER_VEC[, 2] - this_p1_loc[2])
     vector_list_norm <- t(apply(vector_list, 1, .norm_one, one))
 
     vector_weight_1 <- DIV^-(rank(USED_DIST[i, ]) - 1) # equals to P ^ (rank(USED_DIST[i,])-1)
-    vector_weight_2 <- SCORE[i] - SCORE # PS - PS[i]; "PS_i - PS_j" in  the paper; In paper, PS[i] is "PS_j".
+    vector_weight_2 <- score[i] - score # PS - PS[i]; "PS_i - PS_j" in  the paper; In paper, PS[i] is "PS_j".
 
     vector_weight <- vector_weight_1 * vector_weight_2
     vector_weight <- vector_weight / sum(abs(vector_weight))
@@ -633,10 +644,10 @@ vector.drawArrow <- function(
   }
 
   if (plot == TRUE & plot.SUMMIT == TRUE) {
-    X1 <- min(OUT$CENTER_VEC[OUT$SUMMIT, 1]) - one / 10
-    X2 <- max(OUT$CENTER_VEC[OUT$SUMMIT, 1]) + one / 10
-    Y1 <- min(OUT$CENTER_VEC[OUT$SUMMIT, 2]) - one / 10
-    Y2 <- max(OUT$CENTER_VEC[OUT$SUMMIT, 2]) + one / 10
+    X1 <- min(out$center_vector[out$summit, 1]) - one / 10
+    X2 <- max(out$center_vector[out$summit, 1]) + one / 10
+    Y1 <- min(out$center_vector[out$summit, 2]) - one / 10
+    Y2 <- max(out$center_vector[out$summit, 2]) + one / 10
 
     graphics::rect(
       xleft = X1,
@@ -652,12 +663,12 @@ vector.drawArrow <- function(
   }
   A1_VEC <- t(A1_VEC)
   A2_VEC <- t(A2_VEC)
-  OUT$A1_VEC <- A1_VEC
-  OUT$A2_VEC <- A2_VEC
-  OUT$A_LENGTH <- A_LENGTH
-  OUT$A_COL <- SCORE.COL
+  out$A1_VEC <- A1_VEC
+  out$A2_VEC <- A2_VEC
+  out$A_LENGTH <- A_LENGTH
+  out$A_COL <- SCORE.COL
 
-  return(OUT)
+  return(out)
 }
 
 # Other functions
@@ -683,9 +694,9 @@ select_Seurat <- function(
 vector.AddMetaByCell.Seurat <- function(
     object,
     used_cells) {
-  SELECT <- rep("NO", ncol(object))
-  SELECT[which(colnames(object) %in% used_cells)] <- "YES"
-  object@meta.data$select <- SELECT
+  select <- rep("NO", ncol(object))
+  select[which(colnames(object) %in% used_cells)] <- "YES"
+  object@meta.data$select <- select
   return(object)
 }
 
@@ -705,7 +716,7 @@ vector.pca.Seurat <- function(
     D <- D[, R_INDEX]
   }
 
-  PCA.OUT <- switch(
+  pca_out <- switch(
     EXPR = method,
     "fast.prcomp" = gmodels::fast.prcomp(
       t(D),
@@ -717,44 +728,56 @@ vector.pca.Seurat <- function(
     "prcomp" = stats::prcomp(t(D))
   )
 
-  EXP <- (cumsum(PCA.OUT$sdev^2) / sum(PCA.OUT$sdev^2))
-  N <- min(which(cumsum(PCA.OUT$sdev^2) / sum(PCA.OUT$sdev^2) > CUT))
+  EXP <- (cumsum(pca_out$sdev^2) / sum(pca_out$sdev^2))
+  N <- min(which(cumsum(pca_out$sdev^2) / sum(pca_out$sdev^2) > CUT))
 
   if (random) {
-    PRED.PCA <- t(D_raw) %*% PCA.OUT$rotation
+    pred_pca <- t(D_raw) %*% pca_out$rotation
   }
 
-  PCA.OUT$EXP <- EXP
-  PCA.OUT$CUT <- CUT
-  PCA.OUT$N <- N
+  pca_out$EXP <- EXP
+  pca_out$CUT <- CUT
+  pca_out$N <- N
   if (random) {
-    PCA.OUT$RN <- RN
-    PCA.OUT$R_INDEX <- R_INDEX
-    PCA.OUT$PRED.PCA <- PRED.PCA
+    pca_out$RN <- RN
+    pca_out$R_INDEX <- R_INDEX
+    pca_out$pred_pca <- pred_pca
   }
 
-  return(PCA.OUT)
+  return(pca_out)
 }
 
 vector.lcol <- function(tag) {
   tag <- as.factor(tag)
   my_color_palette <- scales::hue_pal()(length(unique(tag)))
-  COL <- my_color_palette[tag]
-  return(COL)
+  colors <- my_color_palette[tag]
+  return(colors)
 }
 
-vector.vcol <- function(VALUE, CV, CN) {
+vector_vcol <- function(value, CV, CN) {
   CRF <- circlize::colorRamp2(CV, CN)
-  COL <- CRF(VALUE)
-  return(COL)
+  colors <- CRF(value)
+  return(colors)
 }
 
-vector.showValue <- function(OUT) {
-  VEC <- OUT$VEC
-  VALUE <- OUT$VALUE
-  N.VALUE <- normalization(VALUE)
-  COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
-  graphics::plot(VEC, col = COL, pch = 16, cex = 0.5, xlab = "", ylab = "", axes = FALSE)
+vector.showValue <- function(out) {
+  vector <- out$vector
+  value <- out$value
+  value_norm <- normalization(value)
+  colors <- vector_vcol(
+    value_norm,
+    c(0, 0.5, 1),
+    c("#009FFF", "#FFF200", "#ec2F4B")
+  )
+  graphics::plot(
+    vector,
+    col = colors,
+    pch = 16,
+    cex = 0.5,
+    xlab = "",
+    ylab = "",
+    axes = FALSE
+  )
   graphics::rect(
     graphics::par("usr")[1],
     graphics::par("usr")[3],
@@ -763,23 +786,24 @@ vector.showValue <- function(OUT) {
     col = NA,
     border = "black"
   )
-  return(OUT)
+
+  return(out)
 }
 
-vector.calValue <- function(PCA) {
-  OUT <- list()
-  PCA.RC <- apply(apply(PCA, 2, rank), 2, normalization)
+vector.calValue <- function(umap) {
+  out <- list()
+  PCA.RC <- apply(apply(umap, 2, rank), 2, normalization)
   PCA.RC <- abs(PCA.RC - 0.5)
-  VALUE <- apply(PCA.RC, 1, mean)
-  OUT$VALUE <- VALUE
-  OUT$PCA.RC <- PCA.RC
-  return(OUT)
+  value <- apply(PCA.RC, 1, mean)
+  out$value <- value
+  out$PCA.RC <- PCA.RC
+  return(out)
 }
 
-vector.nonCenter <- function(OUT) {
-  OUT$SCORE <- OUT$CENTER_VALUE[OUT$USED]
-  OUT$COL <- OUT$VALUE.COL
-  return(OUT)
+vector.nonCenter <- function(out) {
+  out$score <- out$center_value[out$used]
+  out$colors <- out$VALUE.COL
+  return(out)
 }
 
 .norm_one <- function(x, one = 1) {
@@ -790,78 +814,78 @@ vector.nonCenter <- function(OUT) {
 }
 
 # Manually do something
-vector.selectPoint <- function(VEC, CEX = 0.5) {
-  points <- gatepoints::fhs(VEC, pch = 16, col = "red3", cex = CEX, mark = TRUE)
+vector.selectPoint <- function(vector, cex_value = 0.5) {
+  points <- gatepoints::fhs(vector, pch = 16, col = "red3", cex = cex_value, mark = TRUE)
   return(points)
 }
 
-vector.selectCenter <- function(OUT, plot = TRUE) {
-  DIST <- OUT$DIST
-  USED <- OUT$USED
-  USED_NAME <- OUT$USED_NAME
-  CENTER_VEC <- OUT$CENTER_VEC
-  INDEX_LIST <- OUT$INDEX_LIST
+vector.selectCenter <- function(out, plot = TRUE) {
+  dist <- out$dist
+  used <- out$used
+  used_name <- out$used_name
+  center_vector <- out$center_vector
+  index_list <- out$index_list
 
-  graphics::plot(OUT$VEC, col = "grey80", pch = 16, cex = 0.5)
-  graphics::points(OUT$CENTER_VEC[USED, ], col = OUT$ORIG.CENTER.COL[USED], pch = 16, cex = 1)
-  SELECT_NAME <- vector.selectPoint(OUT$CENTER_VEC[USED, ], CEX = 1)
-  SUMMIT <- USED[as.numeric(SELECT_NAME)]
+  graphics::plot(out$vector, col = "grey80", pch = 16, cex = 0.5)
+  graphics::points(out$center_vector[used, ], col = out$ORIG.CENTER.COL[used], pch = 16, cex = 1)
+  SELECT_NAME <- vector.selectPoint(out$center_vector[used, ], cex_value = 1)
+  summit <- used[as.numeric(SELECT_NAME)]
 
-  SCORE <- c()
+  score <- c()
   i <- 1
-  while (i <= length(USED_NAME)) {
-    this_name <- USED_NAME[i]
-    this_dist <- DIST[which(colnames(DIST) == this_name), which(rownames(DIST) %in% paste0("P", SUMMIT))]
+  while (i <= length(used_name)) {
+    this_name <- used_name[i]
+    this_dist <- dist[which(colnames(dist) == this_name), which(rownames(dist) %in% paste0("P", summit))]
     this_dist <- this_dist
-    # this_value=CENTER_VALUE[USED]
+    # this_value=center_value[used]
     this_score <- min(this_dist) # sum(rank(-this_dist) * rank(this_value))
     # this_cor=cor(-this_value, this_dist)#,method='spearman')
-    SCORE <- c(SCORE, this_score)
+    score <- c(score, this_score)
     i <- i + 1
   }
 
-  PS <- SCORE
+  PS <- score
 
-  SCORE <- max(SCORE) - SCORE
+  score <- max(score) - score
 
-  VALUE <- SCORE
-  N.VALUE <- (VALUE - min(VALUE)) / (max(VALUE) - min(VALUE))
-  COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
+  value <- score
+  value_norm <- normalization(value)
+  colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
-  OUT$COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$ORIG.COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$P.SCORE <- rep(0, nrow(OUT$VEC))
-  OUT$P.PS <- rep(NA, nrow(OUT$VEC))
+  out$colors <- rep("grey70", nrow(out$vector))
+  out$ORIG.COL <- rep("grey70", nrow(out$vector))
+  out$p_score <- rep(0, nrow(out$vector))
+  out$P.PS <- rep(NA, nrow(out$vector))
   i <- 1
-  while (i <= length(USED)) {
-    this_index <- INDEX_LIST[[USED[i]]]
-    OUT$COL[this_index] <- COL[i]
-    OUT$ORIG.COL[this_index] <- OUT$ORIG.CENTER.COL[USED][i]
-    OUT$P.SCORE[this_index] <- SCORE[i]
-    OUT$P.PS[this_index] <- PS[i]
+  while (i <= length(used)) {
+    this_index <- index_list[[used[i]]]
+    out$colors[this_index] <- colors[i]
+    out$ORIG.COL[this_index] <- out$ORIG.CENTER.COL[used][i]
+    out$p_score[this_index] <- score[i]
+    out$P.PS[this_index] <- PS[i]
     i <- i + 1
   }
 
   if (plot == TRUE) {
-    graphics::plot(OUT$VEC, col = OUT$COL, pch = 16, cex = 0.5)
-    graphics::points(CENTER_VEC[SUMMIT, ], col = "black", pch = 16, cex = 1.5)
-    graphics::points(CENTER_VEC[SUMMIT, ], col = "red", pch = 16, cex = 1)
+    graphics::plot(out$vector, col = out$colors, pch = 16, cex = 0.5)
+    graphics::points(center_vector[summit, ], col = "black", pch = 16, cex = 1.5)
+    graphics::points(center_vector[summit, ], col = "red", pch = 16, cex = 1)
   }
 
-  OUT$SCORE <- SCORE
-  OUT$PS <- PS
-  OUT$SUMMIT <- SUMMIT
+  out$score <- score
+  out$PS <- PS
+  out$summit <- summit
 
-  return(OUT)
+  return(out)
 }
 
-vector.reDrawArrow <- function(OUT, COL = "grey70") {
-  A1_VEC <- OUT$A1_VEC
-  A2_VEC <- OUT$A2_VEC
-  A_LENGTH <- OUT$A_LENGTH
-  VEC <- OUT$VEC
+vector.reDrawArrow <- function(out, colors = "grey70") {
+  A1_VEC <- out$A1_VEC
+  A2_VEC <- out$A2_VEC
+  A_LENGTH <- out$A_LENGTH
+  vector <- out$vector
 
-  graphics::plot(x = VEC[, 1], y = VEC[, 2], col = COL, cex = 0.5, pch = 16)
+  graphics::plot(x = vector[, 1], y = vector[, 2], col = colors, cex = 0.5, pch = 16)
   i <- 1
   while (i <= length(A_LENGTH)) {
     graphics::arrows(
@@ -873,28 +897,28 @@ vector.reDrawArrow <- function(OUT, COL = "grey70") {
     i <- i + 1
   }
 
-  return(OUT)
+  return(out)
 }
 
 
-vector.selectRegion <- function(OUT) {
-  P.SCORE <- OUT$P.SCORE
-  A1_VEC <- OUT$A1_VEC
-  A2_VEC <- OUT$A2_VEC
-  A_LENGTH <- OUT$A_LENGTH
-  VEC <- OUT$VEC
-  P.PS <- OUT$P.PS
+vector.selectRegion <- function(out) {
+  p_score <- out$p_score
+  A1_VEC <- out$A1_VEC
+  A2_VEC <- out$A2_VEC
+  A_LENGTH <- out$A_LENGTH
+  vector <- out$vector
+  P.PS <- out$P.PS
 
-  INDEX_LIST <- OUT$INDEX_LIST
-  USED <- OUT$USED
-  SELECT_NAME <- vector.selectPoint(VEC, CEX = 0.1)
-  SELECT_INDEX <- which(rownames(VEC) %in% SELECT_NAME)
-  SELECT_INDEX <- SELECT_INDEX[which(SELECT_INDEX %in% OUT$USED_INDEX)]
+  index_list <- out$index_list
+  used <- out$used
+  SELECT_NAME <- vector.selectPoint(vector, cex_value = 0.1)
+  SELECT_INDEX <- which(rownames(vector) %in% SELECT_NAME)
+  SELECT_INDEX <- SELECT_INDEX[which(SELECT_INDEX %in% out$USED_INDEX)]
 
   A_USED <- c()
   i <- 1
-  while (i <= length(USED)) {
-    if (length(which(INDEX_LIST[[USED[i]]] %in% SELECT_INDEX)) > 0) {
+  while (i <= length(used)) {
+    if (length(which(index_list[[used[i]]] %in% SELECT_INDEX)) > 0) {
       A_USED <- c(A_USED, i)
     }
 
@@ -902,9 +926,9 @@ vector.selectRegion <- function(OUT) {
   }
 
   # Draw new
-  COL <- OUT$COL
-  COL[which(!rownames(VEC) %in% SELECT_NAME)] <- "grey70"
-  graphics::plot(x = VEC[, 1], y = VEC[, 2], col = COL, cex = 0.5, pch = 16)
+  colors <- out$colors
+  colors[which(!rownames(vector) %in% SELECT_NAME)] <- "grey70"
+  graphics::plot(x = vector[, 1], y = vector[, 2], col = colors, cex = 0.5, pch = 16)
   i <- 1
   while (i <= length(A_LENGTH)) {
     graphics::arrows(
@@ -925,295 +949,295 @@ vector.selectRegion <- function(OUT) {
     )
   }
 
-  OUT$A_USED <- A_USED
-  OUT$SELECT_NAME <- SELECT_NAME
-  OUT$SELECT_INDEX <- SELECT_INDEX
-  OUT$SELECT_SCORE <- P.SCORE[SELECT_INDEX]
-  OUT$SELECT_PS <- P.PS[SELECT_INDEX]
+  out$A_USED <- A_USED
+  out$SELECT_NAME <- SELECT_NAME
+  out$SELECT_INDEX <- SELECT_INDEX
+  out$SELECT_SCORE <- p_score[SELECT_INDEX]
+  out$SELECT_PS <- P.PS[SELECT_INDEX]
 
-  return(OUT)
+  return(out)
 }
 
-vector.reDrawRegion <- function(OUT) {
-  P.SCORE <- OUT$P.SCORE
-  A1_VEC <- OUT$A1_VEC
-  A2_VEC <- OUT$A2_VEC
-  A_LENGTH <- OUT$A_LENGTH
-  VEC <- OUT$VEC
-  P.PS <- OUT$P.PS
-  INDEX_LIST <- OUT$INDEX_LIST
-  USED <- OUT$USED
-  SELECT_NAME <- OUT$SELECT_NAME # vector.selectPoint(VEC,CEX=0.1)
-  SELECT_INDEX <- which(rownames(VEC) %in% SELECT_NAME)
+# vector.reDrawRegion <- function(out) {
+#   p_score <- out$p_score
+#   A1_VEC <- out$A1_VEC
+#   A2_VEC <- out$A2_VEC
+#   A_LENGTH <- out$A_LENGTH
+#   vector <- out$vector
+#   P.PS <- out$P.PS
+#   index_list <- out$index_list
+#   used <- out$used
+#   SELECT_NAME <- out$SELECT_NAME # vector.selectPoint(vector,cex_value=0.1)
+#   SELECT_INDEX <- which(rownames(vector) %in% SELECT_NAME)
 
-  A_USED <- c()
-  i <- 1
-  while (i <= length(USED)) {
-    if (length(which(INDEX_LIST[[USED[i]]] %in% SELECT_INDEX)) > 0) {
-      A_USED <- c(A_USED, i)
-    }
+#   A_USED <- c()
+#   i <- 1
+#   while (i <= length(used)) {
+#     if (length(which(index_list[[used[i]]] %in% SELECT_INDEX)) > 0) {
+#       A_USED <- c(A_USED, i)
+#     }
 
-    i <- i + 1
-  }
+#     i <- i + 1
+#   }
 
-  # Draw new
-  COL <- OUT$COL
-  COL[which(!rownames(VEC) %in% SELECT_NAME)] <- "grey70"
-  graphics::plot(x = VEC[, 1], y = VEC[, 2], col = COL, cex = 0.5, pch = 16)
-  # graphics::points(x=VEC[,1],y=VEC[,2], col=COL,cex=0.5, pch=16)
+#   # Draw new
+#   colors <- out$colors
+#   colors[which(!rownames(vector) %in% SELECT_NAME)] <- "grey70"
+#   graphics::plot(x = vector[, 1], y = vector[, 2], col = colors, cex = 0.5, pch = 16)
 
-  i <- 1
-  while (i <= length(A_LENGTH)) {
-    graphics::arrows(
-      x0 = A1_VEC[i, 1], y0 = A1_VEC[i, 2],
-      x1 = A2_VEC[i, 1], y1 = A2_VEC[i, 2],
-      lwd = 2, length = A_LENGTH[i],
-      col = "black"
-    )
-    i <- i + 1
-  }
+#   i <- 1
+#   while (i <= length(A_LENGTH)) {
+#     graphics::arrows(
+#       x0 = A1_VEC[i, 1], y0 = A1_VEC[i, 2],
+#       x1 = A2_VEC[i, 1], y1 = A2_VEC[i, 2],
+#       lwd = 2, length = A_LENGTH[i],
+#       col = "black"
+#     )
+#     i <- i + 1
+#   }
 
-  for (i in A_USED) {
-    graphics::arrows(
-      x0 = A1_VEC[i, 1], y0 = A1_VEC[i, 2],
-      x1 = A2_VEC[i, 1], y1 = A2_VEC[i, 2],
-      lwd = 2, length = A_LENGTH[i],
-      col = "red"
-    )
-  }
-  OUT$A_USED <- A_USED
-  OUT$SELECT_NAME <- SELECT_NAME
-  OUT$SELECT_INDEX <- SELECT_INDEX
-  OUT$SELECT_SCORE <- P.SCORE[SELECT_INDEX]
-  OUT$SELECT_PS <- P.PS[SELECT_INDEX]
+#   for (i in A_USED) {
+#     graphics::arrows(
+#       x0 = A1_VEC[i, 1], y0 = A1_VEC[i, 2],
+#       x1 = A2_VEC[i, 1], y1 = A2_VEC[i, 2],
+#       lwd = 2, length = A_LENGTH[i],
+#       col = "red"
+#     )
+#   }
+#   out$A_USED <- A_USED
+#   out$SELECT_NAME <- SELECT_NAME
+#   out$SELECT_INDEX <- SELECT_INDEX
+#   out$SELECT_SCORE <- p_score[SELECT_INDEX]
+#   out$SELECT_PS <- P.PS[SELECT_INDEX]
 
-  return(OUT)
-}
+#   return(out)
+# }
 
-vector.RPPCA <- function(PCA) {
-  R.PCA <- apply(PCA, 2, rank)
-  D <- t(R.PCA)
-  PCA.OUT <- gmodels::fast.prcomp(
-    t(D),
-    retx = TRUE,
-    center = FALSE,
-    scale. = FALSE,
-    tol = NULL
-  )
-  PPCA <- PCA.OUT$x
-  return(PPCA)
-}
+# vector.RPPCA <- function(umap) {
+#   R.PCA <- apply(umap, 2, rank)
+#   D <- t(R.PCA)
+#   pca_out <- gmodels::fast.prcomp(
+#     t(D),
+#     retx = TRUE,
+#     center = FALSE,
+#     scale. = FALSE,
+#     tol = NULL
+#   )
+#   PPCA <- pca_out$x
+#   return(PPCA)
+# }
 
 
-vector.medCurv <- function(
-    PCA,
-    MAX = 1000) {
-  MS <- vector.calValue(PCA)$PCA.RC
-  COR <- cor(MS)
-  MED <- c()
-  ALL <- c()
-  i <- 1
-  while (i <= ncol(COR) & i <= MAX) {
-    this_col <- COR[1:i, i]
-    ALL <- c(ALL, this_col)
-    ALL[which(ALL == 1)] <- NA
-    this_med <- median(ALL, na.rm = TRUE)
-    MED <- c(MED, this_med)
-    if (i %% 100 == 1) {
-      print(i)
-    }
-    i <- i + 1
-  }
-  MED[1] <- MED[2]
-  return(MED)
-}
+# vector.medCurv <- function(
+#     umap,
+#     MAX = 1000) {
+#   MS <- vector.calValue(umap)$PCA.RC
+#   COR <- cor(MS)
+#   MED <- c()
+#   ALL <- c()
+#   i <- 1
+#   while (i <= ncol(COR) && i <= MAX) {
+#     this_col <- COR[1:i, i]
+#     ALL <- c(ALL, this_col)
+#     ALL[which(ALL == 1)] <- NA
+#     this_med <- median(ALL, na.rm = TRUE)
+#     MED <- c(MED, this_med)
+#     if (i %% 100 == 1) {
+#       print(i)
+#     }
+#     i <- i + 1
+#   }
+#   MED[1] <- MED[2]
+#   return(MED)
+# }
 
 # 2020.01.03
-vector.smoothOut <- function(X, Z) {
-  Y <- X
-  Y[order(Z)] <- X[order(Z)] - stats::smooth(X[order(Z)])
-  return(Y)
-}
 
-vector.regressOut <- function(X, Z) {
-  FIT <- stats::lm(X ~ Z)
-  Y <- X - predict(FIT)
-  return(Y)
-}
+# vector.smoothOut <- function(X, Z) {
+#   Y <- X
+#   Y[order(Z)] <- X[order(Z)] - stats::smooth(X[order(Z)])
+#   return(Y)
+# }
 
-vector.removeOut <- function(X) {
-  Q1 <- stats::quantile(X, 0.25)
-  Q3 <- stats::quantile(X, 0.75)
-  IQR <- Q3 - Q1
-  LW <- Q1 - 1.5 * IQR
-  UP <- Q3 + 1.5 * IQR
-  X[which(X > UP)] <- UP
-  X[which(X < LW)] <- LW
+# vector.regressOut <- function(X, Z) {
+#   FIT <- stats::lm(X ~ Z)
+#   Y <- X - predict(FIT)
+#   return(Y)
+# }
 
-  return(X)
-}
+# vector.removeOut <- function(X) {
+#   Q1 <- stats::quantile(X, 0.25)
+#   Q3 <- stats::quantile(X, 0.75)
+#   IQR <- Q3 - Q1
+#   LW <- Q1 - 1.5 * IQR
+#   up_value <- Q3 + 1.5 * IQR
+#   X[which(X > up_value)] <- up_value
+#   X[which(X < LW)] <- LW
+
+#   return(X)
+# }
 
 # 2020.1.12
-.normNew <- function(x) {
-  pos_index <- which(x > 0)
-  neg_index <- which(x < 0)
-  x[pos_index] <- rank(x[pos_index])
-  x[neg_index] <- rank(-x[neg_index])
+# .normNew <- function(x) {
+#   pos_index <- which(x > 0)
+#   neg_index <- which(x < 0)
+#   x[pos_index] <- rank(x[pos_index])
+#   x[neg_index] <- rank(-x[neg_index])
 
-  return(x)
-}
+#   return(x)
+# }
 
-vector.calValueNew <- function(PCA) {
-  OUT <- list()
-  PCA.RC <- apply(PCA, 2, .normNew)
-  VALUE <- apply(PCA.RC, 1, mean)
-  OUT$VALUE <- VALUE
-  OUT$PCA.RC <- PCA.RC
+# vector.calValueNew <- function(umap) {
+#   out <- list()
+#   PCA.RC <- apply(umap, 2, .normNew)
+#   value <- apply(PCA.RC, 1, mean)
+#   out$value <- value
+#   out$PCA.RC <- PCA.RC
 
-  return(OUT)
-}
+#   return(out)
+# }
 
-vector.getValueNew <- function(OUT, PCA, plot = TRUE) {
-  VALUE.OUT <- vector.calValueNew(PCA)
-  OUT$VALUE <- VALUE.OUT$VALUE
-  OUT$PCA <- PCA
-  OUT$PCA.RC <- VALUE.OUT$PCA.RC
-  if (plot == TRUE) {
-    vector.showValue(OUT)
-  }
+# vector.getValueNew <- function(out, umap, plot = TRUE) {
+#   VALUE.OUT <- vector.calValueNew(umap)
+#   out$value <- VALUE.OUT$value
+#   out$umap <- umap
+#   out$PCA.RC <- VALUE.OUT$PCA.RC
+#   if (plot == TRUE) {
+#     vector.showValue(out)
+#   }
 
-  return(OUT)
-}
+#   return(out)
+# }
 
 
 # 20201030
-vector.autoCenterCor <- function(
-    OUT,
-    UP = 0.9,
-    plot = TRUE) {
-  DIST <- OUT$DIST
-  USED <- OUT$USED
-  USED_NAME <- OUT$USED_NAME
-  CENTER_VALUE <- OUT$CENTER_VALUE
-  CENTER_VEC <- OUT$CENTER_VEC
-  INDEX_LIST <- OUT$INDEX_LIST
+# vector.autoCenterCor <- function(
+#     out,
+#     up_value = 0.9,
+#     plot = TRUE) {
+#   dist <- out$dist
+#   used <- out$used
+#   used_name <- out$used_name
+#   center_value <- out$center_value
+#   center_vector <- out$center_vector
+#   index_list <- out$index_list
 
-  USED_CENTER_VALUE <- CENTER_VALUE[USED]
+#   used_center_value <- center_value[used]
 
-  HIGH <- USED[which(USED_CENTER_VALUE >= stats::quantile(USED_CENTER_VALUE, UP))]
-  HIGH_NAME <- USED_NAME[which(USED_CENTER_VALUE >= stats::quantile(USED_CENTER_VALUE, UP))]
+#   high <- used[which(used_center_value >= stats::quantile(used_center_value, up_value))]
+#   high_name <- used_name[which(used_center_value >= stats::quantile(used_center_value, up_value))]
 
-  SUB <- igraph::induced_subgraph(OUT$GRAPH, HIGH_NAME)
-  SUB_CPT <- components(SUB)
-  CLUSTER <- list()
-  LENGTH <- c()
-  PCH <- rep(1, length(HIGH))
-  DIST_COR <- c()
-  DIST_MEAN <- c()
+#   sub_graph <- igraph::induced_subgraph(out$graph, high_name)
+#   sub_cpt <- components(sub_graph)
+#   cluster <- list()
+#   length <- c()
+#   pch <- rep(1, length(high))
+#   dist_cor <- c()
+#   dist_mean <- c()
 
-  i <- 1
-  while (i <= SUB_CPT$no) {
-    this_name <- names(which(SUB_CPT$membership == i))
-    this_index <- as.numeric(stringr::str_replace(this_name, "P", ""))
-    PCH[which(HIGH %in% this_index)] <- as.character(i)
-    LENGTH <- c(LENGTH, length(this_index))
-    if (length(this_index) == 1) {
-      this_dist <- DIST[USED, this_index]
-    } else {
-      this_dist <- apply(DIST[USED, this_index], 1, mean)
-    }
-    this_cor <- cor(this_dist, CENTER_VALUE[USED], method = "spearman")
-    DIST_COR <- c(DIST_COR, this_cor)
+#   i <- 1
+#   while (i <= sub_cpt$no) {
+#     this_name <- names(which(sub_cpt$membership == i))
+#     this_index <- as.numeric(stringr::str_replace(this_name, "P", ""))
+#     pch[which(high %in% this_index)] <- as.character(i)
+#     length <- c(length, length(this_index))
+#     if (length(this_index) == 1) {
+#       this_dist <- dist[used, this_index]
+#     } else {
+#       this_dist <- apply(dist[used, this_index], 1, mean)
+#     }
+#     this_cor <- cor(this_dist, center_value[used], method = "spearman")
+#     dist_cor <- c(dist_cor, this_cor)
 
-    DIST_MEAN <- c(DIST_MEAN, mean(this_dist))
-    CLUSTER <- c(CLUSTER, list(this_index))
-    i <- i + 1
-  }
+#     dist_mean <- c(dist_mean, mean(this_dist))
+#     cluster <- c(cluster, list(this_index))
+#     i <- i + 1
+#   }
 
-  TMP <- -DIST_COR
-  SELECT <- which(TMP == max(TMP))[1]
+#   tmp <- -dist_cor
+#   select <- which(tmp == max(tmp))[1]
 
-  SUMMIT <- CLUSTER[[SELECT]]
+#   summit <- cluster[[select]]
 
-  SCORE <- c()
-  PS <- c()
-  i <- 1
-  while (i <= length(USED_NAME)) {
-    this_name <- USED_NAME[i]
-    this_dist <- DIST[
-      which(colnames(DIST) == this_name),
-      which(rownames(DIST) %in% paste0("P", SUMMIT))
-    ]
-    this_dist <- this_dist
-    this_score <- min(this_dist)
-    SCORE <- c(SCORE, this_score)
-    PS <- c(PS, this_score)
-    i <- i + 1
-  }
-  SCORE <- max(SCORE) - SCORE
+#   score <- c()
+#   PS <- c()
+#   i <- 1
+#   while (i <= length(used_name)) {
+#     this_name <- used_name[i]
+#     this_dist <- dist[
+#       which(colnames(dist) == this_name),
+#       which(rownames(dist) %in% paste0("P", summit))
+#     ]
+#     this_dist <- this_dist
+#     this_score <- min(this_dist)
+#     score <- c(score, this_score)
+#     PS <- c(PS, this_score)
+#     i <- i + 1
+#   }
+#   score <- max(score) - score
 
-  VALUE <- SCORE
-  N.VALUE <- (VALUE - min(VALUE)) / (max(VALUE) - min(VALUE))
-  COL <- vector.vcol(N.VALUE, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
+#   value <- score
+#   value_norm <- normalization(value)
+#   colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
-  OUT$COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$ORIG.COL <- rep("grey70", nrow(OUT$VEC))
-  OUT$P.SCORE <- rep(0, nrow(OUT$VEC))
-  OUT$P.PS <- rep(NA, nrow(OUT$VEC))
-  i <- 1
-  while (i <= length(USED)) {
-    this_index <- INDEX_LIST[[USED[i]]]
-    OUT$COL[this_index] <- COL[i]
-    OUT$ORIG.COL[this_index] <- OUT$ORIG.CENTER.COL[USED][i]
-    OUT$P.SCORE[this_index] <- SCORE[i]
-    OUT$P.PS[this_index] <- PS[i]
-    i <- i + 1
-  }
+#   out$colors <- rep("grey70", nrow(out$vector))
+#   out$ORIG.COL <- rep("grey70", nrow(out$vector))
+#   out$p_score <- rep(0, nrow(out$vector))
+#   out$P.PS <- rep(NA, nrow(out$vector))
+#   i <- 1
+#   while (i <= length(used)) {
+#     this_index <- index_list[[used[i]]]
+#     out$colors[this_index] <- colors[i]
+#     out$ORIG.COL[this_index] <- out$ORIG.CENTER.COL[used][i]
+#     out$p_score[this_index] <- score[i]
+#     out$P.PS[this_index] <- PS[i]
+#     i <- i + 1
+#   }
 
-  if (plot == TRUE) {
-    graphics::plot(
-      OUT$VEC,
-      col = OUT$ORIG.COL,
-      pch = 16,
-      cex = 0.5
-    )
-    graphics::text(
-      CENTER_VEC[HIGH, 1],
-      CENTER_VEC[HIGH, 2],
-      labels = PCH,
-      cex = 1,
-      pos = 2
-    )
-    graphics::points(
-      CENTER_VEC[HIGH, 1],
-      CENTER_VEC[HIGH, 2],
-      col = "black",
-      pch = 16,
-      cex = 1
-    )
-    graphics::points(
-      CENTER_VEC[SUMMIT, 1],
-      CENTER_VEC[SUMMIT, 2],
-      col = "black",
-      pch = 16,
-      cex = 1.5
-    )
-    graphics::points(
-      CENTER_VEC[SUMMIT, 1],
-      CENTER_VEC[SUMMIT, 2],
-      col = "red",
-      pch = 16,
-      cex = 1
-    )
-  }
+#   if (plot == TRUE) {
+#     graphics::plot(
+#       out$vector,
+#       col = out$ORIG.COL,
+#       pch = 16,
+#       cex = 0.5
+#     )
+#     graphics::text(
+#       center_vector[high, 1],
+#       center_vector[high, 2],
+#       labels = pch,
+#       cex = 1,
+#       pos = 2
+#     )
+#     graphics::points(
+#       center_vector[high, 1],
+#       center_vector[high, 2],
+#       col = "black",
+#       pch = 16,
+#       cex = 1
+#     )
+#     graphics::points(
+#       center_vector[summit, 1],
+#       center_vector[summit, 2],
+#       col = "black",
+#       pch = 16,
+#       cex = 1.5
+#     )
+#     graphics::points(
+#       center_vector[summit, 1],
+#       center_vector[summit, 2],
+#       col = "red",
+#       pch = 16,
+#       cex = 1
+#     )
+#   }
 
-  OUT$SCORE <- SCORE
-  OUT$SUMMIT <- SUMMIT
-  OUT$CLUSTER <- CLUSTER
-  OUT$LENGTH <- LENGTH
-  OUT$PCH <- PCH
-  OUT$DIST_COR <- DIST_COR
-  OUT$PS <- PS
+#   out$score <- score
+#   out$summit <- summit
+#   out$cluster <- cluster
+#   out$length <- length
+#   out$pch <- pch
+#   out$dist_cor <- dist_cor
+#   out$PS <- PS
 
-  return(OUT)
-}
+#   return(out)
+# }
