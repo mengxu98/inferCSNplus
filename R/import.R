@@ -39,6 +39,7 @@ utils::globalVariables(
     "communities",
     "components",
     "corr",
+    "count",
     "curvetype",
     "cutreeDynamicTree",
     "degree",
