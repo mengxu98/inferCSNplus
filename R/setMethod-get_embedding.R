@@ -50,6 +50,7 @@ setMethod(
 #'
 #' @method get_embedding Seurat
 #' @param reduction The reduction to use.
+#' @param dims The number of dimensions to use.
 #'
 #' @rdname get_embedding
 setMethod(
@@ -58,11 +59,12 @@ setMethod(
   definition = function(
       object,
       reduction = "umap",
+      dims = 2,
       ...) {
     return(
       list(
         "pca" = object@reductions$pca@cell.embeddings,
-        "umap" = object@reductions[[reduction]]@cell.embeddings,
+        "umap" = object@reductions[[reduction]]@cell.embeddings[, 1:dims],
         "feature_loadings" = object@reductions$pca@feature.loadings,
         "sdev" = object@reductions$pca@stdev
       )

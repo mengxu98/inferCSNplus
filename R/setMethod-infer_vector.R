@@ -1,7 +1,6 @@
 #' @param object The information of pca and UMAP.
 #' @param plot Logical value.
 #'
-#' @return vector result
 #' @export
 #'
 #' @method infer_vector default
@@ -108,6 +107,9 @@ setMethod(
   }
 )
 
+#' @param reduction The reduction method.
+#' @param dims The reduction to use.
+#' 
 #' @method infer_vector Seurat
 #'
 #' @rdname infer_vector
@@ -118,9 +120,13 @@ setMethod(
       object,
       filter = FALSE,
       plot = TRUE,
+      reduction = "umap",
+      dims = 2,
       ...) {
     dimension <- get_embedding(
-      object
+      object,
+      reduction = reduction,
+      dims = dims
     )
     result <- infer_vector(dimension)
     selected <- which(result$P.PS != "NA")

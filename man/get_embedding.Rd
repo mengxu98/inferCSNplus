@@ -10,7 +10,7 @@ get_embedding(object, ...)
 
 \S4method{get_embedding}{matrix}(object, cores = 1, seed = 1, dims = 10, ...)
 
-\S4method{get_embedding}{Seurat}(object, reduction = "umap", ...)
+\S4method{get_embedding}{Seurat}(object, reduction = "umap", dims = 2, ...)
 }
 \arguments{
 \item{object}{The input data, a matrix with cells/samples by genes/features or a seurat object.}
@@ -26,7 +26,7 @@ get_embedding(object, ...)
 \item{reduction}{The reduction to use.}
 }
 \value{
-Dimensional information
+Embedding
 }
 \description{
 Get dimensional information

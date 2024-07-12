@@ -57,7 +57,7 @@ setGeneric(
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
 #'
-#' @return Dimensional information
+#' @return Embedding
 #' @export
 #'
 #' @rdname get_embedding
@@ -74,7 +74,7 @@ setGeneric(
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
 #'
-#' @return Dimensional information
+#' @return vector
 #' @export
 #'
 #' @rdname infer_vector

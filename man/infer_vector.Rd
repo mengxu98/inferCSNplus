@@ -13,7 +13,14 @@ infer_vector(object, ...)
 
 \S4method{infer_vector}{matrix}(object, filter = FALSE, plot = TRUE, ...)
 
-\S4method{infer_vector}{Seurat}(object, filter = FALSE, plot = TRUE, ...)
+\S4method{infer_vector}{Seurat}(
+  object,
+  filter = FALSE,
+  plot = TRUE,
+  reduction = "umap",
+  dims = 2,
+  ...
+)
 }
 \arguments{
 \item{object}{The information of pca and UMAP.}
@@ -24,11 +31,13 @@ infer_vector(object, ...)
 
 \item{filter}{Logical value, default set to \code{FALSE},
 will filter cells though pseudotime.}
+
+\item{reduction}{The reduction method.}
+
+\item{dims}{The reduction to use.}
 }
 \value{
-Dimensional information
-
-vector result
+vector
 }
 \description{
 infer VECTOR
