@@ -267,7 +267,7 @@ estimate.size.factors <- function(
 #' Convert a slam matrix to a sparseMatrix
 #' @param slam_matrix A slam matrix
 #' @export
-as.sparse <- function(slam_matrix) {
+as_sparse <- function(slam_matrix) {
   retVal <- Matrix::sparseMatrix(
     i = slam_matrix[["i"]],
     j = slam_matrix[["j"]],
