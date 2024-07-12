@@ -36,6 +36,24 @@ reference:
   - inferCSN.logo
   - inferCSN
 
+- subtitle: "Sparse regression model"
+- contents:
+  - fit_models
+  - fit_model
+  - format_coefs
+  - model.fit
+  - single.network
+  - sparse.regression
+  - fit_bagging_ridge
+  - fit_bayesian_ridge
+  - fit_brms
+  - fit_cvglmnet
+  - fit_cvsrm
+  - fit_glm
+  - fit_glmnet
+  - fit_srm
+  - fit_xgb
+
 - subtitle: "Class"
 - contents:
   - initiate_object
@@ -48,14 +66,14 @@ reference:
 
 - subtitle: "vector functions"
 - contents:
-  - inferVECTOR
-  - vector.autoCenter
-  - vector.buildGrid
-  - vector.buildNet
-  - vector.drawArrow
-  - vector.getValue
-  - vector.gridValue
-  - vector.rankPCA
+  - infer_vector
+  - vector_auto_center
+  - vector_build_grid
+  - vector_build_net
+  - vector_build_value
+  - vector_draw_arrow
+  - vector_grid_value
+  - vector_rank_pca
 
 - subtitle: "RNA data processing"
 - contents:
@@ -63,7 +81,7 @@ reference:
   - generate_aggregated_data
   - aggregating.data
   - as.slam.matrix
-  - as.sparse
+  - as_sparse
   - estimate.size.factors
   - estimate.size.factors.dense
   - estimate.size.factors.sparse
@@ -75,19 +93,19 @@ reference:
 
 - subtitle: "Peak data processing"
 - contents:
-  - extract.cre
-  - extract.cre.gene.links
-  - extract.links
-  - extract.network
-  - extract.nodes
-  - extract.peak.tf.links
+  - extract_cre
+  - extract_cre.gene.links
+  - extract_links
+  - extract_network
+  - extract_nodes
+  - extract_peak.tf.links
   - find.overlapping.coordinates
   - find_peaks_near_genes
 
 - subtitle: "Dynamic object"
 - contents:
-  - get.pseudotime
-  - get.dimensional
+  - get_pseudotime
+  - get_embedding
   - findDynGenes
 
 - subtitle: "Network processing"
@@ -189,26 +207,9 @@ reference:
   - calculate.gene.rank
   - compute_pagerank
 
-- subtitle: "Sparse regression model"
-- contents:
-  - fit_models
-  - fit_model
-  - format_coefs
-  - model.fit
-  - single.network
-  - sparse.regression
-  - fit_bagging_ridge
-  - fit_bayesian_ridge
-  - fit_brms
-  - fit_cvglmnet
-  - fit_cvsrm
-  - fit_glm
-  - fit_glmnet
-  - fit_srm
-  - fit_xgb
-
 - subtitle: "Utils functions"
 - contents:
+  - as_matrix
   - check.parameters
   - coef.SRM_fit
   - coef.SRM_fit_CV
