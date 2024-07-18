@@ -46,7 +46,7 @@ could be choose \code{"Shannon"} or \code{"Renyi"} to compute entropy.}
 
 \item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical value. Whether to print detailed information.}
 }
 \value{
 Filtered network table
@@ -95,17 +95,17 @@ network.heatmap(
   rect_color = "gray70"
 )
 
-auc.calculate(
+calculate_auc(
   network_table,
   example_ground_truth,
   plot = TRUE
 )
-auc.calculate(
+calculate_auc(
   network_table_filtered,
   example_ground_truth,
   plot = TRUE
 )
-auc.calculate(
+calculate_auc(
   network_table_filtered_entropy,
   example_ground_truth,
   plot = TRUE

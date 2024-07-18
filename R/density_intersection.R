@@ -234,10 +234,10 @@ density_points <- function(
       labels = cluster_order
     )
 
-    xIndex <- split(plot_data[["pseudotime"]], plot_data[["cluster"]])
-    bg_data <- as.data.frame(t(sapply(xIndex, range)))
+    index_list <- split(plot_data[["pseudotime"]], plot_data[["cluster"]])
+    bg_data <- as.data.frame(t(sapply(index_list, range)))
     colnames(bg_data) <- c("xmin", "xmax")
-    bg_data[["group.by"]] <- names(xIndex)
+    bg_data[["group.by"]] <- names(index_list)
 
     bg_data[["ymin"]] <- 0
     bg_data[["ymax"]] <- Inf
@@ -376,7 +376,7 @@ density_points <- function(
   return(results)
 }
 
-#' dynamic.windowing
+#' dynamic_windowing
 #'
 #' @param meta_data meta_data
 #' @param cluster_list cluster_list
@@ -388,9 +388,9 @@ density_points <- function(
 #' @param key_word key_word
 #' @param key_sign key_sign
 #'
-#' @return a
+#' @return Divided cell list
 #' @export
-dynamic.windowing <- function(
+dynamic_windowing <- function(
     meta_data,
     bin_points = NULL,
     cluster_list = NULL,

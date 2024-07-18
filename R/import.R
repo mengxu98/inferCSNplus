@@ -4,6 +4,7 @@
 #' @importFrom graphics axis barplot par
 #' @importFrom Rcpp evalCpp
 #' @importFrom RcppArmadillo armadillo_version
+#' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom stats coef predict cor na.omit sd
 #' @importFrom utils methods write.table
 #' @importFrom stats family gaussian na.pass

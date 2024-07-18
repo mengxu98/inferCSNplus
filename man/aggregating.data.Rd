@@ -30,7 +30,7 @@ aggregating.data(
 
 \item{seed}{The seed used in randomly shuffling the data for cross-validation.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical value. Whether to print detailed information.}
 }
 \value{
 Seurat object with aggregated data

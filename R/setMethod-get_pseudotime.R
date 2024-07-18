@@ -1,11 +1,11 @@
-#' @param meta_data meta data
-#' @param embeddings embeddings information
-#' @param cluster_by choose column used for `slingshot`
+#' @param meta_data Input meta data.
+#' @param embeddings Embeddings information
+#' @param cluster_by The column used for `slingshot`
 #' @param cores CPU cores used for umap
 #' @param seed random seed for umap
 #' @param start_cluster start_cluster
 #' @param end_cluster end_cluster
-#' @param verbose verbose
+#' @param verbose Logical, whether to print log messages.
 #'
 #' @return A list with a matrix and new meta data
 #' @export
@@ -81,8 +81,9 @@ get_pseudotime.default <- function(
   return(result)
 }
 
-#' @param assay assay
-#' @param slot slot
+#' @param assay The assay used for `slingshot`.
+#' @param slot The slot used for `slingshot`.
+#' @param reduction The reduction used for `slingshot`.
 #'
 #' @return Seurat object
 #' @export
@@ -95,11 +96,12 @@ get_pseudotime.Seurat <- function(
     assay = "RNA",
     cluster_by = "cluster",
     slot = "data",
+    reduction = "umap",
     start_cluster = NULL,
     end_cluster = NULL,
     ...) {
   data <- Seurat::GetAssay(object, assay = assay)[slot]
-  embeddings <- Seurat::Embeddings(object, reduction = "umap")
+  embeddings <- Seurat::Embeddings(object, reduction = reduction)
   meta_data <- object@meta.data
 
   result <- get_pseudotime(

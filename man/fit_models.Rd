@@ -82,7 +82,7 @@ For more info, see \code{\link[stats]{formula}}}
 
 \item{scale}{Logical. Whether to z-transform the expression and accessibility matrices.}
 
-\item{verbose}{Print detailed information.}
+\item{verbose}{Logical value. Whether to print detailed information.}
 
 \item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 }

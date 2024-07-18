@@ -139,10 +139,9 @@ plot_gof.CSNObject <- function(
     BBBBC
     BBBBC
     "
-  p_out <- p2 + p1 + p3 + plot_layout(design = layout) & no_margin()
+  p_out <- p2 + p1 + p3 + patchwork::plot_layout(design = layout) & no_margin()
   return(p_out)
 }
-
 
 #' Plot module metrics number of genes, number of peaks and number of TFs per gene.
 #'

@@ -63,8 +63,8 @@ setMethod(
       ...) {
     return(
       list(
-        "pca" = object@reductions$pca@cell.embeddings,
-        "umap" = object@reductions[[reduction]]@cell.embeddings[, 1:dims],
+        "pca" = Seurat::Embeddings(object, reduction = "pca"),
+        "umap" = Seurat::Embeddings(object, reduction = reduction)[, 1:dims],
         "feature_loadings" = object@reductions$pca@feature.loadings,
         "sdev" = object@reductions$pca@stdev
       )

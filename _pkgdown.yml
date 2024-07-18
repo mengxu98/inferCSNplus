@@ -132,9 +132,9 @@ reference:
   - define_epochs_new
   - density_points
   - diffnet_community_detection
-  - dynamic.genes
-  - dynamic.genes_new
-  - dynamic.windowing
+  - dynamic_genes
+  - dynamic_genes_new
+  - dynamic_windowing
   - dynamic_difference_network
   - dynamic_shortest_path
   - dynamic_shortest_path_multiple
@@ -198,8 +198,9 @@ reference:
 
 - subtitle: "Network evaluation"
 - contents:
-  - auc.calculate
-  - acc.calculate
+  - calculate_auc
+  - calculate_acc
+  - prepare_network_data
   - JI_across_topregs
 
 - subtitle: "Calculate gene rank"
@@ -219,7 +220,6 @@ reference:
   - normalization
   - table.to.matrix
   - filter_sort_matrix
-  - prepare.performance.data
   - print.logo
   - print.SRM_fit
   - print.SRM_fit_CV

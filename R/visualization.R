@@ -1,4 +1,4 @@
-#' ##' Plot links of inferCSN on focused genes
+#' ##' Plot links on focused genes
 #' #'
 #' #' @param network_table inferCSN result
 #' #' @param gene_anno the genome annotation

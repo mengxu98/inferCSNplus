@@ -6,20 +6,20 @@
 #' @return Gene list
 #' @export
 #'
-#' @method dynamic.genes default
+#' @method dynamic_genes default
 #'
-#' @rdname dynamic.genes
+#' @rdname dynamic_genes
 #'
 #' @examples
 #' \dontrun{
 #' data("example_matrix")
 #' vector_result <- infer_vector(example_matrix)
-#' dynamic.genes(
+#' dynamic_genes(
 #'   object = t(vector_result$matrix),
 #'   pseudotime = vector_result$pseudotime[, 2]
 #' )
 #' }
-dynamic.genes.default <- function(
+dynamic_genes.default <- function(
     object,
     pseudotime = NULL,
     fdr_threshold = 0.05,
@@ -71,10 +71,10 @@ dynamic.genes.default <- function(
 #'
 #' @export
 #'
-#' @method dynamic.genes Seurat
+#' @method dynamic_genes Seurat
 #'
-#' @rdname dynamic.genes
-dynamic.genes.Seurat <- function(
+#' @rdname dynamic_genes
+dynamic_genes.Seurat <- function(
     object,
     fdr_threshold = 0.05,
     cluster = NULL,
@@ -90,7 +90,7 @@ dynamic.genes.Seurat <- function(
     object <- subset(object, cluster == cluster)
   }
 
-  genes <- dynamic.genes(
+  genes <- dynamic_genes(
     Matrix::as.matrix(
       switch(
         EXPR = slot,
@@ -105,16 +105,10 @@ dynamic.genes.Seurat <- function(
   return(genes)
 }
 
-gamFit <- function(
+gam_fit <- function(
     matrix,
     celltime,
     cores = 1) {
-  # ans <- apply(matrix, 1, function(z) {
-  #   d <- data.frame(z = z, t = celltime)
-  #   tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
-  #   p <- summary(tmp)[4][[1]][1, 5]
-  #   p
-  # })
   ans <- parallelize_fun(
     seq_len(nrow(matrix)),
     fun = function(z) {
@@ -155,7 +149,6 @@ findDynGenes <- function(
   meta_data$pseudotime <- meta_data[, pseudotime_column]
   meta_data <- meta_data[which(!is.na(meta_data$pseudotime)), ]
 
-
   meta_data$cluster <- meta_data[, group_column]
   meta_data$cells <- rownames(meta_data)
 
@@ -176,7 +169,7 @@ findDynGenes <- function(
 
   object <- object[, meta_data$cells]
 
-  dynamic_genes <- gamFit(
+  dynamic_genes <- gam_fit(
     object,
     meta_data$pseudotime,
     cores = cores
@@ -188,9 +181,12 @@ findDynGenes <- function(
   )
   cells <- cells[order(cells$pseudotime), ]
 
-  ans <- list(genes = dynamic_genes, cells = cells)
-
-  ans
+  return(
+    list(
+      genes = dynamic_genes,
+      cells = cells
+    )
+  )
 }
 
 #' find genes expressed dynamically
@@ -208,7 +204,7 @@ findDynGenes <- function(
 #' @return pvals and cell info
 #'
 #' @export
-dynamic.genes_new <- function(
+dynamic_genes_new <- function(
     object,
     meta_data,
     cluster_by = NULL,
@@ -224,7 +220,7 @@ dynamic.genes_new <- function(
   meta_data$cluster <- meta_data[, group_column]
   meta_data$cells <- rownames(meta_data)
 
-  meta_data_list <- dynamic.windowing(
+  meta_data_list <- dynamic_windowing(
     meta_data,
     group_column = group_column,
     pseudotime_column = pseudotime_column,
@@ -244,10 +240,11 @@ dynamic.genes_new <- function(
       object <- object[, x$cells]
 
       log_message("\rStarting gammma for cluster: ", cluster, verbose = verbose)
-      dynamic_genes <- gamFit(
+      dynamic_genes <- gam_fit(
         object,
         x$pseudotime,
-        cores = cores)
+        cores = cores
+      )
       dynamic_genes <- as.data.frame(dynamic_genes)
       dynamic_genes$genes <- rownames(dynamic_genes)
       dynamic_genes <- dynamic_genes[dynamic_genes$dynamic_genes < p_value, ]

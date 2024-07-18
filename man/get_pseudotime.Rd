@@ -26,6 +26,7 @@ get_pseudotime(object, ...)
   assay = "RNA",
   cluster_by = "cluster",
   slot = "data",
+  reduction = "umap",
   start_cluster = NULL,
   end_cluster = NULL,
   ...
@@ -36,11 +37,11 @@ get_pseudotime(object, ...)
 
 \item{...}{Arguments for other methods}
 
-\item{meta_data}{meta data}
+\item{meta_data}{Input meta data.}
 
-\item{embeddings}{embeddings information}
+\item{embeddings}{Embeddings information}
 
-\item{cluster_by}{choose column used for `slingshot`}
+\item{cluster_by}{The column used for `slingshot`}
 
 \item{cores}{CPU cores used for umap}
 
@@ -50,11 +51,13 @@ get_pseudotime(object, ...)
 
 \item{end_cluster}{end_cluster}
 
-\item{verbose}{verbose}
+\item{verbose}{Logical, whether to print log messages.}
 
-\item{assay}{assay}
+\item{assay}{The assay used for `slingshot`.}
 
-\item{slot}{slot}
+\item{slot}{The slot used for `slingshot`.}
+
+\item{reduction}{The reduction used for `slingshot`.}
 }
 \value{
 Dimensional information

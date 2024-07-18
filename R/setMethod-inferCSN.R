@@ -214,7 +214,7 @@ setMethod(
         next
       }
 
-      targets <- dynamic.genes(object_sub)
+      targets <- dynamic_genes(object_sub)
 
       if (aggregate) {
         if ("aggregated_data" %in% names(Seurat::Misc(object_sub))) {
