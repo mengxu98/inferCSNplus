@@ -16,7 +16,7 @@ compute_pagerank <- function(
     names(networks_list), function(x) NULL
   )
   for (net in names(networks_list)) {
-    ranked_networks[[net]] <- calculate.gene.rank(
+    ranked_networks[[net]] <- calculate_gene_rank(
       networks_list[[net]],
       regulators = regulators,
       targets = targets

@@ -108,7 +108,7 @@ setGeneric(
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
 #' @param ... Arguments for other methods
 #'
-#' @return Dimensional information
+#' @return Pseudotime information corresponding to cells
 #' @export get_pseudotime
 #'
 #' @rdname get_pseudotime

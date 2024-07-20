@@ -331,11 +331,8 @@ plot_top_features <- function(
   for (i in seq_len(length(network_list))) {
     epoch <- names(network_list)[i]
     network_table <- network_list[[i]]
-    message(
-      paste0(
-        "\rPlotting for ", i, "/", length(network_list), " network: ", epoch, "."
-      ),
-      appendLF = FALSE
+    log_message(
+      paste0("Plotting for ", i, "/", length(network_list), " network: ", epoch)
     )
 
     if (is.null(regulators)) {
@@ -345,7 +342,7 @@ plot_top_features <- function(
         if (!is.null(gene_ranks)) {
           rank <- gene_ranks[[epoch]]
         } else {
-          rank <- calculate.gene.rank(network_table)
+          rank <- calculate_gene_rank(network_table)
         }
         top_regulators <- rownames(rank[rank$is_regulator == TRUE, ])
       }

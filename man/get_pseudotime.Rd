@@ -12,7 +12,7 @@ get_pseudotime(object, ...)
   object,
   meta_data = NULL,
   embeddings = NULL,
-  cluster_by = "cluster",
+  cluster_column = "cluster",
   cores = 1,
   seed = 1,
   start_cluster = NULL,
@@ -24,8 +24,8 @@ get_pseudotime(object, ...)
 \method{get_pseudotime}{Seurat}(
   object,
   assay = "RNA",
-  cluster_by = "cluster",
-  slot = "data",
+  layer = "data",
+  cluster_column = "cluster",
   reduction = "umap",
   start_cluster = NULL,
   end_cluster = NULL,
@@ -41,30 +41,26 @@ get_pseudotime(object, ...)
 
 \item{embeddings}{Embeddings information}
 
-\item{cluster_by}{The column used for `slingshot`}
+\item{cluster_column}{The column used for \code{\link[slingshot]{slingshot}}.}
 
-\item{cores}{CPU cores used for umap}
+\item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 
-\item{seed}{random seed for umap}
+\item{seed}{The seed used in randomly shuffling the data for cross-validation.}
 
-\item{start_cluster}{start_cluster}
+\item{start_cluster}{The start cluster.}
 
-\item{end_cluster}{end_cluster}
+\item{end_cluster}{The end cluster.}
 
-\item{verbose}{Logical, whether to print log messages.}
+\item{verbose}{Logical value. Whether to print detailed information.}
 
-\item{assay}{The assay used for `slingshot`.}
+\item{assay}{The assay used for \code{\link[slingshot]{slingshot}}.}
 
-\item{slot}{The slot used for `slingshot`.}
+\item{layer}{The layer used for \code{\link[slingshot]{slingshot}}.}
 
-\item{reduction}{The reduction used for `slingshot`.}
+\item{reduction}{The reduction used for \code{\link[slingshot]{slingshot}}.}
 }
 \value{
-Dimensional information
-
-A list with a matrix and new meta data
-
-Seurat object
+Pseudotime information corresponding to cells
 }
 \description{
 Get pseudotime information
@@ -72,6 +68,6 @@ Get pseudotime information
 \examples{
 \dontrun{
 data("example_matrix")
-result <- get_pseudotime(example_matrix)
+head(get_pseudotime(example_matrix))
 }
 }

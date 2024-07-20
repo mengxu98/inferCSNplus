@@ -26,7 +26,7 @@ sample_and_epoch_reconstruct <- function(
     ncells_per_sample = 400,
     p_value = 0.05,
     zThresh = 5,
-    pseudotime_column = "dpt_pseudotime",
+    pseudotime_column = "pseudotime",
     group_column = "leiden",
     method = "pearson",
     crossweight = FALSE,

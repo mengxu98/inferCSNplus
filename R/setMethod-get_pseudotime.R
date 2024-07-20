@@ -1,13 +1,10 @@
 #' @param meta_data Input meta data.
 #' @param embeddings Embeddings information
-#' @param cluster_by The column used for `slingshot`
-#' @param cores CPU cores used for umap
-#' @param seed random seed for umap
-#' @param start_cluster start_cluster
-#' @param end_cluster end_cluster
-#' @param verbose Logical, whether to print log messages.
+#' @param cluster_column The column used for \code{\link[slingshot]{slingshot}}.
+#' @param start_cluster The start cluster.
+#' @param end_cluster The end cluster.
+#' @inheritParams inferCSN
 #'
-#' @return A list with a matrix and new meta data
 #' @export
 #'
 #' @method get_pseudotime default
@@ -17,13 +14,13 @@
 #' @examples
 #' \dontrun{
 #' data("example_matrix")
-#' result <- get_pseudotime(example_matrix)
+#' head(get_pseudotime(example_matrix))
 #' }
 get_pseudotime.default <- function(
     object,
     meta_data = NULL,
     embeddings = NULL,
-    cluster_by = "cluster",
+    cluster_column = "cluster",
     cores = 1,
     seed = 1,
     start_cluster = NULL,
@@ -40,11 +37,12 @@ get_pseudotime.default <- function(
       cells = cells,
       cluster = "cluster"
     )
+    rownames(meta_data) <- cells
   } else {
-    if (!cluster_by %in% colnames(meta_data)) {
+    if (!cluster_column %in% colnames(meta_data)) {
       meta_data$cluster <- "cluster"
     } else {
-      meta_data$cluster <- meta_data[, cluster_by]
+      meta_data$cluster <- meta_data[, cluster_column]
     }
   }
 
@@ -66,26 +64,21 @@ get_pseudotime.default <- function(
   pseudotime_res <- apply(
     pseudotime_res, 2, function(x) {
       normalization(
-        x,
-        method = "max"
+        x
       )
     }
   )
   pseudotime_res <- as.data.frame(pseudotime_res)
-  meta_data <- cbind(meta_data, pseudotime_res)
-  result <- list(
-    matrix = object,
-    meta_data = meta_data
-  )
+  colnames(pseudotime_res) <- paste0("pseudotime_slingshot", 1:ncol(pseudotime_res))
+  pseudotime_res <- cbind.data.frame(cluster = meta_data$cluster, pseudotime_res)
 
-  return(result)
+  return(pseudotime_res)
 }
 
-#' @param assay The assay used for `slingshot`.
-#' @param slot The slot used for `slingshot`.
-#' @param reduction The reduction used for `slingshot`.
+#' @param assay The assay used for \code{\link[slingshot]{slingshot}}.
+#' @param layer The layer used for \code{\link[slingshot]{slingshot}}.
+#' @param reduction The reduction used for \code{\link[slingshot]{slingshot}}.
 #'
-#' @return Seurat object
 #' @export
 #'
 #' @method get_pseudotime Seurat
@@ -94,27 +87,25 @@ get_pseudotime.default <- function(
 get_pseudotime.Seurat <- function(
     object,
     assay = "RNA",
-    cluster_by = "cluster",
-    slot = "data",
+    layer = "data",
+    cluster_column = "cluster",
     reduction = "umap",
     start_cluster = NULL,
     end_cluster = NULL,
     ...) {
-  data <- Seurat::GetAssay(object, assay = assay)[slot]
   embeddings <- Seurat::Embeddings(object, reduction = reduction)
-  meta_data <- object@meta.data
 
   result <- get_pseudotime(
-    data,
-    meta_data = meta_data,
+    Seurat::GetAssay(object, layer = layer),
+    meta_data = object@meta.data,
     embeddings = embeddings,
-    cluster_by = cluster_by,
+    cluster_column = cluster_column,
     start_cluster = start_cluster,
     end_cluster = end_cluster,
     ...
   )
-  meta_data <- result$meta_data[colnames(object), ]
-  object@meta.data <- meta_data
+  result <- result[colnames(object), ]
+  object <- Seurat::AddMetaData(object, result)
 
   return(object)
 }

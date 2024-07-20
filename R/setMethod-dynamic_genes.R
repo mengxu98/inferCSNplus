@@ -1,9 +1,44 @@
-#' @param object Expression object.
-#' @param pseudotime Pseudotime
-#' @param fdr_threshold Threshold of fdr.
-#' @param cores cores
+gam_fit <- function(
+    matrix,
+    pseudotime,
+    cores = 1,
+    verbose = TRUE,
+    adjust_method = "BH") {
+  adjust_method <- match.arg(adjust_method, stats::p.adjust.methods)
+
+  # Fit a GAM model with a loess term for pseudotime
+  res <- parallelize_fun(
+    rownames(matrix),
+    function(x) {
+      gam_model <- suppressWarnings(
+        gam::gam(
+          exp ~ gam::lo(t),
+          data = data.frame(
+            exp = matrix[x, ],
+            t = pseudotime
+          )
+        )
+      )
+      data.frame(
+        gene = x,
+        p_value = summary(gam_model)[4][[1]][1, 5]
+      )
+    },
+    cores = cores,
+    verbose = verbose
+  ) |> purrr::list_rbind()
+  res$adjust_p_value <- stats::p.adjust(
+    res$p_value,
+    method = adjust_method
+  ) |> na.omit()
+
+  return(res)
+}
+
+#' @param pseudotime Pseudotime of cells, the length and order should be the same as the expression matrix columns.
+#' @param adjust_method The method used to calculate adjust P-value.
+#' @inheritParams inferCSN
 #'
-#' @return Gene list
 #' @export
 #'
 #' @method dynamic_genes default
@@ -11,8 +46,14 @@
 #' @rdname dynamic_genes
 #'
 #' @examples
-#' \dontrun{
 #' data("example_matrix")
+#' data("example_meta_data")
+#' dynamic_genes(
+#'   object = t(example_matrix),
+#'   pseudotime = example_meta_data$pseudotime
+#' )
+#'
+#' \dontrun{
 #' vector_result <- infer_vector(example_matrix)
 #' dynamic_genes(
 #'   object = t(vector_result$matrix),
@@ -22,52 +63,37 @@
 dynamic_genes.default <- function(
     object,
     pseudotime = NULL,
-    fdr_threshold = 0.05,
     cores = 1,
+    verbose = TRUE,
+    adjust_method = "BH",
     ...) {
   if (is.null(pseudotime)) {
+    log_message(
+      "No pseudotime provided, using all genes.",
+      verbose = verbose
+    )
     return(rownames(object))
   }
   sorted_genes <- names(
-    sort(apply(object, 1, stats::var), decreasing = TRUE)
+    sort(
+      apply(object, 1, stats::var),
+      decreasing = TRUE
+    )
   )
   object <- object[sorted_genes, ]
 
-  # Fit a GAM model with a loess term for pseudotime
-  res <- parallelize_fun(
-    sorted_genes,
-    function(x) {
-      data <- data.frame(
-        exp = object[x, ],
-        t = pseudotime
-      )
-
-      gam_model <- suppressWarnings(
-        gam::gam(exp ~ gam::lo(t), data = data)
-      )
-      data.frame(
-        gene = x,
-        P_value = summary(gam_model)[4][[1]][1, 5]
-      )
-    },
+  res <- gam_fit(
+    object,
+    pseudotime,
     cores = cores,
-    verbose = FALSE
+    verbose = verbose
   )
-  res <- purrr::list_rbind(res)
 
-  res$fdr <- stats::p.adjust(res$P_value, method = "BH")
-  genes <- res[res$fdr < fdr_threshold, 1]
-  if (length(genes) < 3) {
-    genes <- sorted_genes
-  }
-
-  return(genes)
+  return(res)
 }
 
-#' @param cluster cluster
-#' @param cluster_column idents
-#' @param pseudotime_column pseudotime_column
-#' @param slot slot used
+#' @param pseudotime_column The column name in meta_data annotating pseudotime or latent time.
+#' @param layer The layer used in Seurat object.
 #'
 #' @export
 #'
@@ -76,55 +102,28 @@ dynamic_genes.default <- function(
 #' @rdname dynamic_genes
 dynamic_genes.Seurat <- function(
     object,
-    fdr_threshold = 0.05,
-    cluster = NULL,
-    cluster_column = NULL,
-    pseudotime_column = NULL,
-    slot = "data",
+    pseudotime_column,
+    cores = 1,
+    verbose = TRUE,
+    adjust_method = "BH",
+    layer = "data",
     ...) {
-  if (!is.null(cluster_column)) {
-    Seurat::Idents(object) <- cluster_column
-  }
-  if (!is.null(cluster)) {
-    object$cluster <- Seurat::Idents(object)
-    object <- subset(object, cluster == cluster)
+  if (!pseudotime_column %in% colnames(object@meta.data)) {
+    stop("pseudotime_column not existed in the provides Seurat object.")
   }
 
-  genes <- dynamic_genes(
+  Seurat::Misc(object, "dynamic_genes") <- dynamic_genes(
     Matrix::as.matrix(
-      switch(
-        EXPR = slot,
-        "counts" = object@assays$RNA$counts,
-        "data" = object@assays$RNA$data
-      )
+      Seurat::GetAssayData(object, layer = layer)
     ),
     pseudotime = object@meta.data[[pseudotime_column]],
-    fdr_threshold = fdr_threshold
-  )
-
-  return(genes)
-}
-
-gam_fit <- function(
-    matrix,
-    celltime,
-    cores = 1) {
-  ans <- parallelize_fun(
-    seq_len(nrow(matrix)),
-    fun = function(z) {
-      z <- matrix[z, ]
-      d <- data.frame(z = z, t = celltime)
-      tmp <- gam::gam(z ~ gam::lo(celltime), data = d)
-      p <- summary(tmp)[4][[1]][1, 5]
-      p
-    },
     cores = cores,
-    verbose = FALSE
+    verbose = verbose,
+    adjust_method = adjust_method,
+    ...
   )
-  ans <- purrr::list_c(ans)
-  names(ans) <- rownames(matrix)
 
-  return(ans)
+  return(object)
 }
 
 #' find genes expressed dynamically
@@ -163,17 +162,20 @@ findDynGenes <- function(
   )
 
   if (nrow(meta_data) == 0) {
-    ans <- list(genes = NULL, cells = NULL)
-    return(ans)
+    res <- list(genes = NULL, cells = NULL)
+    return(res)
   }
 
   object <- object[, meta_data$cells]
 
-  dynamic_genes <- gam_fit(
+  res <- gam_fit(
     object,
     meta_data$pseudotime,
     cores = cores
   )
+  p_value <- res$adjust_p_value
+  names(p_value) <- res$gene
+
   cells <- data.frame(
     cells = meta_data$cells,
     pseudotime = meta_data$pseudotime,
@@ -183,7 +185,7 @@ findDynGenes <- function(
 
   return(
     list(
-      genes = dynamic_genes,
+      genes = p_value,
       cells = cells
     )
   )
@@ -240,15 +242,15 @@ dynamic_genes_new <- function(
       object <- object[, x$cells]
 
       log_message("\rStarting gammma for cluster: ", cluster, verbose = verbose)
-      dynamic_genes <- gam_fit(
+      res <- gam_fit(
         object,
         x$pseudotime,
         cores = cores
       )
-      dynamic_genes <- as.data.frame(dynamic_genes)
+      dynamic_genes <- res$adjust_p_value
+      names(dynamic_genes) <- res$gene
       dynamic_genes$genes <- rownames(dynamic_genes)
       dynamic_genes <- dynamic_genes[dynamic_genes$dynamic_genes < p_value, ]
-      dynamic_genes <- na.omit(dynamic_genes)
 
       cells <- data.frame(
         cells = x$cells,
@@ -513,8 +515,8 @@ assign_epochs_new1 <- function(
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
         t <- stats::t.test(chunk[gene, ], background[gene, ])
-        ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
-        diffres <- rbind(diffres, ans)
+        res <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        diffres <- rbind(diffres, res)
       }
 
       diffres$padj <- stats::p.adjust(diffres$pval, method = "BH")
@@ -666,8 +668,8 @@ assign_network <- function(
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
         t <- stats::t.test(chunk[gene, ], background[gene, ])
-        ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
-        diffres <- rbind(diffres, ans)
+        res <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        diffres <- rbind(diffres, res)
       }
 
       diffres$padj <- stats::p.adjust(diffres$pval, method = "BH")

@@ -8,48 +8,57 @@
 \usage{
 dynamic_genes(object, ...)
 
-\method{dynamic_genes}{default}(object, pseudotime = NULL, fdr_threshold = 0.05, cores = 1, ...)
+\method{dynamic_genes}{default}(
+  object,
+  pseudotime = NULL,
+  cores = 1,
+  verbose = TRUE,
+  adjust_method = "BH",
+  ...
+)
 
 \method{dynamic_genes}{Seurat}(
   object,
-  fdr_threshold = 0.05,
-  cluster = NULL,
-  cluster_column = NULL,
-  pseudotime_column = NULL,
-  slot = "data",
+  pseudotime_column,
+  cores = 1,
+  verbose = TRUE,
+  adjust_method = "BH",
+  layer = "data",
   ...
 )
 }
 \arguments{
-\item{object}{Expression object.}
+\item{object}{The input data, a matrix with cells/samples by genes/features or a seurat object.}
 
 \item{...}{Arguments for other methods}
 
-\item{pseudotime}{Pseudotime}
+\item{pseudotime}{Pseudotime of cells, the length and order should be the same as the expression matrix columns.}
 
-\item{fdr_threshold}{Threshold of fdr.}
+\item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
 
-\item{cores}{cores}
+\item{verbose}{Logical value. Whether to print detailed information.}
 
-\item{cluster}{cluster}
+\item{adjust_method}{The method used to calculate adjust P-value.}
 
-\item{cluster_column}{idents}
+\item{pseudotime_column}{The column name in meta_data annotating pseudotime or latent time.}
 
-\item{pseudotime_column}{pseudotime_column}
-
-\item{slot}{slot used}
+\item{layer}{The layer used in Seurat object.}
 }
 \value{
 A new object with dynamic genes
-
-Gene list
 }
 \description{
 Get dynamic genes
 }
 \examples{
-\dontrun{
 data("example_matrix")
+data("example_meta_data")
+dynamic_genes(
+  object = t(example_matrix),
+  pseudotime = example_meta_data$pseudotime
+)
+
+\dontrun{
 vector_result <- infer_vector(example_matrix)
 dynamic_genes(
   object = t(vector_result$matrix),
