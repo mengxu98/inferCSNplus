@@ -54,21 +54,19 @@ get_pseudotime.default <- function(
   }
 
   log_message("Running `slingshot`", verbose = verbose)
-  slingshot_res <- slingshot::slingshot(
+  pseudotime_res <- slingshot::slingshot(
     embeddings,
     clusterLabels = meta_data$cluster,
     start.clus = start_cluster,
     end.clus = end_cluster
-  )
-  pseudotime_res <- slingshot::slingPseudotime(slingshot_res)
+  ) |> slingshot::slingPseudotime()
   pseudotime_res <- apply(
     pseudotime_res, 2, function(x) {
       normalization(
         x
       )
     }
-  )
-  pseudotime_res <- as.data.frame(pseudotime_res)
+  ) |> as.data.frame()
   colnames(pseudotime_res) <- paste0("pseudotime_slingshot", 1:ncol(pseudotime_res))
   pseudotime_res <- cbind.data.frame(cluster = meta_data$cluster, pseudotime_res)
 

@@ -8,13 +8,13 @@ gam_fit <- function(
 
   # Fit a GAM model with a loess term for pseudotime
   res <- parallelize_fun(
-    rownames(matrix),
+    colnames(matrix),
     function(x) {
       gam_model <- suppressWarnings(
         gam::gam(
           exp ~ gam::lo(t),
           data = data.frame(
-            exp = matrix[x, ],
+            exp = matrix[, x],
             t = pseudotime
           )
         )
@@ -31,6 +31,10 @@ gam_fit <- function(
     res$p_value,
     method = adjust_method
   ) |> na.omit()
+  res <- res[order(
+    as.numeric(res$adjust_p_value),
+    decreasing = FALSE
+  ), ]
 
   return(res)
 }
@@ -49,14 +53,14 @@ gam_fit <- function(
 #' data("example_matrix")
 #' data("example_meta_data")
 #' dynamic_genes(
-#'   object = t(example_matrix),
+#'   object = example_matrix,
 #'   pseudotime = example_meta_data$pseudotime
 #' )
 #'
 #' \dontrun{
 #' vector_result <- infer_vector(example_matrix)
 #' dynamic_genes(
-#'   object = t(vector_result$matrix),
+#'   object = vector_result$matrix,
 #'   pseudotime = vector_result$pseudotime[, 2]
 #' )
 #' }
@@ -72,15 +76,15 @@ dynamic_genes.default <- function(
       "No pseudotime provided, using all genes.",
       verbose = verbose
     )
-    return(rownames(object))
+    return(colnames(object))
   }
-  sorted_genes <- names(
-    sort(
-      apply(object, 1, stats::var),
-      decreasing = TRUE
-    )
-  )
-  object <- object[sorted_genes, ]
+  # sorted_genes <- names(
+  #   sort(
+  #     apply(object, 2, stats::var),
+  #     decreasing = TRUE
+  #   )
+  # )
+  # object <- object[, sorted_genes]
 
   res <- gam_fit(
     object,

@@ -54,14 +54,14 @@ Get dynamic genes
 data("example_matrix")
 data("example_meta_data")
 dynamic_genes(
-  object = t(example_matrix),
+  object = example_matrix,
   pseudotime = example_meta_data$pseudotime
 )
 
 \dontrun{
 vector_result <- infer_vector(example_matrix)
 dynamic_genes(
-  object = t(vector_result$matrix),
+  object = vector_result$matrix,
   pseudotime = vector_result$pseudotime[, 2]
 )
 }
