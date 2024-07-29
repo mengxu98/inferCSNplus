@@ -1,6 +1,6 @@
-#' The Modules class
-#'
-#' The Modules object stores the TF modules extracted from the inferred network..
+#' @title The Modules class
+#' @description
+#'  The Modules object stores the TF modules extracted from the inferred network..
 #'
 #' @slot meta A dataframe with meta data about the modules.
 #' @slot features A named list with a set of fetures (genes/peaks) for each module.
@@ -18,9 +18,9 @@ Modules <- setClass(
   )
 )
 
-#' The Network class
-#'
-#' The Network object stores the inferred network itself, information about the fitting
+#' @title The Network class
+#'@description
+#'  The Network object stores the inferred network itself, information about the fitting
 #' process as well as graph representations of the network.
 #'
 #' @slot modules A list TF modules.
@@ -46,9 +46,9 @@ Network <- setClass(
   )
 )
 
-#' The Regions class
-#'
-#' The Regions object stores the genomic regions that are considered by the model.
+#' @title The Regions class
+#' @description
+#'  The Regions object stores the genomic regions that are considered by the model.
 #' It stores their genomic positions, how they map to the peaks in the Seurat object
 #' and motif matches.
 #'
@@ -71,9 +71,9 @@ Regions <- setClass(
 )
 
 
-#' The RegularotyNetwork class
-#'
-#' The RegularotyNetwork object is the core data structure in Pando.
+#' @title The RegularotyNetwork class
+#' @description
+#'  The RegularotyNetwork object is the core data structure in Pando.
 #' It stores all data necessary for network inference and analysis
 #' that is not provided by Seurat.
 #'
@@ -98,9 +98,9 @@ RegulatoryNetwork <- setClass(
 )
 
 
-#' The CSNObject class
-#'
-#' The CSNObject object is an extended \code{Seurat} object
+#' @title The CSNObject class
+#' @description
+#'  The CSNObject object is an extended \code{Seurat} object
 #' for the storage and analysis of Regulatory network data.
 #'
 #' @slot csn A named list containing \code{RegulatoryNetwork} objects with inferred networks.
@@ -117,9 +117,9 @@ CSNObject <- setClass(
   )
 )
 
-#' The CSNObjectList class
-#'
-#' The CSNObjectList object is an extended \code{Seurat} object
+#' @title The CSNObjectList class
+#' @description
+#'  The CSNObjectList object is an extended \code{Seurat} object
 #' for the storage and analysis of Regulatory network data.
 #'
 #' @slot data Seurat object list.
@@ -134,7 +134,7 @@ CSNObjectList <- setClass(
   )
 )
 
-#' Get network
+#' @title Get network
 #'
 #' @param network network
 #'
@@ -148,9 +148,6 @@ GetNetwork.CSNObject <- function(
   return(GetNetwork(object@csn, network = network))
 }
 
-
-#' Get network
-#'
 #' @param network network
 #'
 #' @rdname GetNetwork
@@ -169,8 +166,7 @@ GetNetwork.RegulatoryNetwork <- function(
   return(object@networks[[network]])
 }
 
-
-#' Get network features
+#' @title Get network features
 #'
 #' @param network network
 #'
@@ -184,7 +180,6 @@ NetworkFeatures.CSNObject <- function(
   return(GetNetwork(object, network = network)@features)
 }
 
-
 #' @rdname NetworkFeatures
 #' @method NetworkFeatures RegulatoryNetwork
 #' @export
@@ -196,7 +191,8 @@ NetworkFeatures.RegulatoryNetwork <- function(
 }
 
 
-#' Get network TFs
+#' @title Get network TFs
+#' 
 #' @rdname NetworkTFs
 #' @method NetworkTFs CSNObject
 #' @export
@@ -213,7 +209,8 @@ NetworkTFs.RegulatoryNetwork <- function(object, ...) {
 }
 
 
-#' Get network regions
+#' @title Get network regions
+#'
 #' @rdname NetworkRegions
 #' @method NetworkRegions CSNObject
 #' @export
@@ -230,7 +227,7 @@ NetworkRegions.RegulatoryNetwork <- function(object, ...) {
 }
 
 
-#' Get network data
+#' @title Get network data
 #' @rdname GetGRN
 #' @method GetGRN CSNObject
 #' @export
@@ -238,8 +235,7 @@ GetGRN.CSNObject <- function(object, ...) {
   return(object@csn)
 }
 
-
-#' Get TF modules
+#' @title Get TF modules
 #'
 #' @param network network
 #'
@@ -272,7 +268,7 @@ NetworkModules.Network <- function(object, ...) {
   return(object@modules)
 }
 
-#' Get network parameters
+#' @title Get network parameters
 #'
 #' @param network network
 #'
@@ -305,7 +301,7 @@ NetworkParams.Network <- function(object, ...) {
   return(object@params)
 }
 
-#' Get network parameters
+#' @title Get network parameters
 #'
 #' @param network network
 #' @param graph graph
@@ -318,7 +314,12 @@ NetworkGraph.CSNObject <- function(
     network = DefaultNetwork(object),
     graph = "module_graph",
     ...) {
-  return(NetworkGraph(GetNetwork(object, network = network), graph = graph))
+  return(
+    NetworkGraph(
+      GetNetwork(object, network = network),
+      graph = graph
+    )
+  )
 }
 
 #' @param network network
@@ -333,7 +334,12 @@ NetworkGraph.RegulatoryNetwork <- function(
     network = DefaultNetwork(object),
     graph = "module_graph",
     ...) {
-  return(NetworkGraph(GetNetwork(object, network = network), graph = graph))
+  return(
+    NetworkGraph(
+      GetNetwork(object, network = network),
+      graph = graph
+    )
+  )
 }
 
 #' @param graph graph
@@ -346,14 +352,15 @@ NetworkGraph.Network <- function(
     graph = "module_graph",
     ...) {
   if (!graph %in% names(object@graphs)) {
-    stop(paste0('The requested graph "', graph, '" does not exist.
-                Try (re-)running `get_network_graph().`')
+    stop(
+      paste0("The requested graph '", graph, "' does not exist. \nTry (re-)running `get_network_graph()`.")
     )
   }
   return(object@graphs[[graph]])
 }
 
-#' Get active network
+#' @title Get active network
+#' 
 #' @rdname DefaultNetwork
 #' @method DefaultNetwork CSNObject
 #' @export
@@ -368,7 +375,7 @@ DefaultNetwork.RegulatoryNetwork <- function(object, ...) {
   return(object@active_network)
 }
 
-#' Get fitted coefficients
+#' @title Get fitted coefficients
 #'
 #' @param object The csn object
 #' @param network network
@@ -396,7 +403,6 @@ coef.RegulatoryNetwork <- function(
   return(GetNetwork(object, network = network)@coefs)
 }
 
-
 #' @rdname coef
 #' @method coef Network
 #' @export
@@ -404,8 +410,7 @@ coef.Network <- function(object, ...) {
   return(object@coefs)
 }
 
-
-#' Get goodness-of-fit info
+#' @title Get goodness-of-fit info
 #'
 #' @param network network
 #'
@@ -419,8 +424,6 @@ gof.CSNObject <- function(
   return(GetNetwork(object, network = network)@fit)
 }
 
-#' @param network network
-#'
 #' @rdname gof
 #' @method gof RegulatoryNetwork
 #' @export
@@ -431,8 +434,6 @@ gof.RegulatoryNetwork <- function(
   return(GetNetwork(object, network = network)@fit)
 }
 
-#' @param network network
-#'
 #' @rdname gof
 #' @method gof Network
 #' @export
@@ -443,8 +444,7 @@ gof.Network <- function(
   return(object@fit)
 }
 
-
-#' Get GRN inference parameters
+#' @title Get GRN inference parameters
 #'
 #' @rdname Params
 #' @method Params CSNObject
@@ -453,7 +453,6 @@ Params.CSNObject <- function(object, ...) {
   return(object@csn@params)
 }
 
-
 #' @rdname Params
 #' @method Params RegulatoryNetwork
 #' @export
@@ -461,8 +460,7 @@ Params.RegulatoryNetwork <- function(object, ...) {
   return(object@params)
 }
 
-
-#' Get summary of seurat assay
+#' @title Get summary of seurat assay
 #'
 #' @param group_name group_name
 #' @param assay assay
@@ -491,8 +489,7 @@ GetAssaySummary.Seurat <- function(
   return(smry)
 }
 
-
-#' Get summary of seurat assay from CSNObject
+#' @title Get summary of seurat assay from CSNObject
 #'
 #' @param group_name group_name
 #' @param assay assay
@@ -510,7 +507,7 @@ GetAssaySummary.CSNObject <- function(
   return(GetAssaySummary(object@data, group_name, assay = NULL, verbose = TRUE))
 }
 
-#' Get Seurat assay from CSNObject
+#' @title Get Seurat assay from CSNObject
 #'
 #' @param assay assay
 #'
@@ -524,8 +521,7 @@ GetAssay.CSNObject <- function(
   return(Seurat::GetAssay(object@data, assay = assay))
 }
 
-
-#' Get layer data from CSNObject
+#' @title Get layer data from CSNObject
 #'
 #' @param ... other parameters
 #'
@@ -536,7 +532,7 @@ LayerData.CSNObject <- function(object, ...) {
   return(SeuratObject::LayerData(object@data, ...))
 }
 
-#' Get variable features from CSNObject
+#' @title Get variable features from CSNObject
 #'
 #' @rdname VariableFeatures
 #' @method VariableFeatures CSNObject
@@ -545,7 +541,7 @@ VariableFeatures.CSNObject <- function(object, ...) {
   return(Seurat::VariableFeatures(object@data, ...))
 }
 
-#' Print RegulatoryNetwork objects
+#' @title Print RegulatoryNetwork objects
 #'
 #' @param x A csn object
 #' @param ... other parameters
@@ -586,7 +582,7 @@ setMethod(
   }
 )
 
-#' Print Network objects
+#' @title Print Network objects
 #'
 #' @rdname print
 #' @export
@@ -613,7 +609,7 @@ setMethod(
   }
 )
 
-#' Print Modules objects
+#' @title Print Modules objects
 #'
 #' @rdname print
 #' @export
@@ -633,7 +629,7 @@ setMethod(
   }
 )
 
-#' Print Regions objects
+#' @title Print Regions objects
 #'
 #' @rdname print
 #' @export

@@ -4,7 +4,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-NumericMatrix table_to_matrix(DataFrame weight_table) {
+NumericMatrix tableToMatrix(DataFrame weight_table) {
   CharacterVector regulators = weight_table["regulator"];
   CharacterVector targets = weight_table["target"];
   NumericVector weight = weight_table["weight"];
@@ -13,9 +13,12 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
   CharacterVector unique_targets = unique(targets);
 
   // // TODO:
-  // // The two lines to sort genes, such as "g3", "g1", "g2" to "g1", "g2", "g3",
-  // // but these codes can not work successful, maybe return "g1.1", "g1.2", "g3".
-  // // Now, use R code: 'weight_matrix <- weight_matrix[unique_regulators, unique_targets]',
+  // // The two lines to sort genes, such as "g3", "g1", "g2" to "g1", "g2",
+  // "g3",
+  // // but these codes can not work successful, maybe return "g1.1", "g1.2",
+  // "g3".
+  // // Now, use R code: 'weight_matrix <- weight_matrix[unique_regulators,
+  // unique_targets]',
   // // to temporarily overcome this problem
   // std::sort(unique_regulators.begin(), unique_regulators.end());
   // std::sort(unique_targets.begin(), unique_targets.end());
@@ -28,8 +31,13 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
   colnames(weight_matrix) = unique_targets;
 
   for (int i = 0; i < weight_table.nrows(); ++i) {
-    int regulators_index = std::distance(unique_regulators.begin(), std::find(unique_regulators.begin(), unique_regulators.end(), regulators[i]));
-    int targets_index = std::distance(unique_targets.begin(), std::find(unique_targets.begin(), unique_targets.end(), targets[i]));
+    int regulators_index =
+        std::distance(unique_regulators.begin(),
+                      std::find(unique_regulators.begin(),
+                                unique_regulators.end(), regulators[i]));
+    int targets_index = std::distance(
+        unique_targets.begin(),
+        std::find(unique_targets.begin(), unique_targets.end(), targets[i]));
     weight_matrix(regulators_index, targets_index) = weight[i];
   }
 
@@ -38,8 +46,8 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
 
 /*
 
-# Older version, bug: can not handle data frame with unequal number regulators and targets.
- NumericMatrix table_to_matrix(DataFrame weight_table) {
+ # Older version, bug: can not handle data frame with unequal number regulators
+ and targets. NumericMatrix tableToMatrix(DataFrame weight_table) {
  CharacterVector regulator = weight_table[0];
  CharacterVector target = weight_table[1];
  NumericVector weight = weight_table[2];
@@ -53,8 +61,9 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
  rownames(weight_matrix) = genes;
 
  for (int i = 0; i < weight_table.nrows(); ++i) {
- int regulators_index = std::distance(genes.begin(), std::find(genes.begin(), genes.end(), regulator[i]));
- int targets_index = std::distance(genes.begin(), std::find(genes.begin(), genes.end(), target[i]));
+ int regulators_index = std::distance(genes.begin(), std::find(genes.begin(),
+ genes.end(), regulator[i])); int targets_index = std::distance(genes.begin(),
+ std::find(genes.begin(), genes.end(), target[i]));
  weight_matrix(regulators_index, targets_index) = weight[i];
  }
 
@@ -86,7 +95,8 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
  )
 
  for (i in 1:nrow(weight_table)) {
- weight_matrix[weight_table$regulator[i], weight_table$target[i]] <- weight_table$weight[i]
+ weight_matrix[weight_table$regulator[i], weight_table$target[i]] <-
+weight_table$weight[i]
  }
 
  return(weight_matrix)
@@ -114,7 +124,7 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
  }
 
 #' @examples
- Rcpp::sourceCpp("src/table_to_matrix.cpp")
+ Rcpp::sourceCpp("src/tableToMatrix.cpp")
  library(inferCSN)
  data("example_matrix")
  weight_table <- inferCSN(
@@ -125,7 +135,7 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
 
  unique_regulators <- gtools::mixedsort(unique(weight_table$regulator))
  unique_targets <- gtools::mixedsort(unique(weight_table$target))
- weight_matrix <- table_to_matrix(weight_table)
+ weight_matrix <- tableToMatrix(weight_table)
  weight_matrix <- weight_matrix[unique_regulators, unique_targets]
  weight_matrix_r1 <- table_to_matrix_v1(weight_table)
  weight_matrix_r2 <- table_to_matrix_v2(weight_table)
@@ -135,7 +145,7 @@ NumericMatrix table_to_matrix(DataFrame weight_table) {
  install.packages("bench")
  }
  bench::mark(
- table_to_matrix(weight_table)[unique_regulators, unique_targets],
+ tableToMatrix(weight_table)[unique_regulators, unique_targets],
  table_to_matrix_v1(weight_table),
  table_to_matrix_v2(weight_table)
  )

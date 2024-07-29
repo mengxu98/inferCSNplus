@@ -1,147 +1,6 @@
-#' @export
-#' @method inferCSN default
-#'
-#' @rdname inferCSN
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix, verbose = TRUE)
-#' head(network_table)
-#'
-#' network_table <- inferCSN(example_matrix, cores = 2)
-#' head(network_table)
-setMethod(
-  f = "inferCSN",
-  signature = signature(object = "matrix"),
-  definition = function(
-    object,
-    penalty = "L0",
-    algorithm = "CD",
-    cross_validation = FALSE,
-    seed = 1,
-    n_folds = 10,
-    percent_samples = 1,
-    r_threshold = 0,
-    regulators = NULL,
-    targets = NULL,
-    regulators_num = NULL,
-    cores = 1,
-    verbose = FALSE,
-    ...) {
-    if (verbose) {
-      message(paste("Running start for <", class(object)[1], ">."))
-    }
-
-    check.parameters(
-      matrix = object,
-      penalty = penalty,
-      algorithm = algorithm,
-      cross_validation = cross_validation,
-      seed = seed,
-      n_folds = n_folds,
-      percent_samples = percent_samples,
-      r_threshold = r_threshold,
-      regulators = regulators,
-      targets = targets,
-      regulators_num = regulators_num,
-      verbose = verbose,
-      cores = cores,
-      ...
-    )
-
-    if (!is.null(regulators)) {
-      regulators <- intersect(colnames(object), regulators)
-    } else {
-      regulators <- colnames(object)
-    }
-    if (!is.null(targets)) {
-      targets <- intersect(colnames(object), targets)
-    } else {
-      targets <- colnames(object)
-    }
-    if (is.null(regulators_num)) {
-      regulators_num <- (ncol(object) - 1)
-    }
-    names(targets) <- targets
-    cores <- min(
-      (parallel::detectCores(logical = FALSE) - 1), cores, length(targets)
-    )
-    weight_list <- parallelize_fun(
-      x = targets,
-      fun = function(x) {
-        single.network(
-          matrix = object,
-          regulators = regulators,
-          target = x,
-          cross_validation = cross_validation,
-          seed = seed,
-          penalty = penalty,
-          algorithm = algorithm,
-          n_folds = n_folds,
-          percent_samples = percent_samples,
-          r_threshold = r_threshold,
-          regulators_num = regulators_num,
-          verbose = verbose
-        )
-      },
-      cores = cores,
-      verbose = verbose
-    )
-    network_table <- purrr::list_rbind(weight_list)
-    network_table <- network_format(
-      network_table,
-      abs_weight = FALSE
-    )
-    if (verbose) message("Run done.")
-
-    return(network_table)
-  }
-)
-
-#' @export
-#' @method inferCSN data.frame
-#'
-#' @rdname inferCSN
-setMethod(
-  f = "inferCSN",
-  signature = signature(object = "data.frame"),
-  definition = function(
-    object,
-    penalty = "L0",
-    algorithm = "CD",
-    cross_validation = FALSE,
-    seed = 1,
-    n_folds = 10,
-    percent_samples = 1,
-    r_threshold = 0,
-    regulators = NULL,
-    targets = NULL,
-    regulators_num = NULL,
-    cores = 1,
-    verbose = FALSE,
-    ...) {
-    if (verbose) {
-      message("Converting the class type of input data from <data.frame> to <matrix>.")
-    }
-    object <- as_matrix(object)
-    inferCSN(
-      object,
-      penalty = penalty,
-      algorithm = algorithm,
-      cross_validation = cross_validation,
-      seed = seed,
-      n_folds = n_folds,
-      percent_samples = percent_samples,
-      r_threshold = r_threshold,
-      regulators = regulators,
-      targets = targets,
-      regulators_num = regulators_num,
-      verbose = verbose,
-      cores = cores,
-      ...
-    )
-  }
-)
+#' @include setClass.R
+#' @include setGenerics.R
+#' @include inferCSN.R
 
 #' @param aggregate Logical, whether to aggregate the data.
 #' @param k_neigh Number of cells to be aggregated per cluster.
@@ -220,7 +79,7 @@ setMethod(
         if ("aggregated_data" %in% names(Seurat::Misc(object_sub))) {
           agg_data <- Seurat::Misc(object_sub, slot = "aggregated_data")
         } else {
-          agg_data <- aggregating.data(
+          agg_data <- aggregating_data(
             object_sub,
             k_neigh = k_neigh,
             atacbinary = atacbinary,
@@ -464,7 +323,7 @@ setMethod(
         Y <- as_matrix(Y)
         target <- rownames(Y)
         regulators <- rownames(X)
-        weight_list[[i]] <- single.network(
+        weight_list[[i]] <- single_network(
           matrix = t(matrix),
           regulators = regulators,
           target = target,
@@ -487,7 +346,7 @@ setMethod(
     "%dopar%" <- foreach::"%dopar%"
     weight_list <- foreach::foreach(
       i = seq_along(targets),
-      .export = c("single.network", "sparse.regression")
+      .export = c("single_network", "sparse.regression")
     ) %dopar% {
       p1 <- paste0(chr[i], ":", (starts[i] - 500), "-", starts[i])
       p2 <- paste0(chr[i], ":", (starts[i] - 250000), "-", (starts[i] + 250000))
@@ -513,7 +372,7 @@ setMethod(
         Y <- as_matrix(Y)
         target <- rownames(Y)
         regulators <- rownames(X)
-        single.network(
+        single_network(
           matrix = t(matrix),
           regulators = regulators,
           target = target,

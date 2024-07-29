@@ -33,17 +33,14 @@ reference:
 - subtitle: "inferCSN"
 - contents:
   - inferCSN-package
-  - inferCSN.logo
+  - inferCSN_logo
   - inferCSN
 
 - subtitle: "Sparse regression model"
 - contents:
-  - fit_models
-  - fit_model
-  - format_coefs
-  - model.fit
-  - single.network
-  - sparse.regression
+  - single_network
+  - sparse_regression
+  - fit_sparse_regression
   - fit_bagging_ridge
   - fit_bayesian_ridge
   - fit_brms
@@ -53,6 +50,9 @@ reference:
   - fit_glmnet
   - fit_srm
   - fit_xgb
+  - fit_model
+  - fit_models
+  - format_coefs
 
 - subtitle: "Class"
 - contents:
@@ -79,7 +79,7 @@ reference:
 - contents:
   - normalize.seurat.object
   - generate_aggregated_data
-  - aggregating.data
+  - aggregating_data
   - as.slam.matrix
   - as_sparse
   - estimate.size.factors
@@ -172,7 +172,7 @@ reference:
   - plot_dynamic_networks
   - plot_static_networks
   - plot_contrast_networks
-  - network.heatmap
+  - plot_network_heatmap
   - plot_detail_network
   - plot_diffnet_detail
   - plot_dyn_diffnet
@@ -211,14 +211,15 @@ reference:
 - subtitle: "Utils functions"
 - contents:
   - as_matrix
-  - check.parameters
+  - check_parameters
+  - check_sparsity
   - coef.SRM_fit
   - coef.SRM_fit_CV
   - coef.CSNObject
   - crossweight
   - network_format
   - normalization
-  - table.to.matrix
+  - table_to_matrix
   - filter_sort_matrix
   - print.logo
   - print.SRM_fit

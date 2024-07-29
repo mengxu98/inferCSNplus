@@ -1,15 +1,32 @@
-#' Fit (regularized) generalized linear model
+#' @title Fit (regularized) generalized linear model
 #'
+#' @md
 #' @param formula An object of class \code{formula} with a symbolic description
 #' of the model to be fitted.
 #' @param data A \code{data.frame} containing the variables in the model.
 #' @param method A character string indicating the method to fit the model.
+#' 
 #' * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
+#' 
 #' * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
 #' * \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
 #' * \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
 #' * \code{'bagging_ridge'} - Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
 #' * \code{'bayesian_ridge'} - Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
+#' [cli::ansi_strip()] [stats::glm()] 
+#'
+#' - \code{'glm'}. Generalized Liner Model with \code{\link[stats]{glm}}.
+#' 
+#' - \code{'glmnet'}, \code{'cv.glmnet'}. Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
+#' 
+#' - \code{'brms'}. Bayesian Regression Models using \code{\link[brms]{brms-package}}.
+#' 
+#' - \code{'xgb'}. Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
+#' 
+#' - \code{'bagging_ridge'}. Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
+#' - \code{'bayesian_ridge'}. Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
+#' 
+#' 
 #' @param family A description of the error distribution and link function to be used in the model.
 #' See \code{\link[stats]{family}} for mode details.
 #' @param alpha The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.
@@ -63,7 +80,7 @@ fit_srm <- function(
   )[, -1]
   response <- data[[formula[[2]]]]
 
-  fit <- model.fit(
+  fit <- fit_sparse_regression(
     model_mat,
     response,
     ...
@@ -124,7 +141,7 @@ fit_cvsrm <- function(
 
   regulators_num <- ncol(model_mat)
   fit <- try(
-    model.fit(
+    fit_sparse_regression(
       model_mat, response,
       cross_validation = TRUE,
       seed = 1,
@@ -135,7 +152,7 @@ fit_cvsrm <- function(
   if (any(class(fit) == "try-error")) {
     if (verbose) message("Cross validation error, used fit instead.")
     fit <- try(
-      model.fit(
+      fit_sparse_regression(
         model_mat, response,
         penalty = penalty,
         algorithm = algorithm,
