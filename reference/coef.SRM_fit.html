@@ -57,7 +57,7 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for SRM_fit</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>, gamma <span class="op">=</span> <span class="cn">NULL</span>, supportSize <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>, gamma <span class="op">=</span> <span class="cn">NULL</span>, regulators_num <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for SRM_fit_CV</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">object</span>, lambda <span class="op">=</span> <span class="cn">NULL</span>, gamma <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
@@ -66,19 +66,19 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
-<dd><p>The output of model.fit or inferCSN.cvfit</p></dd>
+<dd><p>The output of <code><a href="fit_sparse_regression.html">fit_sparse_regression</a></code>.</p></dd>
 
 
 <dt>lambda</dt>
-<dd><p>The value of lambda at which to extract the solution</p></dd>
+<dd><p>The value of lambda at which to extract the solution.</p></dd>
 
 
 <dt>gamma</dt>
-<dd><p>The value of gamma at which to extract the solution</p></dd>
+<dd><p>The value of gamma at which to extract the solution.</p></dd>
 
 
-<dt>supportSize</dt>
-<dd><p>The number of non-zeros each solution extracted will contain</p></dd>
+<dt>regulators_num</dt>
+<dd><p>The number of non-zeros each solution extracted will contain.</p></dd>
 
 
 <dt>...</dt>
@@ -88,9 +88,6 @@
     <div id="value">
     <h2>Value</h2>
     
-
-<p>Return the specific solution</p>
-
 
 <p>Return the specific solution</p>
     </div>

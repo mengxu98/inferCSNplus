@@ -56,17 +56,23 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rough_hierarchy</span><span class="op">(</span><span class="va">modnet</span>, abs_weight <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rough_hierarchy</span><span class="op">(</span><span class="va">network_table</span>, abs_weight <span class="op">=</span> <span class="cn">TRUE</span>, directed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>modnet</dt>
-<dd><p>modnet</p></dd>
+    <dl><dt>network_table</dt>
+<dd><p>The weight data table of network.</p></dd>
 
 
 <dt>abs_weight</dt>
-<dd><p>abs_weight</p></dd>
+<dd><p>Logical value, whether to perform absolute value on weights,
+default set to <code>TRUE</code>, and when set <code>abs_weight</code> to <code>TRUE</code>,
+the output of weight table will create a new column named <code>Interaction</code>.</p></dd>
+
+
+<dt>directed</dt>
+<dd><p>Whether the network is directed.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -78,13 +84,8 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mengxu98.github.io/inferCSNplus/">inferCSN</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_matrix"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">network_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="inferCSN.html">inferCSN</a></span><span class="op">(</span><span class="va">example_matrix</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_matrix"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">network_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="inferCSN.html">inferCSN</a></span><span class="op">(</span><span class="va">example_matrix</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">rough_hierarchy</span><span class="op">(</span><span class="va">network_table</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $roots</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "g17" "g18" "g16" "g15" "g14" "g12" "g13" "g11" "g4"  "g9"  "g10" "g7" </span>

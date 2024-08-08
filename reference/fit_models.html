@@ -47,7 +47,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Fit models for gene expression</h1>
-    <small class="dont-index">Source: <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/setGenerics.R" class="external-link"><code>R/setGenerics.R</code></a>, <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/setMethod-inferCSN.R" class="external-link"><code>R/setMethod-inferCSN.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/setGenerics.R" class="external-link"><code>R/setGenerics.R</code></a>, <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/inferCSN-methods.R" class="external-link"><code>R/inferCSN-methods.R</code></a></small>
     <div class="hidden name"><code>fit_models.Rd</code></div>
     </div>
 
@@ -149,9 +149,9 @@ Only used of `peak_to_gene_method = 'GREAT'`.</p></dd>
 <dd><p>A character string indicating the method to fit the model.
 * <code>'srm'</code> - Sparse Regression Model.
 * <code>'glm'</code> - Generalized Liner Model with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></code>.
-* <code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></code>.
-* <code>'brms'</code> - Bayesian Regression Models using <code><a href="https://paul-buerkner.github.io/brms/reference/brms-package.html" class="external-link">brms-package</a></code>.
-* <code>'xgb'</code> - Gradient Boosting Regression using <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></code>.
+* <code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code>glmnet</code>.
+* <code>'brms'</code> - Bayesian Regression Models using <code>brms-package</code>.
+* <code>'xgb'</code> - Gradient Boosting Regression using <code>xgboost</code>.
 * <code>'bagging_ridge'</code> - Bagging Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.
 * <code>'bayesian_ridge'</code> - Bayesian Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></dd>
 

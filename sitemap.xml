@@ -85,9 +85,6 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/VariableFeatures.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/acc.calculate.html</loc>
-  </url>
-  <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/add_interaction_type.html</loc>
   </url>
   <url>
@@ -100,13 +97,10 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/aggregate_matrix.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/aggregating.data.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/aggregating_data.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/as.slam.matrix.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/as.sparse.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/as_matrix.html</loc>
@@ -127,13 +121,7 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/assign_network.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/auc.calculate.html</loc>
-  </url>
-  <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/biglist_compute_betweenness_degree.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/calculate.gene.rank.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/calculate_acc.html</loc>
@@ -148,7 +136,7 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/caoGenes.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/check.parameters.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/check_sparsity.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/coef.SRM_fit.html</loc>
@@ -194,15 +182,6 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/diffnet_community_detection.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/dynamic.genes.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/dynamic.genes_new.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/dynamic.windowing.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/dynamic_difference_network.html</loc>
@@ -254,24 +233,6 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/expression_ksmooth.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.cre.gene.links.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.cre.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.links.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.network.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.nodes.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/extract.peak.tf.links.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/extract_cre.gene.links.html</loc>
@@ -352,6 +313,9 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/fit_models.html</loc>
   </url>
   <url>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/fit_sparse_regression.html</loc>
+  </url>
+  <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/fit_srm.html</loc>
   </url>
   <url>
@@ -362,12 +326,6 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/generate_aggregated_data.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/get.dimensional.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/get.pseudotime.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/get.tf.gene.html</loc>
@@ -436,10 +394,7 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN.logo.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/inferVECTOR.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN_logo.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/infer_vector.html</loc>
@@ -460,16 +415,10 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/mean_subnetwork_expression.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/model.fit.html</loc>
-  </url>
-  <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/motif2tf.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/motifs.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/network.heatmap.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/network_format.html</loc>
@@ -541,6 +490,9 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/plot_network_graph.html</loc>
   </url>
   <url>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/plot_network_heatmap.html</loc>
+  </url>
+  <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/plot_scatter.html</loc>
   </url>
   <url>
@@ -566,9 +518,6 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/predict.SRM_fit.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/prepare.performance.data.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/prepare_network_data.html</loc>
@@ -610,16 +559,16 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/score_targets.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/single.network.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/sparse.regression.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/single_network.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_cor.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_covcor.html</loc>
+  </url>
+  <url>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_regression.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/split_epochs_by_group.html</loc>
@@ -637,31 +586,10 @@
     <loc>https://mengxu98.github.io/inferCSNplus/reference/subnets.html</loc>
   </url>
   <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/table.to.matrix.html</loc>
+    <loc>https://mengxu98.github.io/inferCSNplus/reference/table_to_matrix.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/transcript.mode.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.autoCenter.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.buildGrid.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.buildNet.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.drawArrow.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.getValue.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.gridValue.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/vector.rankPCA.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/vector_auto_center.html</loc>
@@ -683,9 +611,6 @@
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/vector_rank_pca.html</loc>
-  </url>
-  <url>
-    <loc>https://mengxu98.github.io/inferCSNplus/reference/weight_filter.html</loc>
   </url>
   <url>
     <loc>https://mengxu98.github.io/inferCSNplus/reference/wn_ig_tabToIgraph.html</loc>

@@ -47,7 +47,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Inferring Cell-Specific Gene Regulatory Network</h1>
-    <small class="dont-index">Source: <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/setGenerics.R" class="external-link"><code>R/setGenerics.R</code></a>, <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/setMethod-inferCSN.R" class="external-link"><code>R/setMethod-inferCSN.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/inferCSN.R" class="external-link"><code>R/inferCSN.R</code></a>, <a href="https://github.com/mengxu98/inferCSNplus/blob/HEAD/R/inferCSN-methods.R" class="external-link"><code>R/inferCSN-methods.R</code></a></small>
     <div class="hidden name"><code>inferCSN.Rd</code></div>
     </div>
 
@@ -74,6 +74,24 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for matrix</span></span>
+<span><span class="fu">inferCSN</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  penalty <span class="op">=</span> <span class="st">"L0"</span>,</span>
+<span>  algorithm <span class="op">=</span> <span class="st">"CD"</span>,</span>
+<span>  cross_validation <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  n_folds <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  percent_samples <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  r_threshold <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  regulators <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  targets <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  regulators_num <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for sparseMatrix</span></span>
 <span><span class="fu">inferCSN</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  penalty <span class="op">=</span> <span class="st">"L0"</span>,</span>
@@ -221,7 +239,7 @@
 
 <dt>penalty</dt>
 <dd><p>The type of regularization.
-This can take either one of the following choices: <code>L0</code> and <code>L0L2</code>.
+This can take either one of the following choices: <code>L0</code>, <code>L0L1</code> and <code>L0L2</code>.
 For high-dimensional and sparse data, such as single-cell sequencing data, <code>L0L2</code> is more effective.</p></dd>
 
 
@@ -244,7 +262,7 @@ The <code>CDPSI</code> algorithm may yield better results, but it also increases
 
 
 <dt>percent_samples</dt>
-<dd><p>The percent of all samples used for <code><a href="sparse.regression.html">sparse.regression</a></code>. Default set to 1.</p></dd>
+<dd><p>The percent of all samples used for <code><a href="sparse_regression.html">sparse_regression</a></code>. Default set to 1.</p></dd>
 
 
 <dt>r_threshold</dt>
@@ -372,15 +390,15 @@ Only used of `peak_to_gene_method = 'GREAT'`.</p></dd>
 <dd><p>A character string indicating the method to fit the model.
 * <code>'srm'</code> - Sparse Regression Model.
 * <code>'glm'</code> - Generalized Liner Model with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></code>.
-* <code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></code>.
-* <code>'brms'</code> - Bayesian Regression Models using <code><a href="https://paul-buerkner.github.io/brms/reference/brms-package.html" class="external-link">brms-package</a></code>.
-* <code>'xgb'</code> - Gradient Boosting Regression using <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></code>.
+* <code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code>glmnet</code>.
+* <code>'brms'</code> - Bayesian Regression Models using <code>brms-package</code>.
+* <code>'xgb'</code> - Gradient Boosting Regression using <code>xgboost</code>.
 * <code>'bagging_ridge'</code> - Bagging Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.
 * <code>'bayesian_ridge'</code> - Bayesian Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></dd>
 
 
 <dt>alpha</dt>
-<dd><p>The elasticnet mixing parameter. See <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></code> for details.</p></dd>
+<dd><p>The elasticnet mixing parameter. See <code>glmnet</code> for details.</p></dd>
 
 
 <dt>family</dt>
@@ -412,7 +430,7 @@ For more info, see <code><a href="https://rdrr.io/r/stats/formula.html" class="e
     <h2>Value</h2>
     
 
-<p>A data table of gene-gene regulatory relationship</p>
+<p>A data table of regulator-target regulatory relationships</p>
 
 
 <p>A CSNObject.</p>
@@ -424,29 +442,140 @@ For more info, see <code><a href="https://rdrr.io/r/stats/formula.html" class="e
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_matrix"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">network_table</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span><span class="va">example_matrix</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">network_table_1</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network_table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     regulator target     weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 162       g17    g18  0.5443805</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         g18     g1 -0.5390453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 109       g16    g15  0.4818454</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 127       g17    g16  0.4599054</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91        g15    g14  0.4516497</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73        g14    g13  0.4483912</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network_table_1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       g17    g18  0.5443805</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       g18     g1 -0.5390453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       g16    g15  0.4818454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       g17    g16  0.4599054</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       g15    g14  0.4516497</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       g14    g13  0.4483912</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">network_table</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span><span class="va">example_matrix</span>, cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">network_table_2</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  cores <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">network_table_1</span>, <span class="va">network_table_2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  regulators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g3"</span>, <span class="st">"g4"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        g2     g3  0.8504059</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        g2     g4  0.7058242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3        g1     g4 -0.2941758</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4        g1     g3 -0.1495941</span>
+<span class="r-in"><span><span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  regulators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g3"</span>, <span class="st">"g0"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: 1 out of 2 candidate targets are in the input matrix.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        g2     g3  0.8504059</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        g1     g3 -0.1495941</span>
+<span class="r-in"><span><span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  regulators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g0"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Warning: 1 out of 2 candidate regulators are in the input matrix.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        g1     g2 0.08715829</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2        g1     g3 0.02584892</span>
+<span class="r-in"><span><span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">example_matrix</span>,</span></span>
+<span class="r-in"><span>  regulators <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  targets <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running start for &lt; matrix &gt;.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Checking input parameters.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using `L0` penalty.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Run done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        g1     g2 0.08715829</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"example_matrix"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">network_table</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span><span class="va">example_matrix</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network_table</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     regulator target     weight</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 162       g17    g18  0.5443805</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9         g18     g1 -0.5390453</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 109       g16    g15  0.4818454</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 127       g17    g16  0.4599054</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 91        g15    g14  0.4516497</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 73        g14    g13  0.4483912</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       g17    g18  0.5443805</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       g18     g1 -0.5390453</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       g16    g15  0.4818454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       g17    g16  0.4599054</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       g15    g14  0.4516497</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       g14    g13  0.4483912</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">network_table_sparse_1</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">as</span><span class="op">(</span><span class="va">example_matrix</span>, <span class="st">"sparseMatrix"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">network_table_sparse_1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   regulator target     weight</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       g17    g18  0.5444471</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       g18     g1 -0.5406940</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       g16    g15  0.4839038</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       g17    g16  0.4603792</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       g15    g14  0.4515050</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       g14    g13  0.4478281</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">network_table_sparse_2</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu">as</span><span class="op">(</span><span class="va">example_matrix</span>, <span class="st">"sparseMatrix"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  cores <span class="op">=</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">network_table</span>,</span></span>
+<span class="r-in"><span>  <span class="va">network_table_sparse_1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">network_table_sparse_1</span>,</span></span>
+<span class="r-in"><span>  <span class="va">network_table_sparse_2</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_scatter.html">plot_scatter</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">network_table</span><span class="op">$</span><span class="va">weight</span>,</span></span>
+<span class="r-in"><span>    <span class="va">network_table_sparse_1</span><span class="op">$</span><span class="va">weight</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  legend_position <span class="op">=</span> <span class="st">"none"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in loadNamespace(x):</span> there is no package called ‘ggpointdensity’</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="plot_weight_distribution.html">plot_weight_distribution</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">network_table</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="plot_weight_distribution.html">plot_weight_distribution</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">network_table_sparse_1</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="inferCSN-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"promoter_regions_hg38"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">seurat_object</span> <span class="op">&lt;-</span> <span class="fu">inferCSN</span><span class="op">(</span></span></span>

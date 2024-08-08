@@ -79,13 +79,20 @@ of the model to be fitted.</p></dd>
 
 
 <dt>method</dt>
-<dd><p>A character string indicating the method to fit the model.
-* <code>'glm'</code> - Generalized Liner Model with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></code>.
-* <code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></code>.
-* <code>'brms'</code> - Bayesian Regression Models using <code><a href="https://paul-buerkner.github.io/brms/reference/brms-package.html" class="external-link">brms-package</a></code>.
-* <code>'xgb'</code> - Gradient Boosting Regression using <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgboost</a></code>.
-* <code>'bagging_ridge'</code> - Bagging Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.
-* <code>'bayesian_ridge'</code> - Bayesian Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></dd>
+<dd><p>A character string indicating the method to fit the model.</p><ul><li><p><code>'glm'</code> - Generalized Liner Model with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></code>.</p></li>
+<li><p><code>'glmnet'</code>, <code>'cv.glmnet'</code> - Regularized Generalized Liner Model with <code>glmnet</code>.</p></li>
+<li><p><code>'brms'</code> - Bayesian Regression Models using <code>brms-package</code>.</p></li>
+<li><p><code>'xgb'</code> - Gradient Boosting Regression using <code>xgboost</code>.</p></li>
+<li><p><code>'bagging_ridge'</code> - Bagging Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></li>
+<li><p><code>'bayesian_ridge'</code> - Bayesian Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.
+<code><a href="https://cli.r-lib.org/reference/ansi_strip.html" class="external-link">cli::ansi_strip()</a></code> <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">stats::glm()</a></code></p></li>
+</ul><ul><li><p><code>'glm'</code>. Generalized Liner Model with <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></code>.</p></li>
+<li><p><code>'glmnet'</code>, <code>'cv.glmnet'</code>. Regularized Generalized Liner Model with <code>glmnet</code>.</p></li>
+<li><p><code>'brms'</code>. Bayesian Regression Models using <code>brms-package</code>.</p></li>
+<li><p><code>'xgb'</code>. Gradient Boosting Regression using <code>xgboost</code>.</p></li>
+<li><p><code>'bagging_ridge'</code>. Bagging Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></li>
+<li><p><code>'bayesian_ridge'</code>. Bayesian Ridge Regression using scikit-learn via <a href="https://rstudio.github.io/reticulate/reference/reticulate.html" class="external-link">reticulate</a>.</p></li>
+</ul></dd>
 
 
 <dt>family</dt>
@@ -94,7 +101,7 @@ See <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">fa
 
 
 <dt>alpha</dt>
-<dd><p>The elasticnet mixing parameter. See <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></code> for details.</p></dd>
+<dd><p>The elasticnet mixing parameter. See <code>glmnet</code> for details.</p></dd>
 
 
 <dt>...</dt>

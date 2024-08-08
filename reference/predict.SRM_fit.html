@@ -66,7 +66,7 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>object</dt>
-<dd><p>The output of model.fit</p></dd>
+<dd><p>The output of fit_sparse_regression</p></dd>
 
 
 <dt>newx</dt>
@@ -75,12 +75,12 @@
 
 <dt>lambda</dt>
 <dd><p>The value of lambda to use for prediction.
-A summary of the lambdas in the regularization path can be obtained using <code>print(fit)</code></p></dd>
+A summary of the lambdas in the regularization path can be obtained using <code><a href="print.SRM_fit.html">print.SRM_fit</a></code>.</p></dd>
 
 
 <dt>gamma</dt>
 <dd><p>The value of gamma to use for prediction.
-A summary of the gammas in the regularization path can be obtained using <code>print(fit)</code></p></dd>
+A summary of the gammas in the regularization path can be obtained using <code><a href="print.SRM_fit.html">print.SRM_fit</a></code>.</p></dd>
 
 
 <dt>...</dt>
@@ -92,15 +92,12 @@ A summary of the gammas in the regularization path can be obtained using <code>p
     
 
 <p>Return predict value</p>
-
-
-<p>Return the predict value</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>If both lambda and gamma are not supplied, then a matrix of predictions for all the solutions in the regularization path is returned.
 If lambda is supplied but gamma is not, the smallest value of gamma is used.
-In case of logistic regression, probability values are returned</p>
+In case of logistic regression, probability values are returned.</p>
     </div>
 
   </div>

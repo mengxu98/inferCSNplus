@@ -62,7 +62,7 @@
         </td>
         <td><p>Inferring cell-type-specific gene regulatory networks from single-cell omics data</p></td>
       </tr><tr><td>
-          <p><code><a href="inferCSN.logo.html">inferCSN.logo()</a></code> </p>
+          <p><code><a href="inferCSN_logo.html">inferCSN_logo()</a></code> </p>
         </td>
         <td><p>inferCSN logo</p></td>
       </tr><tr><td>
@@ -74,29 +74,17 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="fit_models.html">fit_models()</a></code> </p>
+          <p><code><a href="single_network.html">single_network()</a></code> </p>
         </td>
-        <td><p>Fit models for gene expression</p></td>
+        <td><p>Construct network for single target gene</p></td>
       </tr><tr><td>
-          <p><code><a href="fit_model.html">fit_model()</a></code> </p>
-        </td>
-        <td><p>Fit (regularized) generalized linear model</p></td>
-      </tr><tr><td>
-          <p><code><a href="format_coefs.html">format_coefs()</a></code> </p>
-        </td>
-        <td><p>Format network coefficients</p></td>
-      </tr><tr><td>
-          <p><code><a href="model.fit.html">model.fit()</a></code> </p>
-        </td>
-        <td><p>Fit a sparse regression model</p></td>
-      </tr><tr><td>
-          <p><code><a href="single.network.html">single.network()</a></code> </p>
-        </td>
-        <td><p>Construct network for single gene</p></td>
-      </tr><tr><td>
-          <p><code><a href="sparse.regression.html">sparse.regression()</a></code> </p>
+          <p><code><a href="sparse_regression.html">sparse_regression()</a></code> </p>
         </td>
         <td><p>Sparse regression model</p></td>
+      </tr><tr><td>
+          <p><code><a href="fit_sparse_regression.html">fit_sparse_regression()</a></code> </p>
+        </td>
+        <td><p>Fit a sparse regression model</p></td>
       </tr><tr><td>
           <p><code><a href="fit_bagging_ridge.html">fit_bagging_ridge()</a></code> </p>
         </td>
@@ -133,6 +121,18 @@
           <p><code><a href="fit_xgb.html">fit_xgb()</a></code> </p>
         </td>
         <td><p>Fit a gradient boosting regression model with XGBoost</p></td>
+      </tr><tr><td>
+          <p><code><a href="fit_model.html">fit_model()</a></code> </p>
+        </td>
+        <td><p>Fit (regularized) generalized linear model</p></td>
+      </tr><tr><td>
+          <p><code><a href="fit_models.html">fit_models()</a></code> </p>
+        </td>
+        <td><p>Fit models for gene expression</p></td>
+      </tr><tr><td>
+          <p><code><a href="format_coefs.html">format_coefs()</a></code> </p>
+        </td>
+        <td><p>Format network coefficients</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h3 id="class">Class <a href="#class" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p>
@@ -214,7 +214,7 @@
         </td>
         <td><p>Create aggregated data for a certain cluster</p></td>
       </tr><tr><td>
-          <p><code><a href="aggregating.data.html">aggregating.data()</a></code> </p>
+          <p><code><a href="aggregating_data.html">aggregating_data()</a></code> </p>
         </td>
         <td><p>Create aggregated data for inferCSN</p></td>
       </tr><tr><td>
@@ -550,7 +550,7 @@
         </td>
         <td><p>plot_contrast_networks</p></td>
       </tr><tr><td>
-          <p><code><a href="network.heatmap.html">network.heatmap()</a></code> </p>
+          <p><code><a href="plot_network_heatmap.html">plot_network_heatmap()</a></code> </p>
         </td>
         <td><p>The heatmap of network</p></td>
       </tr><tr><td>
@@ -674,9 +674,9 @@
         </td>
         <td><p>Convert dgCMatrix into a dense matrix</p></td>
       </tr><tr><td>
-          <p><code><a href="check.parameters.html">check.parameters()</a></code> </p>
+          <p><code><a href="check_sparsity.html">check_sparsity()</a></code> </p>
         </td>
-        <td><p>Check input parameters</p></td>
+        <td><p>Check sparsity of matrix</p></td>
       </tr><tr><td>
           <p><code><a href="coef.SRM_fit.html">coef(<i>&lt;SRM_fit&gt;</i>)</a></code> <code><a href="coef.SRM_fit.html">coef(<i>&lt;SRM_fit_CV&gt;</i>)</a></code> </p>
         </td>
@@ -696,9 +696,9 @@
       </tr><tr><td>
           <p><code><a href="normalization.html">normalization()</a></code> </p>
         </td>
-        <td><p>normalization</p></td>
+        <td><p>Normalize numeric vector</p></td>
       </tr><tr><td>
-          <p><code><a href="table.to.matrix.html">table.to.matrix()</a></code> </p>
+          <p><code><a href="table_to_matrix.html">table_to_matrix()</a></code> </p>
         </td>
         <td><p>Switch weight table to matrix</p></td>
       </tr><tr><td>
@@ -708,11 +708,11 @@
       </tr><tr><td>
           <p><code><a href="print.logo.html">print(<i>&lt;logo&gt;</i>)</a></code> </p>
         </td>
-        <td><p>print logo figure</p></td>
+        <td><p>print logo</p></td>
       </tr><tr><td>
           <p><code><a href="print.SRM_fit.html">print(<i>&lt;SRM_fit&gt;</i>)</a></code> <code><a href="print.SRM_fit.html">print(<i>&lt;SRM_fit_CV&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Prints a summary of model.fit</p></td>
+        <td><p>Prints a summary of <code>fit_sparse_regression</code></p></td>
       </tr><tr><td>
           <p><code><a href="print.html">print(<i>&lt;RegulatoryNetwork&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;Network&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;Modules&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;Regions&gt;</i>)</a></code> </p>
         </td>
