@@ -4,16 +4,21 @@
 \alias{dynamic_shortest_path_multiple}
 \title{Function to return shortest path from multiple TFs to multiple targets in a dynamic network}
 \usage{
-dynamic_shortest_path_multiple(grn, from, to, weight_column = "weight")
+dynamic_shortest_path_multiple(
+  network_table,
+  regulators,
+  targets,
+  weight_column = "weight"
+)
 }
 \arguments{
-\item{grn}{a dyanmic network}
+\item{network_table}{a dyanmic network}
 
-\item{from}{the starting TFs}
-
-\item{to}{the end TFs}
+\item{targets}{the end TFs}
 
 \item{weight_column}{column name in network_table with edge weights that will be converted to distances}
+
+\item{from}{the starting TFs}
 }
 \value{
 dataframe with shortest path, distance, normalized distance, and action

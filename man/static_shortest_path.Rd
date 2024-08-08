@@ -6,8 +6,8 @@
 \usage{
 static_shortest_path(
   network_table,
-  from,
-  to,
+  regulator,
+  target,
   weight_column = "weight",
   compare_to_average = FALSE
 )
@@ -15,9 +15,9 @@ static_shortest_path(
 \arguments{
 \item{network_table}{a static network dataframe}
 
-\item{from}{the starting regulator/gene}
+\item{regulator}{The starting gene.}
 
-\item{to}{the end regulator/gene}
+\item{target}{The end gene.}
 
 \item{weight_column}{column name in network_table with edge weights that will be converted to distances}
 
@@ -28,4 +28,13 @@ shortest path, distance, normalized distance, and action
 }
 \description{
 Function to return shortest path from 1 regulator to 1 target in a static network
+}
+\examples{
+data("example_matrix")
+network_table <- inferCSN(example_matrix)
+static_shortest_path(
+  network_table,
+  regulator = "g1",
+  target = "g2"
+)
 }

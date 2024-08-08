@@ -288,7 +288,7 @@ For more info, see \code{\link[stats]{formula}}}
 \item{clusters}{clusters.}
 }
 \value{
-A data table of gene-gene regulatory relationship
+A data table of regulator-target regulatory relationships
 
 A CSNObject.
 
@@ -299,29 +299,78 @@ Inferring Cell-Specific Gene Regulatory Network
 }
 \examples{
 data("example_matrix")
-network_table <- inferCSN(example_matrix, verbose = TRUE)
-head(network_table)
+network_table_1 <- inferCSN(
+  example_matrix,
+  verbose = TRUE
+)
+head(network_table_1)
 
-network_table <- inferCSN(example_matrix, cores = 2)
-head(network_table)
+network_table_2 <- inferCSN(
+  example_matrix,
+  cores = 2
+)
+
+identical(network_table_1, network_table_2)
+
+inferCSN(
+  example_matrix,
+  regulators = c("g1", "g2"),
+  targets = c("g3", "g4"),
+  verbose = TRUE
+)
+inferCSN(
+  example_matrix,
+  regulators = c("g1", "g2"),
+  targets = c("g3", "g0"),
+  verbose = TRUE
+)
+inferCSN(
+  example_matrix,
+  regulators = c("g1", "g0"),
+  targets = c("g2", "g3"),
+  verbose = TRUE
+)
+inferCSN(
+  example_matrix,
+  regulators = c("g1"),
+  targets = c("g2"),
+  verbose = TRUE
+)
 data("example_matrix")
-network_table <- inferCSN(example_matrix, verbose = TRUE)
+network_table <- inferCSN(example_matrix)
 head(network_table)
 
-network_table <- inferCSN(example_matrix, cores = 2)
-head(network_table)
+network_table_sparse_1 <- inferCSN(
+  as(example_matrix, "sparseMatrix")
+)
+head(network_table_sparse_1)
 
-network_table_sparse <- inferCSN(
+network_table_sparse_2 <- inferCSN(
   as(example_matrix, "sparseMatrix"),
   cores = 2
 )
-head(network_table_sparse)
+identical(
+  network_table,
+  network_table_sparse_1
+)
+
+identical(
+  network_table_sparse_1,
+  network_table_sparse_2
+)
 
 plot_scatter(
   data.frame(
-    network_table_sparse$weight,
-    network_table$weight
-  )
+    network_table$weight,
+    network_table_sparse_1$weight
+  ),
+  legend_position = "none"
+)
+
+plot_weight_distribution(
+  network_table
+) + plot_weight_distribution(
+  network_table_sparse_1
 )
 \dontrun{
 data("promoter_regions_hg38")

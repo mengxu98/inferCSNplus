@@ -35,27 +35,23 @@
 #' )
 #'
 #' p1 <- plot_scatter(
-#'   test_data,
-#'   keep_aspect_ratio = TRUE
+#'   test_data
 #' )
 #' p2 <- plot_scatter(
 #'   test_data,
-#'   marginal_type = "boxplot",
-#'   keep_aspect_ratio = TRUE
+#'   marginal_type = "boxplot"
 #' )
 #' p1 + p2
 #'
 #' p3 <- plot_scatter(
 #'   test_data,
-#'   facet = TRUE,
-#'   keep_aspect_ratio = TRUE
+#'   facet = TRUE
 #' )
 #' p3
 #'
 #' p4 <- plot_scatter(
 #'   test_data[, 1:2],
-#'   marginal_type = "histogram",
-#'   keep_aspect_ratio = TRUE
+#'   marginal_type = "histogram"
 #' )
 #' p4
 plot_scatter <- function(
@@ -73,7 +69,7 @@ plot_scatter <- function(
     margins_size = 10,
     compute_correlation = TRUE,
     compute_correlation_method = "pearson",
-    keep_aspect_ratio = FALSE,
+    keep_aspect_ratio = TRUE,
     facet = FALSE,
     se = FALSE,
     pointdensity = TRUE) {
@@ -177,28 +173,59 @@ plot_scatter <- function(
 
 #' @title plot_weight_distribution
 #'
-#' @param net_table Input data frame.
+#' @param network_table Input data frame.
+#' @param binwidth Width of the bins.
+#' @param show_border Logical value, whether to show border of the bins.
+#' @param border_color Color of the border.
+#' @param alpha Alpha value of the bins.
+#' @param theme Theme of the bins.
+#' @param theme_begin Begin value of the theme.
+#' @param theme_end End value of the theme.
+#' @param theme_direction Direction of the theme.
+#' @param legend_position The position of legend.
 #'
 #' @return ggplot object
 #' @export
 #'
 #' @examples
 #' data("example_matrix")
-#' net_table <- inferCSN(example_matrix)
-#' plot_weight_distribution(net_table)
-plot_weight_distribution <- function(net_table) {
-  ggplot(net_table, aes(x = weight)) +
+#' network_table <- inferCSN(example_matrix)
+#' plot_weight_distribution(network_table)
+plot_weight_distribution <- function(
+    network_table,
+    binwidth = 0.01,
+    show_border = FALSE,
+    border_color = "black",
+    alpha = 1,
+    theme = "viridis",
+    theme_begin = 0,
+    theme_end = 0.5,
+    theme_direction = -1,
+    legend_position = "right") {
+  ggplot(network_table, aes(x = weight)) +
     geom_histogram(
       aes(fill = after_stat(count)),
-      binwidth = 0.01
+      binwidth = binwidth,
+      color = ifelse(show_border, border_color, NA),
+      alpha = alpha
     ) +
     viridis::scale_fill_viridis(
-      begin = 0,
-      end = 0.3,
-      direction = -1
+      option = theme,
+      begin = theme_begin,
+      end = theme_end,
+      direction = theme_direction
     ) +
     scale_x_continuous(name = "Weight") +
     scale_y_continuous(name = "Count") +
+    theme(
+      panel.grid.minor = element_blank(),
+      panel.grid.major.x = element_line(
+        color = "grey", size = 0.5
+      ),
+      axis.text = element_text(size = 12),
+      axis.title = element_text(size = 14, face = "bold"),
+      legend.position = legend_position
+    ) +
     theme_bw()
 }
 
@@ -253,15 +280,15 @@ plot_embedding <- function(
 
   set.seed(seed)
   result <- switch(method,
-                   "umap" = {
-                     uwot::umap(expression_matrix, n_components = 3)
-                   },
-                   "tsne" = {
-                     Rtsne::Rtsne(expression_matrix, dims = 3)$Y
-                   },
-                   "pca" = {
-                     stats::prcomp(expression_matrix, rank. = 3)$x
-                   }
+    "umap" = {
+      uwot::umap(expression_matrix, n_components = 3)
+    },
+    "tsne" = {
+      Rtsne::Rtsne(expression_matrix, dims = 3)$Y
+    },
+    "pca" = {
+      stats::prcomp(expression_matrix, rank. = 3)$x
+    }
   )
 
   result_df <- as.data.frame(result)

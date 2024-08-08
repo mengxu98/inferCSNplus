@@ -4,12 +4,16 @@
 \alias{rough_hierarchy}
 \title{rough_hierarchy}
 \usage{
-rough_hierarchy(modnet, abs_weight = TRUE)
+rough_hierarchy(network_table, abs_weight = TRUE, directed = TRUE)
 }
 \arguments{
-\item{modnet}{modnet}
+\item{network_table}{The weight data table of network.}
 
-\item{abs_weight}{abs_weight}
+\item{abs_weight}{Logical value, whether to perform absolute value on weights,
+default set to \code{TRUE}, and when set \code{abs_weight} to \code{TRUE},
+the output of weight table will create a new column named \code{Interaction}.}
+
+\item{directed}{Whether the network is directed.}
 }
 \value{
 list
@@ -18,8 +22,7 @@ list
 returns rough roots in the network, rough roots selected as those connected to most number of nodes
 }
 \examples{
-library(inferCSN)
 data("example_matrix")
-network_table <- inferCSN(example_matrix, verbose = TRUE)
+network_table <- inferCSN(example_matrix)
 rough_hierarchy(network_table)
 }

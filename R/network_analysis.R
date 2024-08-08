@@ -1,7 +1,5 @@
 # =================== Functions to analyze networks =====================
 
-# =================== Functions to select effector targets =====================
-
 # Updated scoring and target selection
 # score_targets adds a column "mean_score" which is just copied from chip-atlas computed average column
 # 				adds a column returning the maximum score for a target across samples
@@ -244,10 +242,10 @@ flatten_network <- function(
 }
 
 
-# modnet the result from running flatten_network
+# network_table the result from running flatten_network
 # module the module name at the end of the paths
-find_paths_to <- function(modnet, module) {
-  modnet_ig <- igraph::graph_from_data_frame(modnet, directed = TRUE)
+find_paths_to <- function(network_table, module) {
+  modnet_ig <- igraph::graph_from_data_frame(network_table, directed = TRUE)
   mods <- igraph::V(modnet_ig)$name
   mods <- mods[mods != module]
 
@@ -272,33 +270,43 @@ find_paths_to <- function(modnet, module) {
 #' @description
 #'  returns rough roots in the network, rough roots selected as those connected to most number of nodes
 #'
-#' @param modnet modnet
-#' @param abs_weight abs_weight
+#' @param directed Whether the network is directed.
+#' @inheritParams network_format
 #'
 #' @return list
 #' @export
 #'
 #' @examples
-#' library(inferCSN)
 #' data("example_matrix")
-#' network_table <- inferCSN(example_matrix, verbose = TRUE)
+#' network_table <- inferCSN(example_matrix)
 #' rough_hierarchy(network_table)
 rough_hierarchy <- function(
-    modnet,
-    abs_weight = TRUE) {
-  # if (class(modnet) != "igraph") {
-  if (!igraph::is.igraph(modnet)) {
-    modnet$weight <- abs(modnet$weight)
-    modnet <- igraph::graph_from_data_frame(modnet, directed = TRUE)
+    network_table,
+    abs_weight = TRUE,
+    directed = TRUE) {
+  # if (class(network_table) != "igraph") {
+  if (!igraph::is.igraph(network_table)) {
+    if (abs_weight) {
+      network_table$weight <- abs(network_table$weight)
+    }
+    network_table <- igraph::graph_from_data_frame(
+      network_table,
+      directed = directed
+    )
   }
 
-  distances <- data.frame(igraph::distances(modnet, mode = "out"))
+  distances <- data.frame(
+    igraph::distances(network_table, mode = "out")
+  )
   distances$num_connected <- rowSums(distances != Inf)
 
   roots <- rownames(distances)[distances$num_connected == max(distances$num_connected)]
-  list(
-    roots = roots,
-    num_paths = max(distances$num_connected)
+
+  return(
+    list(
+      roots = roots,
+      num_paths = max(distances$num_connected)
+    )
   )
 }
 
@@ -308,18 +316,27 @@ rough_hierarchy <- function(
 #' Function to return shortest path from 1 regulator to 1 target in a static network
 #'
 #' @param network_table a static network dataframe
-#' @param from the starting regulator/gene
-#' @param to the end regulator/gene
+#' @param regulator The starting gene.
+#' @param target The end gene.
 #' @param weight_column column name in network_table with edge weights that will be converted to distances
 #' @param compare_to_average if TRUE will compute normalized against average path length
 #'
 #' @return shortest path, distance, normalized distance, and action
 #'
 #' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' network_table <- inferCSN(example_matrix)
+#' static_shortest_path(
+#'   network_table,
+#'   regulator = "g1",
+#'   target = "g2"
+#' )
 static_shortest_path <- function(
     network_table,
-    from,
-    to,
+    regulator,
+    target,
     weight_column = "weight",
     compare_to_average = FALSE) {
   # compute relative edge lengths
@@ -336,8 +353,8 @@ static_shortest_path <- function(
   )
   path <- igraph::shortest_paths(
     ig,
-    from = from,
-    to = to,
+    from = regulator,
+    to = target,
     mode = "out",
     output = "both",
     weights = igraph::E(ig)$edge_length
@@ -353,8 +370,8 @@ static_shortest_path <- function(
   # compute distance
   distance <- igraph::distances(
     ig,
-    v = from,
-    to = to,
+    v = regulator,
+    to = target,
     mode = "out",
     weights = igraph::E(ig)$edge_length
   )[1, 1]
@@ -390,9 +407,9 @@ static_shortest_path <- function(
 
 #' Function to return shortest path from 1 regulator to 1 target in a dynamic network
 #'
-#' @param grn a dyanmic network
-#' @param from the starting regulator
-#' @param to the end regulator
+#' @param network_table a dyanmic network
+#' @param regulator the starting regulator
+#' @param target the end regulator
 #' @param weight_column column name in network_table with edge weights that will be converted to distances
 #' @param compare_to_average if TRUE will compute normalized against average path length
 #'
@@ -400,65 +417,70 @@ static_shortest_path <- function(
 #'
 #' @export
 dynamic_shortest_path <- function(
-    grn,
-    from,
-    to,
+    network_table,
+    regulator,
+    target,
     weight_column = "weight",
     compare_to_average = FALSE) {
-  # merge
-  network_table <- do.call("rbind", grn)
+  network_table <- do.call("rbind", network_table)
   network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
 
-  res <- static_shortest_path(network_table, from, to, weight_column, compare_to_average)
-  res
+  return(
+    static_shortest_path(
+      network_table,
+      regulator,
+      target,
+      weight_column,
+      compare_to_average
+    )
+  )
 }
-
 
 # quick function to loop through ^^ for multiple TFs and targets. Returns a data frame
 #
-# grn dynamic network (list)
+# network_table dynamic network (list)
 # from a vector of TFs
 # to a vector of targets
 
 #' Function to return shortest path from multiple TFs to multiple targets in a dynamic network
 #'
-#' @param grn a dyanmic network
+#' @param network_table a dyanmic network
 #' @param from the starting TFs
-#' @param to the end TFs
+#' @param targets the end TFs
 #' @param weight_column column name in network_table with edge weights that will be converted to distances
 #'
 #' @return dataframe with shortest path, distance, normalized distance, and action
 #'
 #' @export
 dynamic_shortest_path_multiple <- function(
-    grn,
-    from,
-    to,
+    network_table,
+    regulators,
+    targets,
     weight_column = "weight") {
   res <- data.frame(
-    from = character(),
-    to = character(),
+    regulator = character(),
+    target = character(),
     path = character(),
     distance = numeric(),
     action = numeric()
   )
 
-  for (regulator in from) {
-    for (target in to) {
+  for (regulator in regulators) {
+    for (target in targets) {
       tryCatch(
         {
           path <- dynamic_shortest_path(
-            grn,
-            from = regulator,
-            to = target,
+            network_table,
+            regulator = regulator,
+            target = target,
             weight_column = weight_column,
             compare_to_average = FALSE
           )
           res <- rbind(
             res,
             data.frame(
-              from = regulator,
-              to = target,
+              regulator = regulator,
+              target = target,
               path = paste(path[["path"]], collapse = "--"),
               distance = path[["distance"]],
               action = path[["action"]]
@@ -470,16 +492,21 @@ dynamic_shortest_path_multiple <- function(
     }
   }
 
-  network_table <- do.call("rbind", grn)
-  network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
-  network_table$normalized_score <- network_table[, weight_column] / max(network_table[, weight_column])
+  network_table <- do.call("rbind", network_table)
+  network_table$normalized_score <- normalization(
+    network_table[, weight_column],
+    method = "max"
+  )
   network_table$edge_length <- 1 - network_table$normalized_score
-  ig <- igraph::graph_from_data_frame(network_table[, c("regulator", "target", "edge_length", "corr")], directed = TRUE)
+  ig <- igraph::graph_from_data_frame(
+    network_table[, c("regulator", "target", "edge_length", "corr")],
+    directed = TRUE
+  )
 
   avg_path_length <- igraph::mean_distance(ig, directed = TRUE)
   res$distance_over_average <- res$distance / avg_path_length
 
-  res
+  return(res)
 }
 
 #' Adds an extra column to the result of dynamic_shortest_path_multiple that predicts overall action based on correlation between "from" and "to"
@@ -518,7 +545,10 @@ static_reachability <- function(
     tfs = NULL,
     tf_only = FALSE) {
   # compute relative edge lengths
-  network_table$normalized_score <- normalization(network_table[, weight_column], method = "max")
+  network_table$normalized_score <- normalization(
+    network_table[, weight_column],
+    method = "max"
+  )
   network_table$edge_length <- 1 - network_table$normalized_score
 
   if (tf_only) {
@@ -561,14 +591,14 @@ static_reachability <- function(
 
 # the dynamic version of ^^ .. again, initial simplified version
 dynamic_reachability <- function(
-    grn,
+    network_table,
     from,
     max_dist = "less_than_mean",
     weight_column = "weight",
     tfs = NULL,
     tf_only = FALSE) {
   # merge
-  network_table <- do.call("rbind", grn)
+  network_table <- do.call("rbind", network_table)
   network_table <- network_table[!duplicated(network_table[, c("regulator", "target")]), ]
 
   res <- static_reachability(

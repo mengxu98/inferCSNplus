@@ -5,19 +5,19 @@
 \title{Function to return shortest path from 1 regulator to 1 target in a dynamic network}
 \usage{
 dynamic_shortest_path(
-  grn,
-  from,
-  to,
+  network_table,
+  regulator,
+  target,
   weight_column = "weight",
   compare_to_average = FALSE
 )
 }
 \arguments{
-\item{grn}{a dyanmic network}
+\item{network_table}{a dyanmic network}
 
-\item{from}{the starting regulator}
+\item{regulator}{the starting regulator}
 
-\item{to}{the end regulator}
+\item{target}{the end regulator}
 
 \item{weight_column}{column name in network_table with edge weights that will be converted to distances}
 
