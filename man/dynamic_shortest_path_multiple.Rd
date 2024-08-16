@@ -14,11 +14,11 @@ dynamic_shortest_path_multiple(
 \arguments{
 \item{network_table}{a dyanmic network}
 
+\item{regulators}{the starting TFs}
+
 \item{targets}{the end TFs}
 
 \item{weight_column}{column name in network_table with edge weights that will be converted to distances}
-
-\item{from}{the starting TFs}
 }
 \value{
 dataframe with shortest path, distance, normalized distance, and action

@@ -13,7 +13,7 @@ static_shortest_path(
 )
 }
 \arguments{
-\item{network_table}{a static network dataframe}
+\item{network_table}{The weight data table of network.}
 
 \item{regulator}{The starting gene.}
 

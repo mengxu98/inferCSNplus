@@ -200,7 +200,6 @@ reference:
 - contents:
   - calculate_auc
   - calculate_acc
-  - prepare_network_data
   - JI_across_topregs
 
 - subtitle: "Calculate gene rank"

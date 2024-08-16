@@ -138,8 +138,10 @@ sparse_regression <- function(
 
     if (any(class(fit) == "try-error")) {
       if (verbose) {
-        message("Warning: cross validation error.")
-        message("Set `cross_validation` to `FALSE` and re-train model.")
+        message(
+          "Warning: cross validation error,
+        setting `cross_validation` to `FALSE` and re-train model."
+        )
       }
       fit <- try(
         fit_sparse_regression(

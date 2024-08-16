@@ -315,7 +315,7 @@ rough_hierarchy <- function(
 
 #' Function to return shortest path from 1 regulator to 1 target in a static network
 #'
-#' @param network_table a static network dataframe
+#' @param network_table The weight data table of network.
 #' @param regulator The starting gene.
 #' @param target The end gene.
 #' @param weight_column column name in network_table with edge weights that will be converted to distances
@@ -342,7 +342,7 @@ static_shortest_path <- function(
   # compute relative edge lengths
   network_table$normalized_score <- normalization(
     network_table[, weight_column],
-    method = "max"
+    method = "maximum"
   )
   network_table$edge_length <- 1 - network_table$normalized_score
 
@@ -445,7 +445,7 @@ dynamic_shortest_path <- function(
 #' Function to return shortest path from multiple TFs to multiple targets in a dynamic network
 #'
 #' @param network_table a dyanmic network
-#' @param from the starting TFs
+#' @param regulators the starting TFs
 #' @param targets the end TFs
 #' @param weight_column column name in network_table with edge weights that will be converted to distances
 #'
