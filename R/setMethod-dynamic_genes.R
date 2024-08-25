@@ -6,7 +6,6 @@ gam_fit <- function(
     adjust_method = "BH") {
   adjust_method <- match.arg(adjust_method, stats::p.adjust.methods)
 
-  # Fit a GAM model with a loess term for pseudotime
   res <- parallelize_fun(
     colnames(matrix),
     function(x) {

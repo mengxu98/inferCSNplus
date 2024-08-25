@@ -9,8 +9,8 @@ rough_hierarchy(network_table, abs_weight = TRUE, directed = TRUE)
 \arguments{
 \item{network_table}{The weight data table of network.}
 
-\item{abs_weight}{Logical value, whether to perform absolute value on weights,
-default set to \code{TRUE}, and when set \code{abs_weight} to \code{TRUE},
+\item{abs_weight}{Logical value, default is \emph{\code{TRUE}}, whether to perform absolute value on weights,
+and when set \code{abs_weight} to \emph{\code{TRUE}},
 the output of weight table will create a new column named \code{Interaction}.}
 
 \item{directed}{Whether the network is directed.}

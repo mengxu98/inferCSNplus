@@ -1,9 +1,13 @@
-#' @title Inferring cell-type-specific gene regulatory networks from single-cell omics data
+#' @title ***inferCSN***: **infer**ring **C**ell-**S**pecific gene regulatory **N**etwork
+#'
+#' @description
+#' An R package for **infer**ring **C**ell-**S**pecific gene regulatory **N**etwork from single-cell omics data
 #'
 #' @author Meng xu (Maintainer), \email{mengxu98@qq.com}
 #'
-#' @source \url{https://github.com/mengxu98/inferCSN}
+#' @source \url{https://github.com/mengxu98/inferCSNplus}
 #'
+#' @md
 #' @docType package
 #' @name inferCSN-package
 "_PACKAGE"
@@ -72,13 +76,15 @@ print.logo <- function(x, ...) {
 .onAttach <- function(libname, pkgname) {
   version <- utils::packageDescription(pkgname, fields = "Version")
 
-  msg <- paste0("---------------------------------------------------
-", pkgname, " version ", version, "
-
+  msg <- paste0(
+    "---------------------------------------------------
+",
+    cli::col_blue(pkgname, " version ", version),
+    "
 This message can be suppressed by:
   suppressPackageStartupMessages(library(inferCSN))
----------------------------------------------------
-")
+---------------------------------------------------"
+  )
 
   packageStartupMessage(inferCSN_logo())
   packageStartupMessage(msg)

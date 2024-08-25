@@ -43,15 +43,15 @@ get_pseudotime(object, ...)
 
 \item{cluster_column}{The column used for \code{\link[slingshot]{slingshot}}.}
 
-\item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
+\item{cores}{The number of cores to use for parallelization with \code{\link[foreach]{foreach}}, default is \emph{\code{1}}.}
 
-\item{seed}{The seed used in randomly shuffling the data for cross-validation.}
+\item{seed}{The random seed for cross-validation, default is \emph{\code{1}}.}
 
 \item{start_cluster}{The start cluster.}
 
 \item{end_cluster}{The end cluster.}
 
-\item{verbose}{Logical value. Whether to print detailed information.}
+\item{verbose}{Logical value, default is \emph{\code{TRUE}}, whether to print progress messages.}
 
 \item{assay}{The assay used for \code{\link[slingshot]{slingshot}}.}
 

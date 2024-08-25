@@ -21,38 +21,38 @@
 #' \dontrun{
 #' data("promoter_regions_hg38")
 #' seurat_object <- inferCSN(
-#'  seurat_object,
-#'  genome_info = promoter_regions_hg38
+#'   seurat_object,
+#'   genome_info = promoter_regions_hg38
 #' )
 #' }
 setMethod(
   f = "inferCSN",
   signature = signature(object = "Seurat"),
   definition = function(
-    object,
-    penalty = "L0",
-    algorithm = "CD",
-    cross_validation = FALSE,
-    seed = 1,
-    n_folds = 10,
-    percent_samples = 1,
-    r_threshold = 0,
-    regulators = NULL,
-    targets = NULL,
-    regulators_num = NULL,
-    cores = 1,
-    verbose = FALSE,
-    aggregate = TRUE,
-    k_neigh = 50,
-    atacbinary = TRUE,
-    max_overlap = 0.8,
-    reduction_name = NULL,
-    size_factor_normalize = FALSE,
-    genome_info = NULL,
-    high_corr_cutoff = NULL,
-    low_corr_cutoff = NULL,
-    rescued = TRUE,
-    ...) {
+      object,
+      penalty = "L0",
+      algorithm = "CD",
+      cross_validation = FALSE,
+      seed = 1,
+      n_folds = 10,
+      percent_samples = 1,
+      r_threshold = 0,
+      regulators = NULL,
+      targets = NULL,
+      regulators_num = NULL,
+      cores = 1,
+      verbose = FALSE,
+      aggregate = TRUE,
+      k_neigh = 50,
+      atacbinary = TRUE,
+      max_overlap = 0.8,
+      reduction_name = NULL,
+      size_factor_normalize = FALSE,
+      genome_info = NULL,
+      high_corr_cutoff = NULL,
+      low_corr_cutoff = NULL,
+      rescued = TRUE,
+      ...) {
     if (verbose) {
       message(paste("Running start for <", class(object)[1], "object >."))
     }
@@ -502,40 +502,41 @@ setMethod(
 setMethod(
   f = "inferCSN",
   signature = signature(
-    object = "CSNObject"),
+    object = "CSNObject"
+  ),
   definition = function(
-    object,
-    penalty = "L0",
-    algorithm = "CD",
-    cross_validation = FALSE,
-    seed = 1,
-    n_folds = 10,
-    percent_samples = 1,
-    r_threshold = 0,
-    regulators = NULL,
-    targets = NULL,
-    regulators_num = NULL,
-    cores = 1,
-    verbose = TRUE,
-    genes = NULL,
-    network_name = paste0(method, "_network"),
-    peak_to_gene_method = c("Signac", "GREAT"),
-    upstream = 100000,
-    downstream = 0,
-    extend = 1000000,
-    only_tss = FALSE,
-    peak_to_gene_domains = NULL,
-    tf_cor = 0.1,
-    peak_cor = 0.,
-    aggregate_rna_col = NULL,
-    aggregate_peaks_col = NULL,
-    method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
-    alpha = 0.5,
-    family = "gaussian",
-    interaction_term = ":",
-    adjust_method = "fdr",
-    scale = FALSE,
-    ...) {
+      object,
+      penalty = "L0",
+      algorithm = "CD",
+      cross_validation = FALSE,
+      seed = 1,
+      n_folds = 10,
+      percent_samples = 1,
+      r_threshold = 0,
+      regulators = NULL,
+      targets = NULL,
+      regulators_num = NULL,
+      cores = 1,
+      verbose = TRUE,
+      genes = NULL,
+      network_name = paste0(method, "_network"),
+      peak_to_gene_method = c("Signac", "GREAT"),
+      upstream = 100000,
+      downstream = 0,
+      extend = 1000000,
+      only_tss = FALSE,
+      peak_to_gene_domains = NULL,
+      tf_cor = 0.1,
+      peak_cor = 0.,
+      aggregate_rna_col = NULL,
+      aggregate_peaks_col = NULL,
+      method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
+      alpha = 0.5,
+      family = "gaussian",
+      interaction_term = ":",
+      adjust_method = "fdr",
+      scale = FALSE,
+      ...) {
     # Match args
     method <- match.arg(method)
     peak_to_gene_method <- match.arg(peak_to_gene_method)
@@ -687,11 +688,15 @@ fit_models.CSNObject <- function(
     )
   }
 
-  peaks2gene <- aggregate_matrix(t(peaks_near_gene), groups = colnames(peaks_near_gene), fun = "sum")
+  peaks2gene <- aggregate_matrix(
+    t(peaks_near_gene),
+    groups = colnames(peaks_near_gene), 
+    fun = "sum"
+  )
 
   # Select peaks passing criteria
-  peaks_at_gene <- as.logical(colMaxs(peaks2gene))
-  peaks_with_motif <- as.logical(rowMaxs(peaks2motif * 1))
+  peaks_at_gene <- as.logical(sparseMatrixStats::colMaxs(peaks2gene))
+  peaks_with_motif <- as.logical(sparseMatrixStats::rowMaxs(peaks2motif * 1))
 
   # Subset data to good peaks
   peaks_use <- peaks_at_gene & peaks_with_motif
@@ -735,7 +740,7 @@ fit_models.CSNObject <- function(
       # Select TFs with motifs in peaks
       gene_peak_tfs <- purrr::map(rownames(peak_motifs), function(p) {
         x <- as.logical(peak_motifs[p, ])
-        peak_tfs <- colMaxs(motif2tf[x, , drop = FALSE])
+        peak_tfs <- sparseMatrixStats::colMaxs(motif2tf[x, , drop = FALSE])
         peak_tfs <- colnames(motif2tf)[as.logical(peak_tfs)]
         peak_tfs <- setdiff(peak_tfs, g)
         return(peak_tfs)
@@ -809,7 +814,9 @@ fit_models.CSNObject <- function(
         result$corr <- tf_g_corr_df
         return(result)
       }
-    }, verbose = verbose, cores = cores)
+    },
+    verbose = verbose, cores = cores
+  )
 
   model_fits <- model_fits[!purrr::map_lgl(model_fits, is.null)]
   if (length(model_fits) == 0) {
@@ -860,39 +867,39 @@ setMethod(
   f = "inferCSN",
   signature = signature(object = "CSNObjectList"),
   definition = function(
-    object,
-    penalty = "L0",
-    algorithm = "CD",
-    cross_validation = FALSE,
-    seed = 1,
-    n_folds = 10,
-    percent_samples = 1,
-    r_threshold = 0,
-    regulators = NULL,
-    targets = NULL,
-    regulators_num = NULL,
-    cores = 1,
-    verbose = TRUE,
-    genes = NULL,
-    network_name = paste0(method, "_network"),
-    peak_to_gene_method = c("Signac", "GREAT"),
-    upstream = 100000,
-    downstream = 0,
-    extend = 1000000,
-    only_tss = FALSE,
-    peak_to_gene_domains = NULL,
-    tf_cor = 0.1,
-    peak_cor = 0.,
-    aggregate_rna_col = NULL,
-    aggregate_peaks_col = NULL,
-    method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
-    alpha = 0.5,
-    family = "gaussian",
-    interaction_term = ":",
-    adjust_method = "fdr",
-    scale = FALSE,
-    clusters = NULL,
-    ...) {
+      object,
+      penalty = "L0",
+      algorithm = "CD",
+      cross_validation = FALSE,
+      seed = 1,
+      n_folds = 10,
+      percent_samples = 1,
+      r_threshold = 0,
+      regulators = NULL,
+      targets = NULL,
+      regulators_num = NULL,
+      cores = 1,
+      verbose = TRUE,
+      genes = NULL,
+      network_name = paste0(method, "_network"),
+      peak_to_gene_method = c("Signac", "GREAT"),
+      upstream = 100000,
+      downstream = 0,
+      extend = 1000000,
+      only_tss = FALSE,
+      peak_to_gene_domains = NULL,
+      tf_cor = 0.1,
+      peak_cor = 0.,
+      aggregate_rna_col = NULL,
+      aggregate_peaks_col = NULL,
+      method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
+      alpha = 0.5,
+      family = "gaussian",
+      interaction_term = ":",
+      adjust_method = "fdr",
+      scale = FALSE,
+      clusters = NULL,
+      ...) {
     method <- match.arg(method)
     peak_to_gene_method <- match.arg(peak_to_gene_method)
 

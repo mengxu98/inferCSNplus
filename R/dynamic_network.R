@@ -1,4 +1,4 @@
-# =================== Functions to define, assign, and extract the dynamic network =====================
+# Functions to define, assign, and extract the dynamic network 
 
 define.epochs <- function(
     dynamic_object,
@@ -52,8 +52,6 @@ define.epochs <- function(
   }
   new_dynRes
 }
-
-
 
 #' Define epochs
 #'
@@ -571,7 +569,7 @@ epochGRN <- function(
 
 
 
-# =================== Old function to cluster and order genes =====================
+# =================== Old function to cluster and order genes 
 # useful for quick and simple epoch assignment, take the place of define_epochs and assign_epochs
 
 #' cluster and order genes

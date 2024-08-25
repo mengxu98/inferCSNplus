@@ -1,14 +1,56 @@
-#' @title Apply function over a List or Vector
+#' @title Print diagnostic message
 #'
+#' @param ... Text to print.
+#' @param verbose Logical value, default is *`TRUE`*.
+#' Whether to print the message.
+#' @param message_type Type of message, default is *`info`*.
+#' Could be choose one of *`info`*, *`warning`*, and *`error`*.
+#' @param cli_model Logical value, default is *`TRUE`*.
+#' Whether to use the `cli` package to print the message.
+#' Add because the message is printed by \code{\link[base]{message}},
+#' the message could be suppressed by \code{\link[base]{suppressMessages}}.
+#'
+#' @md
+#' @export
+#' @examples
+#' log_message("Hello, ", "world!")
+#' suppressMessages(log_message("Hello, ", "world!"))
+#' log_message("Hello, world!", verbose = FALSE)
+#' log_message("Hello, world!", verbose = TRUE, message_type = "warning")
+log_message <- function(
+    ...,
+    verbose = TRUE,
+    message_type = "info",
+    cli_model = TRUE) {
+  if (message_type == "error") {
+    stop(...)
+  }
+  if (verbose) {
+    if (cli_model) {
+      switch(
+        EXPR = message_type,
+        "info" = cli::cli_alert_success(paste0(...)),
+        "warning" = cli::cli_alert_warning(paste0("Warning: ", ...))
+      )
+    } else {
+      switch(
+        EXPR = message_type,
+        "info" = message(paste0(...)),
+        "warning" = message(paste0("Warning: ", ...))
+      )
+    }
+  }
+}
+
+#' @title Parallelize a function
+#'
+#' @inheritParams inferCSN
 #' @param x A vector or list to apply over.
 #' @param fun The function to be applied to each element.
-#' @param cores Number of CPU cores used.
-#' Setting to parallelize the computation with \code{\link[foreach]{foreach}}.
-#' @param export_fun export_fun.
-#' @param verbose Logical. Whether to print progress bar.
-#' Only works in sequential mode.
+#' @param export_fun The functions to export the function to workers.
 #'
-#' @return A list of results.
+#' @md
+#' @return A list of computed results
 #'
 #' @export
 parallelize_fun <- function(
@@ -17,17 +59,25 @@ parallelize_fun <- function(
     cores = 1,
     export_fun = NULL,
     verbose = TRUE) {
-  if (cores == 1 && verbose) {
-    return(pbapply::pblapply(X = x, FUN = fun))
+  if (cores == 1) {
+    log_message(
+      "Using 1 core.",
+      verbose = verbose
+    )
+    if (verbose) {
+      return(pbapply::pblapply(X = x, FUN = fun))
+    }
+    if (!verbose) {
+      return(base::lapply(X = x, FUN = fun))
+    }
   }
-  if (cores == 1 && !verbose) {
-    return(base::lapply(X = x, FUN = fun))
-  }
+
   if (cores > 1) {
     doParallel::registerDoParallel(cores = cores)
-    if (verbose) {
-      message("Using ", foreach::getDoParWorkers(), " cores.")
-    }
+    log_message(
+      "Using ", foreach::getDoParWorkers(), " cores.",
+      verbose = verbose
+    )
 
     "%dopar%" <- foreach::"%dopar%"
     output_list <- foreach::foreach(
@@ -59,19 +109,23 @@ parallelize_fun <- function(
     verbose,
     cores,
     ...) {
-  if (verbose) {
-    message("Checking input parameters.")
-  }
+  log_message(
+    "Checking input parameters.",
+    verbose = verbose
+  )
 
   if (length(dim(matrix)) != 2) {
-    stop(
-      "The input matrix must be a two-dimensional matrix."
+    log_message(
+      "The input matrix must be a two-dimensional matrix.",
+      message_type = "error",
+      verbose = verbose
     )
   }
 
   if (is.null(colnames(matrix))) {
-    stop(
-      "The input matrix must contain the names of the genes as colnames."
+    log_message(
+      "The input matrix must contain the names of the genes as colnames.",
+      message_type = "error"
     )
   }
 
@@ -80,58 +134,73 @@ parallelize_fun <- function(
 
   if (!is.numeric(seed)) {
     seed <- 1
-    if (verbose) {
-      message("Warning: random seed is not a valid value, initialize it to 1.")
-    }
+    log_message(
+      "random seed is not a valid value, initialize it to 1.",
+      message_type = "warning",
+      verbose = verbose
+    )
   }
 
   if (!(is.numeric(percent_samples) && percent_samples > 0 && percent_samples <= 1)) {
-    stop("Please set `percent_samples` value between: (0, 1].")
+    log_message(
+      "Please set `percent_samples` value between: (0, 1].",
+      message_type = "error"
+    )
   }
 
   if (!is.null(targets)) {
     intersect_targets <- intersect(targets, colnames(matrix))
     if (length(intersect_targets) == 0) {
-      stop("The input genes must contain at least 1 target.")
+      log_message(
+        "The input genes must contain at least 1 target.",
+        message_type = "error"
+      )
     }
 
     if (length(intersect_targets) < length(targets)) {
-      if (verbose) {
-        message(
-          "Warning: ",
-          length(intersect_targets), " out of ",
-          length(targets), " candidate targets are in the input matrix."
-        )
-      }
+      log_message(
+        length(intersect_targets), " out of ",
+        length(targets), " candidate targets are in the input matrix.",
+        message_type = "warning",
+        verbose = verbose
+      )
     }
   }
 
   if (!is.null(regulators)) {
     intersect_regulators <- intersect(regulators, colnames(matrix))
     if (length(intersect_regulators) == 0) {
-      stop("The input genes must contain at least 1 regulator.")
+      log_message(
+        "The input genes must contain at least 1 regulator.",
+        message_type = "error"
+      )
     }
 
     if (length(intersect_regulators) < length(regulators)) {
-      if (verbose) {
-        message(
-          "Warning: ",
-          length(intersect_regulators), " out of ",
-          length(regulators), " candidate regulators are in the input matrix."
-        )
-      }
+      log_message(
+        length(intersect_regulators), " out of ",
+        length(regulators), " candidate regulators are in the input matrix.",
+        message_type = "warning",
+        verbose = verbose
+      )
     }
   }
 
   if (!is.numeric(cores) || cores < 1) {
-    stop("`cores` should be a stricly positive integer.")
+    log_message(
+      "`cores` should be a stricly positive integer.",
+    )
   }
 
-  if (verbose) {
-    message("Using `", penalty, "` penalty.")
-    if (cross_validation) {
-      message("Using cross validation.")
-    }
+  log_message(
+    "Using ", penalty, " sparse regression model.",
+    verbose = verbose
+  )
+  if (cross_validation) {
+    log_message(
+      "Using cross validation, and setting ", n_folds, " folds.",
+      verbose = verbose
+    )
   }
 }
 
@@ -152,8 +221,11 @@ parallelize_fun <- function(
 #' @title Convert dgCMatrix into a dense matrix
 #'
 #' @param x A matrix.
-#' @param parallel Setting to parallelize the computation with \code{\link[RcppParallel]{setThreadOptions}}.
-#' @param sparse Logical. Whether to output a sparse matrix.
+#' @param parallel Logical value, default is *`FALSE`*.
+#' Setting to parallelize the computation with \code{\link[RcppParallel]{setThreadOptions}}.
+#' @param sparse Logical value, default is *`FALSE`*, whether to output a sparse matrix.
+#'
+#' @md
 #' @export
 #'
 #' @examples
@@ -189,6 +261,7 @@ parallelize_fun <- function(
 #'   as_matrix(as.matrix(sparse_matrix), sparse = TRUE)
 #' )
 #'
+#' \dontrun{
 #' network_table_1 <- inferCSN(
 #'   as_matrix(example_matrix, sparse = TRUE)
 #' )
@@ -203,6 +276,7 @@ parallelize_fun <- function(
 #'   ),
 #'   legend_position = "none"
 #' )
+#' }
 as_matrix <- function(
     x,
     parallel = FALSE,
@@ -275,100 +349,17 @@ check_sparsity <- function(x) {
   return(sparsity)
 }
 
-#' @title Switch weight table to matrix
-#'
-#' @inheritParams network_format
-#'
-#' @return Weight matrix
-#' @export
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix)
-#' head(network_table)
-#'
-#' table_to_matrix(network_table)[1:6, 1:6]
-#'
-#' table_to_matrix(
-#'   network_table,
-#'   regulators = c("g1", "g2"),
-#'   targets = c("g3", "g4")
-#' )
-table_to_matrix <- function(
-    network_table,
-    regulators = NULL,
-    targets = NULL) {
-  network_table <- network_format(
-    network_table,
-    abs_weight = FALSE
-  )
-  weight_matrix <- .Call(
-    "_inferCSN_tableToMatrix",
-    PACKAGE = "inferCSN",
-    network_table
-  )
-  weight_matrix <- filter_sort_matrix(
-    weight_matrix,
-    regulators = regulators,
-    targets = targets
-  )
-
-  return(weight_matrix)
-}
-
-#' @title Filter and sort matrix
-#'
-#' @param weight_matrix The matrix of network weight.
-#' @inheritParams network_format
-#'
-#' @return Filtered and sorted matrix
-#' @export
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix)
-#' weight_matrix <- table_to_matrix(network_table)
-#' filter_sort_matrix(weight_matrix)[1:6, 1:6]
-#'
-#' filter_sort_matrix(
-#'   weight_matrix,
-#'   regulators = c("g1", "g2"),
-#'   targets = c("g3", "g4")
-#' )
-filter_sort_matrix <- function(
-    weight_matrix,
-    regulators = NULL,
-    targets = NULL) {
-  weight_matrix[is.na(weight_matrix)] <- 0
-  if (!is.null(regulators)) {
-    regulators <- intersect(rownames(weight_matrix), regulators)
-  } else {
-    regulators <- rownames(weight_matrix)
-  }
-  if (!is.null(targets)) {
-    targets <- intersect(colnames(weight_matrix), targets)
-  } else {
-    targets <- colnames(weight_matrix)
-  }
-
-  unique_regulators <- gtools::mixedsort(unique(regulators))
-  unique_targets <- gtools::mixedsort(unique(targets))
-  weight_matrix <- weight_matrix[unique_regulators, unique_targets]
-
-  return(weight_matrix)
-}
-
-#' @title Format weight table
+#' @title Format network table
 #'
 #' @param network_table The weight data table of network.
 #' @param regulators Regulators list.
 #' @param targets Targets list.
-#' @param abs_weight Logical value, whether to perform absolute value on weights,
-#'  default set to `TRUE`, and when set `abs_weight` to `TRUE`,
+#' @param abs_weight Logical value, default is *`TRUE`*, whether to perform absolute value on weights,
+#'  and when set `abs_weight` to *`TRUE`*,
 #'  the output of weight table will create a new column named `Interaction`.
 #'
 #' @md
-#' @return Format weight table
+#' @return Formated network table
 #' @export
 #'
 #' @examples
@@ -435,19 +426,102 @@ network_format <- function(
   return(network_table)
 }
 
+#' @title Filter and sort matrix
+#'
+#' @inheritParams network_format
+#' @param network_matrix The matrix of network weight.
+#'
+#' @return Filtered and sorted matrix
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' network_table <- inferCSN(example_matrix)
+#' network_matrix <- table_to_matrix(network_table)
+#' filter_sort_matrix(network_matrix)[1:6, 1:6]
+#'
+#' filter_sort_matrix(
+#'   network_matrix,
+#'   regulators = c("g1", "g2"),
+#'   targets = c("g3", "g4")
+#' )
+filter_sort_matrix <- function(
+    network_matrix,
+    regulators = NULL,
+    targets = NULL) {
+  network_matrix[is.na(network_matrix)] <- 0
+  if (!is.null(regulators)) {
+    regulators <- intersect(rownames(network_matrix), regulators)
+  } else {
+    regulators <- rownames(network_matrix)
+  }
+  if (!is.null(targets)) {
+    targets <- intersect(colnames(network_matrix), targets)
+  } else {
+    targets <- colnames(network_matrix)
+  }
+
+  unique_regulators <- gtools::mixedsort(unique(regulators))
+  unique_targets <- gtools::mixedsort(unique(targets))
+  network_matrix <- network_matrix[unique_regulators, unique_targets]
+
+  return(network_matrix)
+}
+
+#' @title Switch network table to matrix
+#'
+#' @inheritParams network_format
+#'
+#' @return Weight matrix
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' network_table <- inferCSN(example_matrix)
+#' head(network_table)
+#'
+#' table_to_matrix(network_table)[1:6, 1:6]
+#'
+#' table_to_matrix(
+#'   network_table,
+#'   regulators = c("g1", "g2"),
+#'   targets = c("g3", "g4")
+#' )
+table_to_matrix <- function(
+    network_table,
+    regulators = NULL,
+    targets = NULL) {
+  network_table <- network_format(
+    network_table,
+    abs_weight = FALSE
+  )
+  network_matrix <- .Call(
+    "_inferCSN_tableToMatrix",
+    PACKAGE = "inferCSN",
+    network_table
+  )
+  network_matrix <- filter_sort_matrix(
+    network_matrix,
+    regulators = regulators,
+    targets = targets
+  )
+
+  return(network_matrix)
+}
+
 #' @title Extracts a specific solution in the regularization path
 #'
+#' @inheritParams inferCSN
 #' @param object The output of \code{\link{fit_sparse_regression}}.
 #' @param lambda The value of lambda at which to extract the solution.
 #' @param gamma The value of gamma at which to extract the solution.
-#' @param regulators_num The number of non-zeros each solution extracted will contain.
 #' @param ... Other parameters
 #'
-#' @method coef SRM_fit
+#' @method coef srm
 #'
 #' @return Return the specific solution
 #' @export
-coef.SRM_fit <- function(
+coef.srm <- function(
     object,
     lambda = NULL,
     gamma = NULL,
@@ -506,31 +580,32 @@ coef.SRM_fit <- function(
   return(t)
 }
 
-#' @rdname coef.SRM_fit
-#' @method coef SRM_fit_CV
+#' @rdname coef.srm
+#' @method coef srm_cv
 #' @export
-coef.SRM_fit_CV <- function(
+coef.srm_cv <- function(
     object,
     lambda = NULL,
     gamma = NULL,
     ...) {
   return(
-    coef.SRM_fit(
+    coef.srm(
       object$fit, lambda, gamma, ...
     )
   )
 }
 
-#' @title Prints a summary of \code{fit_sparse_regression}
+#' @title Prints a summary of `fit_sparse_regression`
 #'
 #' @param x The output of \code{\link{fit_sparse_regression}}.
 #' @param ... Other parameters
 #'
-#' @method print SRM_fit
+#' @method print srm
 #'
-#' @return Return information of \code{fit_sparse_regression}
+#' @md
+#' @return Return information of `fit_sparse_regression`
 #' @export
-print.SRM_fit <- function(x, ...) {
+print.srm <- function(x, ...) {
   gammas <- rep(x$gamma, times = lapply(x$lambda, length))
   return(
     data.frame(
@@ -542,28 +617,26 @@ print.SRM_fit <- function(x, ...) {
   )
 }
 
-#' @rdname print.SRM_fit
-#' @method print SRM_fit_CV
+#' @rdname print.srm
+#' @method print srm_cv
 #' @export
-print.SRM_fit_CV <- function(x, ...) {
+print.srm_cv <- function(x, ...) {
   return(
-    print.SRM_fit(x$fit)
+    print.srm(x$fit)
   )
 }
 
-#' @title Predict Response
+#' @title Predicts response for a given sample
 #'
-#' @description Predicts response for a given sample
-#'
-#' @param object The output of fit_sparse_regression
+#' @param object The output of fit_sparse_regression.
 #' @param newx A matrix on which predictions are made. The matrix should have p columns
 #' @param lambda The value of lambda to use for prediction.
-#' A summary of the lambdas in the regularization path can be obtained using \code{\link{print.SRM_fit}}.
+#' A summary of the lambdas in the regularization path can be obtained using \code{\link{print.srm}}.
 #' @param gamma The value of gamma to use for prediction.
-#' A summary of the gammas in the regularization path can be obtained using \code{\link{print.SRM_fit}}.
+#' A summary of the gammas in the regularization path can be obtained using \code{\link{print.srm}}.
 #' @param ... Other parameters
 #'
-#' @method predict SRM_fit
+#' @method predict srm
 #'
 #' @details
 #' If both lambda and gamma are not supplied, then a matrix of predictions for all the solutions in the regularization path is returned.
@@ -572,13 +645,13 @@ print.SRM_fit_CV <- function(x, ...) {
 #'
 #' @return Return predict value
 #' @export
-predict.SRM_fit <- function(
+predict.srm <- function(
     object,
     newx,
     lambda = NULL,
     gamma = NULL,
     ...) {
-  beta <- coef.SRM_fit(object, lambda, gamma)
+  beta <- coef.srm(object, lambda, gamma)
   if (object$settings$intercept) {
     # add a column of ones for the intercept
     x <- cbind(1, newx)
@@ -593,17 +666,17 @@ predict.SRM_fit <- function(
   return(prediction)
 }
 
-#' @rdname predict.SRM_fit
-#' @method predict SRM_fit_CV
+#' @rdname predict.srm
+#' @method predict srm_cv
 #' @export
-predict.SRM_fit_CV <- function(
+predict.srm_cv <- function(
     object,
     newx,
     lambda = NULL,
     gamma = NULL,
     ...) {
   return(
-    predict.SRM_fit(
+    predict.srm(
       object$fit, newx, lambda, gamma, ...
     )
   )
@@ -683,30 +756,24 @@ normalization <- function(
   )
 }
 
-#' @title Sum of Squared Errors
-#'
-#' @param y_true A numeric vector with ground truth values.
-#' @param y_pred A numeric vector with predicted values.
-sse <- function(y_true, y_pred) {
+.sse <- function(y_true, y_pred) {
   return(
     sum((y_true - y_pred)**2)
   )
 }
 
-#' @title Relative Squared Error
-#'
-#' @inheritParams sse
-rse <- function(y_true, y_pred) {
+.rse <- function(y_true, y_pred) {
   return(
-    sse(y_true, y_pred) / sse(y_true, mean(y_true))
+    .sse(y_true, y_pred) / .sse(y_true, mean(y_true))
   )
 }
 
 #' @title \eqn{R^2} (coefficient of determination)
 #'
-#' @inheritParams sse
+#' @param y_true A numeric vector with ground truth values.
+#' @param y_pred A numeric vector with predicted values.
 r_square <- function(y_true, y_pred) {
   return(
-    1 - rse(y_true, y_pred)
+    1 - .rse(y_true, y_pred)
   )
 }

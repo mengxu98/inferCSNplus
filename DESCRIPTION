@@ -13,8 +13,8 @@ BugReports: https://github.com/mengxu98/inferCSNplus/issues
 Depends:
     R (>= 4.1.0)
 Imports:
+    DelayedArray,
     doParallel,
-    dplyr,
     foreach,
     GenomicRanges,
     ggnetwork,
@@ -24,12 +24,10 @@ Imports:
     methods,
     parallel,
     patchwork,
-    progress,
     purrr,
     Rcpp,
     RcppArmadillo,
     RcppParallel,
-    sparseMatrixStats,
     slam,
     Signac,
     Seurat,
@@ -43,6 +41,7 @@ Suggests:
     cli,
     circlize,
     chromVAR,
+    dplyr,
     FNN,
     gam,
     gatepoints,
@@ -55,8 +54,10 @@ Suggests:
     plotly,
     precrec,
     pROC,
+    progress,
     scales,
     slingshot,
+    sparseMatrixStats,
     testthat (>= 3.0.0),
     bayestestR,
     brms,
@@ -111,7 +112,7 @@ Collate:
     'crossweighting.R'
     'data.R'
     'density_intersection.R'
-    'dynamic.network.R'
+    'dynamic_network.R'
     'extract_genes.R'
     'extract_network.R'
     'find.overlapping.coordinates.R'

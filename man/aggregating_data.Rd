@@ -16,7 +16,7 @@ aggregating_data(
 )
 }
 \arguments{
-\item{object}{The input data for \code{inferCSN}.}
+\item{object}{The input data for \emph{\code{inferCSN}}.}
 
 \item{k_neigh}{Number of cells to be aggregated per cluster.}
 
@@ -28,9 +28,9 @@ aggregating_data(
 
 \item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor.}
 
-\item{seed}{The seed used in randomly shuffling the data for cross-validation.}
+\item{seed}{The random seed for cross-validation, default is \emph{\code{1}}.}
 
-\item{verbose}{Logical value. Whether to print detailed information.}
+\item{verbose}{Logical value, default is \emph{\code{TRUE}}, whether to print progress messages.}
 }
 \value{
 Seurat object with aggregated data

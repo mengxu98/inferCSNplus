@@ -34,9 +34,9 @@ dynamic_genes(object, ...)
 
 \item{pseudotime}{Pseudotime of cells, the length and order should be the same as the expression matrix columns.}
 
-\item{cores}{Number of CPU cores used. Setting to parallelize the computation with \code{\link[foreach]{foreach}}.}
+\item{cores}{The number of cores to use for parallelization with \code{\link[foreach]{foreach}}, default is \emph{\code{1}}.}
 
-\item{verbose}{Logical value. Whether to print detailed information.}
+\item{verbose}{Logical value, default is \emph{\code{TRUE}}, whether to print progress messages.}
 
 \item{adjust_method}{The method used to calculate adjust P-value.}
 

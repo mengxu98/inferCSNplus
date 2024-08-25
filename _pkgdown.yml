@@ -28,13 +28,47 @@ navbar:
       href: reference/index.html
 
 reference:
-- title: "Inferring gene regulatory network"
 
-- subtitle: "inferCSN"
+- subtitle: "Inferring cell-specific gene regulatory network"
 - contents:
   - inferCSN-package
   - inferCSN_logo
   - inferCSN
+
+- subtitle: "Network visualization"
+- contents:
+  - plot_dynamic_networks
+  - plot_static_networks
+  - plot_contrast_networks
+  - plot_network_heatmap
+  - plot_detail_network
+  - plot_diffnet_detail
+  - plot_dyn_diffnet
+  - plot_dynamic_network
+  - plot_gof
+  - plot_heatmap_by_treatment
+  - plot_module_metrics
+  - plot_network_graph
+  - plot_targets_and_regulators
+  - plot_targets_with_top_regulators_detail
+  - plot_tf_network
+  - plot_top_features
+  - heatmap_by_treatment_group
+  - hm_dyn
+  - hm_dyn_clust
+  - hm_dyn_epoch
+
+- subtitle: "Plotting functions"
+- contents:
+  - plot_scatter
+  - plot_embedding
+  - plot_weight_distribution
+
+- subtitle: "Network evaluation"
+- contents:
+  - calculate_auc
+  - calculate_acc
+  - JI_across_topregs
 
 - subtitle: "Sparse regression model"
 - contents:
@@ -53,16 +87,6 @@ reference:
   - fit_model
   - fit_models
   - format_coefs
-
-- subtitle: "Class"
-- contents:
-  - initiate_object
-  - CSNObject-class
-  - CSNObjectList-class
-  - Modules-class
-  - Network-class
-  - Regions-class
-  - RegulatoryNetwork-class
 
 - subtitle: "vector functions"
 - contents:
@@ -167,41 +191,6 @@ reference:
   - static_shortest_path
   - scale_matrix
 
-- subtitle: "Network visualization"
-- contents:
-  - plot_dynamic_networks
-  - plot_static_networks
-  - plot_contrast_networks
-  - plot_network_heatmap
-  - plot_detail_network
-  - plot_diffnet_detail
-  - plot_dyn_diffnet
-  - plot_dynamic_network
-  - plot_gof
-  - plot_heatmap_by_treatment
-  - plot_module_metrics
-  - plot_network_graph
-  - plot_targets_and_regulators
-  - plot_targets_with_top_regulators_detail
-  - plot_tf_network
-  - plot_top_features
-  - heatmap_by_treatment_group
-  - hm_dyn
-  - hm_dyn_clust
-  - hm_dyn_epoch
-
-- subtitle: "Plotting functions"
-- contents:
-  - plot_scatter
-  - plot_embedding
-  - plot_weight_distribution
-
-- subtitle: "Network evaluation"
-- contents:
-  - calculate_auc
-  - calculate_acc
-  - JI_across_topregs
-
 - subtitle: "Calculate gene rank"
 - contents:
   - calculate_gene_rank
@@ -211,8 +200,8 @@ reference:
 - contents:
   - as_matrix
   - check_sparsity
-  - coef.SRM_fit
-  - coef.SRM_fit_CV
+  - coef.srm
+  - coef.srm_cv
   - coef.CSNObject
   - crossweight
   - network_format
@@ -220,11 +209,11 @@ reference:
   - table_to_matrix
   - filter_sort_matrix
   - print.logo
-  - print.SRM_fit
-  - print.SRM_fit_CV
+  - print.srm
+  - print.srm_cv
   - print.RegulatoryNetwork
-  - predict.SRM_fit
-  - predict.SRM_fit_CV
+  - predict.srm
+  - predict.srm_cv
   - peaks.split
   - ranges.for.coords
   - get.tf.gene
@@ -260,9 +249,17 @@ reference:
   - ig_tabToIgraph
   - log_message
   - r_square
-  - rse
-  - sse
   - sparse_covcor
+
+- subtitle: "Class"
+- contents:
+  - initiate_object
+  - CSNObject-class
+  - CSNObjectList-class
+  - Modules-class
+  - Network-class
+  - Regions-class
+  - RegulatoryNetwork-class
 
 - subtitle: "Example data"
 - contents:

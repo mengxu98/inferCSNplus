@@ -1,9 +1,9 @@
 #' @title Construct network for single target gene
 #'
+#' @inheritParams inferCSN
 #' @param matrix An expression matrix.
 #' @param target The target gene.
 #'
-#' @inheritParams inferCSN
 #'
 #' @return The weight data table of sub-network
 #' @export
@@ -82,11 +82,10 @@ single_network <- function(
 
 #' @title Sparse regression model
 #'
+#' @inheritParams inferCSN
 #' @param x The matrix of regulators.
 #' @param y The vector of target.
 #' @param computation_method The method used to compute \code{r}.
-#'
-#' @inheritParams inferCSN
 #'
 #' @return Coefficients
 #' @export
@@ -107,7 +106,7 @@ sparse_regression <- function(
     percent_samples = 1,
     r_threshold = 0,
     computation_method = "cor",
-    verbose = FALSE,
+    verbose = TRUE,
     ...) {
   if (percent_samples == 1) {
     test_x <- x
@@ -137,12 +136,12 @@ sparse_regression <- function(
     )
 
     if (any(class(fit) == "try-error")) {
-      if (verbose) {
-        message(
-          "Warning: cross validation error,
-        setting `cross_validation` to `FALSE` and re-train model."
-        )
-      }
+      log_message(
+        "cross validation error,
+        setting `cross_validation` to `FALSE` and re-train model.",
+        message_type = "warning",
+        verbose = verbose
+      )
       fit <- try(
         fit_sparse_regression(
           x, y,
@@ -236,6 +235,7 @@ sparse_regression <- function(
 #' @description
 #'  Computes the regularization path for the specified loss function and penalty function.
 #'
+#' @inheritParams sparse_regression
 #' @param loss The loss function.
 #' @param nLambda The number of Lambda values to select.
 #' @param nGamma The number of Gamma values to select.
@@ -262,7 +262,6 @@ sparse_regression <- function(
 #' @param intercept If `FALSE`, no intercept term is included in the model.
 #' @param lows Lower bounds for coefficients.
 #' @param highs Upper bounds for coefficients.
-#' @inheritParams sparse_regression
 #'
 #' @md
 #'
@@ -448,7 +447,7 @@ fit_sparse_regression <- function(
   if (!cross_validation) {
     if (methods::is(x, "sparseMatrix")) {
       m <- .Call(
-        "_inferCSN_SRM_model_fit_sparse",
+        "_inferCSN_srm_model_sparse",
         PACKAGE = "inferCSN",
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
@@ -458,7 +457,7 @@ fit_sparse_regression <- function(
       )
     } else {
       m <- .Call(
-        "_inferCSN_SRM_model_fit_dense",
+        "_inferCSN_srm_model_dense",
         PACKAGE = "inferCSN",
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
@@ -471,7 +470,7 @@ fit_sparse_regression <- function(
     set.seed(seed)
     if (methods::is(x, "sparseMatrix")) {
       m <- .Call(
-        "_inferCSN_SRM_model_fit_CV_sparse",
+        "_inferCSN_srm_model_cv_sparse",
         PACKAGE = "inferCSN",
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
@@ -481,7 +480,7 @@ fit_sparse_regression <- function(
       )
     } else {
       m <- .Call(
-        "_inferCSN_SRM_model_fit_CV_dense",
+        "_inferCSN_srm_model_cv_dense",
         PACKAGE = "inferCSN",
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
@@ -535,7 +534,7 @@ fit_sparse_regression <- function(
     varnames <- colnames(x)
   }
   fit$varnames <- varnames
-  class(fit) <- "SRM_fit"
+  class(fit) <- "srm"
   fit$n <- dim(x)[1]
   fit$p <- dim(x)[2]
 
@@ -543,7 +542,7 @@ fit_sparse_regression <- function(
     g <- fit
   } else {
     g <- list(fit = fit, cvMeans = m$CVMeans, cvSDs = m$CVSDs)
-    class(g) <- "SRM_fit_CV"
+    class(g) <- "srm_cv"
   }
 
   return(g)

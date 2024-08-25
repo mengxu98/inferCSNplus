@@ -1,22 +1,3 @@
-#' @title Print diagnostic message
-#'
-#' @param ... Text to print
-#' @param verbose Display messages
-#' @param method method used to print messages
-#' @param append appendLF messages
-log_message <- function(
-    ...,
-    verbose = TRUE,
-    method = "message",
-    append = FALSE) {
-  if (verbose) {
-    switch(method,
-      "message" = message(paste0(...), appendLF = append),
-      "cat" = cat(paste0(...))
-    )
-  }
-}
-
 #' @title Format network coefficients
 #'
 #' @param coefs A data frame with coefficients
@@ -98,7 +79,7 @@ find_modules.Network <- function(
 
   models_use <- gof(object) %>%
     dplyr::filter(rsq > rsq_thresh & nvariables > nvar_thresh) %>%
-    pull(target) %>%
+    dplyr::pull(target) %>%
     unique()
 
   modules <- coef(object) %>%

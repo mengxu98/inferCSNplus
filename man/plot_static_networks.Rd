@@ -2,7 +2,7 @@
 % Please edit documentation in R/network_visualization.R
 \name{plot_static_networks}
 \alias{plot_static_networks}
-\title{Plot of dynamic networks}
+\title{Plot dynamic networks}
 \usage{
 plot_static_networks(
   network_table,
@@ -21,10 +21,10 @@ plot_static_networks(
 \item{legend_position}{The position of legend.}
 }
 \value{
-A list of ggplot2 objects
+A ggplot2 object
 }
 \description{
-Plot of dynamic networks
+Plot dynamic networks
 }
 \examples{
 data("example_matrix")

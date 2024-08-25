@@ -1,4 +1,4 @@
-#' @import Matrix ggplot2 ggraph tidygraph
+#' @import Matrix ggplot2 ggraph patchwork tidygraph
 #'
 #' @importFrom grDevices dev.off pdf
 #' @importFrom graphics axis barplot par
@@ -9,12 +9,12 @@
 #' @importFrom utils methods write.table
 #' @importFrom stats family gaussian na.pass
 #' @importFrom methods as is new
+#' @importFrom DelayedArray makeNindexFromArrayViewport
 #' @importClassesFrom Signac Motif
 #' @importClassesFrom GenomicRanges GRanges
 #' @importClassesFrom SeuratObject Seurat
 NULL
 
-#' @import sparseMatrixStats
 summary_fun <- list(
   "mean" = sparseMatrixStats::colMeans2,
   "median" = sparseMatrixStats::colMedians,
@@ -24,7 +24,8 @@ summary_fun <- list(
   "any" = sparseMatrixStats::colAnys,
   "all" = sparseMatrixStats::colAlls,
   "sd" = sparseMatrixStats::colSds,
-  "mad" = sparseMatrixStats::colMads
+  "mad" = sparseMatrixStats::colMads,
+  "makeNindexFromArrayViewport" = DelayedArray::makeNindexFromArrayViewport
 )
 
 utils::globalVariables(
