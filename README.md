@@ -2,13 +2,13 @@
 
 <!-- badges: start -->
 
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/inferCSN)](https://github.com/cran/inferCSN) [![devel-ver](https://img.shields.io/github/r-package/v/mengxu98/inferCSNplus?label=devel-ver)](https://github.com/mengxu98/inferCSNplus/blob/main/DESCRIPTION) [![R-CMD-check](https://github.com/mengxu98/inferCSNplus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mengxu98/inferCSN/actions/workflows/R-CMD-check.yaml) [![test-coverage](https://github.com/mengxu98/inferCSNplus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mengxu98/inferCSNplus/actions/workflows/test-coverage.yaml) [![pkgdown](https://github.com/mengxu98/inferCSNplus/actions/workflows/pkgdown.yaml/badge.svg)](https://mengxu98.github.io/inferCSNplus/reference/index.html) [![RStudio CRAN mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/inferCSNplus)](https://CRAN.R-project.org/package=inferCSN) [![code-size](https://img.shields.io/github/languages/code-size/mengxu98/inferCSNplus)](https://github.com/mengxu98/inferCSNplus)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/inferCSN)](https://github.com/cran/inferCSN) [![devel-ver](https://img.shields.io/github/r-package/v/mengxu98/inferCSNplus?label=devel-ver)](https://github.com/mengxu98/inferCSNplus/blob/main/DESCRIPTION) [![R-CMD-check](https://github.com/mengxu98/inferCSNplus/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mengxu98/inferCSN/actions/workflows/R-CMD-check.yaml) [![test-coverage](https://github.com/mengxu98/inferCSNplus/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mengxu98/inferCSNplus/actions/workflows/test-coverage.yaml) [![pkgdown](https://github.com/mengxu98/inferCSNplus/actions/workflows/pkgdown.yaml/badge.svg)](https://mengxu98.github.io/inferCSNplus/reference/index.html) [![RStudio CRAN mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/inferCSN)](https://CRAN.R-project.org/package=inferCSN) [![code-size](https://img.shields.io/github/languages/code-size/mengxu98/inferCSNplus)](https://github.com/mengxu98/inferCSNplus)
 
 <!-- badges: end -->
 
 ## **Introduction**
 
-[*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/) is an R package for **infer**ring **C**ell-**S**pecific gene regulatory **N**etwork from single-cell omics data.
+[*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/) is an R package for ***infer***ring ***C***ell-***S***pecific gene regulatory ***N***etwork from single-cell omics data.
 
 <img src="man/figures/inferCSNplus.svg" width="90%"/>
 
@@ -36,4 +36,4 @@ pak::pak("mengxu98/inferCSNplus")
 
 ## **Usage**
 
-How to use [*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/)? Please reference [*`here`*](https://mengxu98.github.io/inferCSNplus/reference/index.html).
+How to use [*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/)? Please reference [*`here`*](https://mengxu98.github.io/inferCSNplus/authors.html#citation).

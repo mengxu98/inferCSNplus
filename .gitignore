@@ -16,3 +16,5 @@ src-x64
 .Rhistory
 .Rproj.user
 .Ruserdata
+
+/.quarto/

@@ -51,7 +51,7 @@ initiate_object.Seurat <- function(
     cand_ranges <- GenomicRanges::subtract(
       cand_ranges, exon_ranges,
       ignore.strand = TRUE
-    ) %>% unlist()
+    ) |> unlist()
   }
 
   # Match candidate ranges to peaks

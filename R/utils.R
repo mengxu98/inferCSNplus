@@ -101,7 +101,7 @@ parallelize_fun <- function(
     cross_validation,
     seed,
     n_folds,
-    percent_samples,
+    subsampling,
     r_threshold,
     regulators,
     targets,
@@ -141,11 +141,35 @@ parallelize_fun <- function(
     )
   }
 
-  if (!(is.numeric(percent_samples) && percent_samples > 0 && percent_samples <= 1)) {
+  if (!(is.numeric(subsampling) && subsampling > 0 && subsampling <= 1)) {
     log_message(
-      "Please set `percent_samples` value between: (0, 1].",
+      "Please set `subsampling` value between: (0, 1].",
       message_type = "error"
     )
+  }
+
+  if (!is.null(regulators)) {
+    intersect_regulators <- intersect(regulators, colnames(matrix))
+    if (length(intersect_regulators) == 0) {
+      log_message(
+        "The input genes must contain at least 1 regulator.",
+        message_type = "error"
+      )
+    }
+
+    if (length(intersect_regulators) < length(regulators)) {
+      log_message(
+        length(intersect_regulators), " out of ",
+        length(regulators), " candidate regulators are in the input matrix.",
+        message_type = "warning",
+        verbose = verbose
+      )
+    } else {
+      log_message(
+        "Using ", length(intersect_regulators), " regulator(s).",
+        verbose = verbose
+      )
+    }
   }
 
   if (!is.null(targets)) {
@@ -164,23 +188,9 @@ parallelize_fun <- function(
         message_type = "warning",
         verbose = verbose
       )
-    }
-  }
-
-  if (!is.null(regulators)) {
-    intersect_regulators <- intersect(regulators, colnames(matrix))
-    if (length(intersect_regulators) == 0) {
+    } else {
       log_message(
-        "The input genes must contain at least 1 regulator.",
-        message_type = "error"
-      )
-    }
-
-    if (length(intersect_regulators) < length(regulators)) {
-      log_message(
-        length(intersect_regulators), " out of ",
-        length(regulators), " candidate regulators are in the input matrix.",
-        message_type = "warning",
+        "Using ", length(intersect_targets), " target(s).",
         verbose = verbose
       )
     }

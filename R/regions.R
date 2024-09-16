@@ -29,17 +29,17 @@ find_motifs.CSNObject <- function(
   }
 
   # Spread data frame to sparse matrix
-  motif2tf <- motif2tf %>%
-    dplyr::select("motif" = 1, "tf" = 2) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(val = 1) %>%
+  motif2tf <- motif2tf |>
+    dplyr::select("motif" = 1, "tf" = 2) |>
+    dplyr::distinct() |>
+    dplyr::mutate(val = 1) |>
     tidyr::pivot_wider(
       names_from = "tf",
       values_from = val,
       values_fill = 0
-    ) %>%
-    tibble::column_to_rownames("motif") %>%
-    as.matrix() %>%
+    ) |>
+    tibble::column_to_rownames("motif") |>
+    as.matrix() |>
     Matrix::Matrix(sparse = TRUE)
 
   tfs_use <- intersect(
