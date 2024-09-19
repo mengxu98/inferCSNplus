@@ -124,7 +124,7 @@ Collate:
     'inferCSN-package.R'
     'initiate_object.R'
     'lda.R'
-    'makeSuperCells.R'
+    'meta_cells.R'
     'models.R'
     'network_analysis.R'
     'network_comparison.R'

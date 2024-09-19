@@ -82,16 +82,6 @@ setGeneric(
 #'   regulators = c("g1", "g2"),
 #'   targets = c("g3", "g0")
 #' )
-#' inferCSN(
-#'   example_matrix,
-#'   regulators = c("g1", "g0"),
-#'   targets = c("g2", "g3")
-#' )
-#' inferCSN(
-#'   example_matrix,
-#'   regulators = c("g1"),
-#'   targets = c("g2")
-#' )
 setMethod(
   f = "inferCSN",
   signature = signature(object = "matrix"),
@@ -147,7 +137,7 @@ setMethod(
     names(targets) <- targets
     cores <- .cores_detect(cores, length(targets))
 
-    weight_list <- parallelize_fun(
+    network_table <- parallelize_fun(
       x = targets,
       fun = function(x) {
         single_network(
@@ -162,17 +152,16 @@ setMethod(
           subsampling = subsampling,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
-          verbose = verbose
+          verbose = verbose,
+          ...
         )
       },
       cores = cores,
       verbose = verbose
-    )
-    network_table <- purrr::list_rbind(weight_list)
-    network_table <- network_format(
-      network_table,
-      abs_weight = FALSE
-    )
+    ) |>
+      purrr::list_rbind() |>
+      network_format(abs_weight = FALSE)
+
     log_message("Run done.", verbose = verbose)
 
     return(network_table)
@@ -276,7 +265,7 @@ setMethod(
     names(targets) <- targets
     cores <- .cores_detect(cores, length(targets))
 
-    weight_list <- parallelize_fun(
+    network_table <- parallelize_fun(
       x = targets,
       fun = function(x) {
         single_network(
@@ -291,17 +280,16 @@ setMethod(
           subsampling = subsampling,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
-          verbose = verbose
+          verbose = verbose,
+          ...
         )
       },
       cores = cores,
       verbose = verbose
-    )
-    network_table <- purrr::list_rbind(weight_list)
-    network_table <- network_format(
-      network_table,
-      abs_weight = FALSE
-    )
+    ) |>
+      purrr::list_rbind() |>
+      network_format(abs_weight = FALSE)
+
     log_message("Run done.", verbose = verbose)
 
     return(network_table)
@@ -328,7 +316,7 @@ setMethod(
                         verbose = TRUE,
                         ...) {
     log_message(
-      "Converting class type of input data from <data.frame> to <matrix>.",
+      "convert the class type of the input data from <data.frame> to <matrix>.",
       message_type = "warning",
       verbose = verbose
     )

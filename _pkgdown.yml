@@ -222,6 +222,7 @@ reference:
   - parallelize_fun
   - mean_module_expression
   - mean_subnetwork_expression
+  - meta_cells
   - no_legend
   - no_margin
   - no_x_text
@@ -234,6 +235,7 @@ reference:
   - sample_and_epoch_reconstruct
   - score_targets
   - sparse_cor
+  - sparse_covcor
   - dMcast
   - edge_rank
   - fast_aggregate
@@ -249,7 +251,6 @@ reference:
   - ig_tabToIgraph
   - log_message
   - r_square
-  - sparse_covcor
 
 - subtitle: "Class"
 - contents:

@@ -135,7 +135,7 @@ parallelize_fun <- function(
   if (!is.numeric(seed)) {
     seed <- 1
     log_message(
-      "random seed is not a valid value, initialize it to 1.",
+      "initialize random seed to 1.",
       message_type = "warning",
       verbose = verbose
     )
@@ -150,9 +150,9 @@ parallelize_fun <- function(
 
   if (!is.null(regulators)) {
     intersect_regulators <- intersect(regulators, colnames(matrix))
-    if (length(intersect_regulators) == 0) {
+    if (length(intersect_regulators) < 2) {
       log_message(
-        "The input genes must contain at least 1 regulator.",
+        "The input genes must contain at least 2 regulator.",
         message_type = "error"
       )
     }
@@ -198,7 +198,9 @@ parallelize_fun <- function(
 
   if (!is.numeric(cores) || cores < 1) {
     log_message(
-      "`cores` should be a stricly positive integer.",
+      "`cores` should be a positive integer, initialize it to 1.",
+      message_type = "warning",
+      verbose = verbose
     )
   }
 
@@ -226,6 +228,98 @@ parallelize_fun <- function(
 
     return(cores)
   }
+}
+
+#' @title Fast correlation and covariance calcualtion for sparse matrices
+#'
+#' @inheritParams sparse_cor
+sparse_covcor <- function(x, y = NULL) {
+  if (!methods::is(x, "sparseMatrix")) {
+    log_message(
+      "x should be a dgCMatrix",
+      message_type = "error"
+    )
+  }
+  n <- nrow(x)
+  mu_x <- colMeans(x)
+  if (is.null(y)) {
+    covmat <- (as.matrix(crossprod(x)) - n * tcrossprod(mu_x)) / (n - 1)
+    sdvec <- sqrt(diag(covmat))
+    cormat <- covmat / tcrossprod(sdvec)
+  } else {
+    if (!methods::is(y, "sparseMatrix")) {
+      log_message(
+        "y should be a dgCMatrix",
+        message_type = "error"
+      )
+    }
+    if (nrow(x) != nrow(y)) {
+      log_message(
+        "x and y should have the same number of rows",
+        message_type = "error"
+      )
+    }
+
+    mu_y <- colMeans(y)
+    covmat <- (as.matrix(crossprod(x, y)) - n * tcrossprod(mu_x, mu_y)) / (n - 1)
+    sdvecX <- sqrt((colSums(x^2) - n * mu_x^2) / (n - 1))
+    sdvecY <- sqrt((colSums(y^2) - n * mu_y^2) / (n - 1))
+    cormat <- covmat / tcrossprod(sdvecX, sdvecY)
+  }
+  return(
+    list(
+      cov = covmat,
+      cor = cormat
+    )
+  )
+}
+
+#' @title Safe correlation function which returns a sparse matrix without missing values
+#'
+#' @param x Sparse matrix or character vector.
+#' @param y Sparse matrix or character vector.
+#' @param method Method to use for calculating the correlation coefficient.
+#' @param allow_neg Logical. Whether to allow negative values or set them to 0.
+#' @param remove_na Logical.
+#' @param remove_inf Logical.
+#' @param ... Other arguments passed to the correlation function.
+#'
+#' @return A correlation matrix.
+#'
+#' @export
+sparse_cor <- function(
+    x,
+    y = NULL,
+    method = "pearson",
+    allow_neg = TRUE,
+    remove_na = TRUE,
+    remove_inf = TRUE,
+    ...) {
+  if (method == "pearson") {
+    x <- Matrix::Matrix(x, sparse = TRUE)
+    if (!is.null(y)) {
+      y <- Matrix::Matrix(y, sparse = TRUE)
+    }
+    corr_mat <- sparse_covcor(x, y)$cor
+  } else {
+    x <- as.matrix(x)
+    if (!is.null(y)) {
+      y <- as.matrix(y)
+    }
+    corr_mat <- stats::cor(x, y, method = method, ...)
+  }
+  if (remove_na) {
+    corr_mat[is.na(corr_mat)] <- 0
+  }
+  if (remove_inf) {
+    corr_mat[is.infinite(corr_mat)] <- 1
+  }
+  corr_mat <- Matrix::Matrix(corr_mat, sparse = TRUE)
+  if (!allow_neg) {
+    corr_mat[corr_mat < 0] <- 0
+  }
+
+  return(corr_mat)
 }
 
 #' @title Convert dgCMatrix into a dense matrix
@@ -312,7 +406,7 @@ as_matrix <- function(
     if (parallel) {
       matrix <- .Call(
         "_inferCSN_asMatrixParallel",
-        PACKAGE = "inferCSN",
+        # PACKAGE = "inferCSN",
         row_pos,
         col_pos,
         x@x,
@@ -322,7 +416,7 @@ as_matrix <- function(
     } else {
       matrix <- .Call(
         "_inferCSN_asMatrix",
-        PACKAGE = "inferCSN",
+        # PACKAGE = "inferCSN",
         row_pos,
         col_pos,
         x@x,
@@ -698,6 +792,7 @@ predict.srm_cv <- function(
 #' @param method Method used for normalization.
 #' @param na_rm Whether to remove `NA` values,
 #' and if setting TRUE, using `0` instead.
+#' @param ... Parameters for other methods.
 #'
 #' @md
 #' @return Normalized numeric vector
@@ -717,7 +812,8 @@ predict.srm_cv <- function(
 normalization <- function(
     x,
     method = "max_min",
-    na_rm = TRUE) {
+    na_rm = TRUE,
+    ...) {
   method <- match.arg(
     method,
     c("max_min", "maximum", "sum", "softmax", "z_score", "mad", "unit_vector")
