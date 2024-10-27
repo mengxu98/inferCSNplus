@@ -18,7 +18,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -35,7 +36,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -52,7 +54,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -69,7 +72,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -86,7 +90,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -113,7 +118,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -149,7 +155,8 @@ inferCSN(
   cross_validation = FALSE,
   seed = 1,
   n_folds = 10,
-  subsampling = 1,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
   r_threshold = 0,
   regulators = NULL,
   targets = NULL,
@@ -196,7 +203,9 @@ The \emph{\code{CDPSI}} algorithm may yield better results, but it also increase
 
 \item{n_folds}{The number of folds for cross-validation, default is \emph{\code{10}}.}
 
-\item{subsampling}{The percent of all samples used for \code{\link{sparse_regression}}, default is \emph{\code{1}}.}
+\item{subsampling_method}{The method to use for subsampling. Options are "sample" or "meta_cells".}
+
+\item{subsampling_ratio}{The percent of all samples used for \code{\link{sparse_regression}}, default is \emph{\code{1}}.}
 
 \item{r_threshold}{Threshold of \eqn{R^2} or correlation coefficient, default is \emph{\code{0}}.}
 
@@ -299,15 +308,17 @@ A CSNObject_list.
 }
 \examples{
 data("example_matrix")
+data("example_ground_truth")
 network_table_1 <- inferCSN(
   example_matrix
 )
-head(network_table_1)
 
 network_table_2 <- inferCSN(
   example_matrix,
   cores = 2
 )
+
+head(network_table_1)
 
 identical(
   network_table_1,
@@ -324,6 +335,23 @@ inferCSN(
   regulators = c("g1", "g2"),
   targets = c("g3", "g0")
 )
+
+\dontrun{
+network_table_07 <- inferCSN(
+  example_matrix,
+  r_threshold = 0.7
+)
+calculate_auc(
+  network_table_1,
+  example_ground_truth,
+  plot = TRUE
+)
+calculate_auc(
+  network_table_07,
+  example_ground_truth,
+  plot = TRUE
+)
+}
 \dontrun{
 data("example_matrix")
 network_table <- inferCSN(example_matrix)

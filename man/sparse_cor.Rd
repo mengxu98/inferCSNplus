@@ -23,15 +23,53 @@ sparse_cor(
 
 \item{allow_neg}{Logical. Whether to allow negative values or set them to 0.}
 
-\item{remove_na}{Logical.}
+\item{remove_na}{Logical. Whether to replace NA values with 0.}
 
-\item{remove_inf}{Logical.}
+\item{remove_inf}{Logical. Whether to replace infinite values with 1.}
 
-\item{...}{Other arguments passed to the correlation function.}
+\item{...}{Other arguments passed to \code{\link[stats]{cor}} function.}
 }
 \value{
 A correlation matrix.
 }
 \description{
 Safe correlation function which returns a sparse matrix without missing values
+}
+\examples{
+m1 <- simulate_sparse_matrix(
+  1000, 1000,
+  density = 0.01
+)
+m2 <- simulate_sparse_matrix(
+  1000, 500,
+  density = 0.01
+)
+
+all.equal(
+  as.matrix(sparse_cor(m1)),
+  cor(as_matrix(m1))
+)
+all.equal(
+  as.matrix(sparse_cor(m1, m2)),
+  cor(as_matrix(m1), as_matrix(m2))
+)
+
+system.time(
+  sparse_cor(m1)
+)
+system.time(
+  cor(as_matrix(m1))
+)
+system.time(
+  sparse_cor(m1, m2)
+)
+system.time(
+  cor(as_matrix(m1), as_matrix(m2))
+)
+
+# add missing values
+m1[sample(1:500, 10)] <- NA
+m2[sample(1:500, 10)] <- NA
+
+sparse_cor(m1, m2)[1:5, 1:5]
 }

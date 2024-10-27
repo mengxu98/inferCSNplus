@@ -93,6 +93,9 @@ std::vector<std::vector<std::unique_ptr<FitResult<T>>>> Grid2D<T>::Fit() {
     }
   } else if (PG.P.Specs.L0L2) {
     index = 2;
+  } else {
+    // Add a default case to initialize index
+    index = 0; // or another appropriate default value
   }
 
   arma::vec Lambdas2 =

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{as_matrix}
 \alias{as_matrix}
-\title{Convert dgCMatrix into a dense matrix}
+\title{Convert sparse matrix into dense matrix}
 \usage{
 as_matrix(x, parallel = FALSE, sparse = FALSE)
 }
@@ -15,20 +15,13 @@ Setting to parallelize the computation with \code{\link[RcppParallel]{setThreadO
 \item{sparse}{Logical value, default is \emph{\code{FALSE}}, whether to output a sparse matrix.}
 }
 \description{
-Convert dgCMatrix into a dense matrix
+Convert sparse matrix into dense matrix
 }
 \examples{
-dims_i <- 2000
-dims_j <- 2000
-sparse_matrix <- Matrix::sparseMatrix(
-  i = sample(1:dims_i, 500),
-  j = sample(1:dims_j, 500),
-  x = rnorm(500),
-  dims = c(dims_i, dims_j),
-  dimnames = list(
-    paste0("a", rep(1:dims_i)),
-    paste0("b", rep(1:dims_j))
-  )
+sparse_matrix <- simulate_sparse_matrix(
+  2000,
+  2000,
+  density = 0.01
 )
 
 system.time(as.matrix(sparse_matrix))
@@ -51,11 +44,21 @@ identical(
 )
 
 \dontrun{
+network_table_0 <- inferCSN(example_matrix)
+
 network_table_1 <- inferCSN(
   as_matrix(example_matrix, sparse = TRUE)
 )
 network_table_2 <- inferCSN(
   as(example_matrix, "sparseMatrix")
+)
+
+plot_scatter(
+  data.frame(
+    network_table_0$weight,
+    network_table_1$weight
+  ),
+  legend_position = "none"
 )
 
 plot_scatter(

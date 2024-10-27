@@ -12,7 +12,8 @@
 #' @param cross_validation Logical value, default is *`FALSE`*, whether to use cross-validation.
 #' @param n_folds The number of folds for cross-validation, default is *`10`*.
 #' @param seed The random seed for cross-validation, default is *`1`*.
-#' @param subsampling The percent of all samples used for \code{\link{sparse_regression}}, default is *`1`*.
+#' @param subsampling_method The method to use for subsampling. Options are "sample" or "meta_cells".
+#' @param subsampling_ratio The percent of all samples used for \code{\link{sparse_regression}}, default is *`1`*.
 #' @param r_threshold Threshold of \eqn{R^2} or correlation coefficient, default is *`0`*.
 #' @param regulators The regulator genes for which to infer the regulatory network.
 #' @param targets The target genes for which to infer the regulatory network.
@@ -37,7 +38,8 @@ setGeneric(
                  cross_validation = FALSE,
                  seed = 1,
                  n_folds = 10,
-                 subsampling = 1,
+                 subsampling_method = "sample",
+                 subsampling_ratio = 1,
                  r_threshold = 0,
                  regulators = NULL,
                  targets = NULL,
@@ -57,15 +59,17 @@ setGeneric(
 #'
 #' @examples
 #' data("example_matrix")
+#' data("example_ground_truth")
 #' network_table_1 <- inferCSN(
 #'   example_matrix
 #' )
-#' head(network_table_1)
 #'
 #' network_table_2 <- inferCSN(
 #'   example_matrix,
 #'   cores = 2
 #' )
+#'
+#' head(network_table_1)
 #'
 #' identical(
 #'   network_table_1,
@@ -82,6 +86,23 @@ setGeneric(
 #'   regulators = c("g1", "g2"),
 #'   targets = c("g3", "g0")
 #' )
+#'
+#' \dontrun{
+#' network_table_07 <- inferCSN(
+#'   example_matrix,
+#'   r_threshold = 0.7
+#' )
+#' calculate_auc(
+#'   network_table_1,
+#'   example_ground_truth,
+#'   plot = TRUE
+#' )
+#' calculate_auc(
+#'   network_table_07,
+#'   example_ground_truth,
+#'   plot = TRUE
+#' )
+#' }
 setMethod(
   f = "inferCSN",
   signature = signature(object = "matrix"),
@@ -91,7 +112,8 @@ setMethod(
                         cross_validation = FALSE,
                         seed = 1,
                         n_folds = 10,
-                        subsampling = 1,
+                        subsampling_method = "sample",
+                        subsampling_ratio = 1,
                         r_threshold = 0,
                         regulators = NULL,
                         targets = NULL,
@@ -111,7 +133,8 @@ setMethod(
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
-      subsampling = subsampling,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
       r_threshold = r_threshold,
       regulators = regulators,
       targets = targets,
@@ -121,19 +144,25 @@ setMethod(
       ...
     )
 
-    if (!is.null(regulators)) {
-      regulators <- intersect(colnames(object), regulators)
-    } else {
-      regulators <- colnames(object)
-    }
-    if (!is.null(targets)) {
-      targets <- intersect(colnames(object), targets)
-    } else {
-      targets <- colnames(object)
-    }
-    if (is.null(regulators_num)) {
-      regulators_num <- (ncol(object) - 1)
-    }
+    object <- subsampling_fun(
+      matrix = object,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
+      seed = seed,
+      verbose = verbose,
+      ...
+    )
+
+    regulators <- intersect(
+      colnames(object),
+      regulators %s% colnames(object)
+    )
+    targets <- intersect(
+      colnames(object),
+      targets %s% colnames(object)
+    )
+    regulators_num <- regulators_num %s% (ncol(object) - 1)
+
     names(targets) <- targets
     cores <- .cores_detect(cores, length(targets))
 
@@ -149,7 +178,7 @@ setMethod(
           penalty = penalty,
           algorithm = algorithm,
           n_folds = n_folds,
-          subsampling = subsampling,
+          subsampling_ratio = subsampling_ratio,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
           verbose = verbose,
@@ -219,7 +248,8 @@ setMethod(
                         cross_validation = FALSE,
                         seed = 1,
                         n_folds = 10,
-                        subsampling = 1,
+                        subsampling_method = "sample",
+                        subsampling_ratio = 1,
                         r_threshold = 0,
                         regulators = NULL,
                         targets = NULL,
@@ -239,7 +269,8 @@ setMethod(
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
-      subsampling = subsampling,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
       r_threshold = r_threshold,
       regulators = regulators,
       targets = targets,
@@ -249,19 +280,25 @@ setMethod(
       ...
     )
 
-    if (!is.null(regulators)) {
-      regulators <- intersect(colnames(object), regulators)
-    } else {
-      regulators <- colnames(object)
-    }
-    if (!is.null(targets)) {
-      targets <- intersect(colnames(object), targets)
-    } else {
-      targets <- colnames(object)
-    }
-    if (is.null(regulators_num)) {
-      regulators_num <- (ncol(object) - 1)
-    }
+    object <- subsampling_fun(
+      matrix = object,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
+      seed = seed,
+      verbose = verbose,
+      ...
+    )
+
+    regulators <- intersect(
+      colnames(object),
+      regulators %s% colnames(object)
+    )
+    targets <- intersect(
+      colnames(object),
+      targets %s% colnames(object)
+    )
+    regulators_num <- regulators_num %s% (ncol(object) - 1)
+
     names(targets) <- targets
     cores <- .cores_detect(cores, length(targets))
 
@@ -277,7 +314,7 @@ setMethod(
           penalty = penalty,
           algorithm = algorithm,
           n_folds = n_folds,
-          subsampling = subsampling,
+          subsampling_ratio = subsampling_ratio,
           r_threshold = r_threshold,
           regulators_num = regulators_num,
           verbose = verbose,
@@ -307,7 +344,8 @@ setMethod(
                         cross_validation = FALSE,
                         seed = 1,
                         n_folds = 10,
-                        subsampling = 1,
+                        subsampling_method = "sample",
+                        subsampling_ratio = 1,
                         r_threshold = 0,
                         regulators = NULL,
                         targets = NULL,
@@ -328,7 +366,8 @@ setMethod(
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
-      subsampling = subsampling,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
       r_threshold = r_threshold,
       regulators = regulators,
       targets = targets,

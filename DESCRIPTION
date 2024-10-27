@@ -23,7 +23,6 @@ Imports:
     Matrix,
     methods,
     parallel,
-    patchwork,
     purrr,
     Rcpp,
     RcppArmadillo,
@@ -34,7 +33,8 @@ Imports:
     SeuratObject,
     tidygraph,
     stats,
-    utils
+    utils,
+    patchwork
 Suggests:
     ComplexHeatmap,
     BSgenome.Hsapiens.UCSC.hg38,
@@ -58,7 +58,6 @@ Suggests:
     scales,
     slingshot,
     sparseMatrixStats,
-    testthat (>= 3.0.0),
     bayestestR,
     brms,
     cowplot,
@@ -128,11 +127,11 @@ Collate:
     'models.R'
     'network_analysis.R'
     'network_comparison.R'
+    'network_evaluation.R'
     'network_heatmap.R'
     'network_sift.R'
     'network_visualization.R'
     'normalize.object.R'
-    'performance_evaluation.R'
     'plotting_functions.R'
     'regions.R'
     'setMethod-dynamic_genes.R'
@@ -140,6 +139,7 @@ Collate:
     'setMethod-get_pseudotime.R'
     'setMethod-infer_vector.R'
     'sparse_regression.R'
+    'subsampling_fun.R'
     'utils.R'
     'utils_2.R'
     'utils_network.R'

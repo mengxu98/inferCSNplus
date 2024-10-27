@@ -20,9 +20,10 @@ template <class T> FitResult<T> CDL012SquaredHingeSwaps<T>::_FitWithBounds() {
 }
 
 template <class T> FitResult<T> CDL012SquaredHingeSwaps<T>::_Fit() {
-  auto result = CDL012SquaredHinge<T>(*(this->X), this->y, this->P)
-                    .Fit(); // result will be maintained till the end
-  this->b0 = result.b0;     // Initialize from previous later....!
+  auto result = CDL012SquaredHinge<T>(*(this->X), this->y, this->P).Fit();
+  // result will be maintained till the end
+  // Initialize from previous later....!
+  this->b0 = result.b0;
   this->B = result.B;
 
   arma::vec onemyxb = result.onemyxb;
@@ -34,7 +35,7 @@ template <class T> FitResult<T> CDL012SquaredHingeSwaps<T>::_Fit() {
   // Fix warning:
   // warning: 'maxindex' may be used uninitialized in this function
   // [-Wmaybe-uninitialized]
-  double Bmaxindex;
+  double Bmaxindex = 0;
 
   this->P.Init = 'u';
 

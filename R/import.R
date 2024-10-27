@@ -1,4 +1,4 @@
-#' @import Matrix ggplot2 ggraph patchwork tidygraph
+#' @import Matrix ggplot2 ggraph patchwork tidygraph ggnetwork
 #'
 #' @importFrom grDevices dev.off pdf
 #' @importFrom graphics axis barplot par

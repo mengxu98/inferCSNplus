@@ -36,7 +36,7 @@ single_network <- function(
     algorithm = "CD",
     regulators_num = (ncol(matrix) - 1),
     n_folds = 10,
-    subsampling = 1,
+    subsampling_ratio = 1,
     r_threshold = 0,
     verbose = TRUE,
     ...) {
@@ -60,7 +60,7 @@ single_network <- function(
     algorithm = algorithm,
     regulators_num = regulators_num,
     n_folds = n_folds,
-    subsampling = subsampling,
+    subsampling_ratio = subsampling_ratio,
     r_threshold = r_threshold,
     verbose = verbose,
     ...
@@ -94,8 +94,8 @@ single_network <- function(
 #' @examples
 #' data("example_matrix")
 #' sparse_regression(
-#'   example_matrix[, -1],
-#'   example_matrix[, 1]
+#'   x = example_matrix[, -1],
+#'   y = example_matrix[, 1]
 #' )
 sparse_regression <- function(
     x, y,
@@ -105,25 +105,11 @@ sparse_regression <- function(
     algorithm = "CD",
     regulators_num = ncol(x),
     n_folds = 10,
-    subsampling = 1,
+    subsampling_ratio = 1,
     r_threshold = 0,
     computation_method = "cor",
     verbose = TRUE,
     ...) {
-  if (subsampling == 1) {
-    test_x <- x
-    test_y <- y
-  } else {
-    set.seed(seed)
-    samples <- sample(
-      nrow(x), subsampling * nrow(x)
-    )
-    test_x <- x[-samples, ]
-    x <- x[samples, ]
-    test_y <- y[-samples]
-    y <- y[samples]
-  }
-
   if (cross_validation) {
     fit <- try(
       fit_sparse_regression(
@@ -134,6 +120,7 @@ sparse_regression <- function(
         cross_validation = cross_validation,
         n_folds = n_folds,
         seed = seed,
+        verbose = verbose,
         ...
       )
     )
@@ -152,6 +139,7 @@ sparse_regression <- function(
           algorithm = algorithm,
           regulators_num = regulators_num,
           cross_validation = FALSE,
+          verbose = verbose,
           ...
         )
       )
@@ -183,7 +171,9 @@ sparse_regression <- function(
         penalty = penalty,
         algorithm = algorithm,
         regulators_num = regulators_num,
-        cross_validation = FALSE
+        cross_validation = FALSE,
+        verbose = verbose,
+        ...
       )
     )
     if (any(class(fit) == "try-error")) {
@@ -197,19 +187,19 @@ sparse_regression <- function(
   pred_y <- as.numeric(
     predict(
       fit,
-      newx = test_x,
+      newx = x,
       lambda = lambda,
       gamma = gamma
     )
   )
 
-  if (length(test_y) == length(pred_y)) {
-    if (stats::var(test_y) != 0 && stats::var(pred_y) != 0) {
+  if (length(y) == length(pred_y)) {
+    if (stats::var(y) != 0 && stats::var(pred_y) != 0) {
       computation_method <- match.arg(computation_method, c("r_square", "cor"))
       r <- switch(
         EXPR = computation_method,
-        "cor" = stats::cor(test_y, pred_y),
-        "r_square" = r_square(test_y, pred_y)
+        "cor" = stats::cor(y, pred_y),
+        "r_square" = r_square(y, pred_y)
       )
     } else {
       r <- 0
@@ -316,6 +306,7 @@ fit_sparse_regression <- function(
     intercept = TRUE,
     lows = -Inf,
     highs = Inf,
+    verbose = TRUE,
     ...) {
   # Check parameter values
   if ((rtol < 0) || (rtol >= 1)) {
@@ -354,7 +345,11 @@ fit_sparse_regression <- function(
   # Handle Lambda Grids
   if (length(lambdaGrid) != 0) {
     if (!is.null(autoLambda) && !autoLambda) {
-      warning("'autoLambda' is ignored and inferred if 'lambdaGrid' is supplied.")
+      log_message(
+        "'autoLambda' is ignored and inferred if 'lambdaGrid' is supplied.",
+        message_type = "warning",
+        verbose = verbose
+      )
     }
     autoLambda <- FALSE
   } else {
@@ -388,7 +383,11 @@ fit_sparse_regression <- function(
   if (penalty != "L0" && !autoLambda) {
     bad_lambda_grid <- FALSE
     if (length(lambdaGrid) != nGamma) {
-      warning("'nGamma' is ignored and replaced with length(lambdaGrid).....")
+      log_message(
+        "'nGamma' is ignored and replaced with length(lambdaGrid).",
+        message_type = "warning",
+        verbose = verbose
+      )
       nGamma <- length(lambdaGrid)
     }
     for (i in seq_along(lambdaGrid)) {
@@ -445,13 +444,10 @@ fit_sparse_regression <- function(
     }
   }
 
-  # Call appropriate C++ function based on matrix type
   m <- list()
   if (!cross_validation) {
     if (methods::is(x, "sparseMatrix")) {
-      m <- .Call(
-        "_inferCSN_srm_model_sparse",
-        PACKAGE = "inferCSN",
+      m <- srm_model_sparse(
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
         maxIters, rtol, atol, activeSet, activeSetNum, maxSwaps,
@@ -459,9 +455,7 @@ fit_sparse_regression <- function(
         excludeFirstK, intercept, withBounds, lows, highs
       )
     } else {
-      m <- .Call(
-        "_inferCSN_srm_model_dense",
-        PACKAGE = "inferCSN",
+      m <- srm_model_dense(
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
         maxIters, rtol, atol, activeSet, activeSetNum, maxSwaps,
@@ -472,9 +466,7 @@ fit_sparse_regression <- function(
   } else {
     set.seed(seed)
     if (methods::is(x, "sparseMatrix")) {
-      m <- .Call(
-        "_inferCSN_srm_model_cv_sparse",
-        PACKAGE = "inferCSN",
+      m <- srm_model_cv_sparse(
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
         maxIters, rtol, atol, activeSet, activeSetNum, maxSwaps,
@@ -482,9 +474,7 @@ fit_sparse_regression <- function(
         seed, excludeFirstK, intercept, withBounds, lows, highs
       )
     } else {
-      m <- .Call(
-        "_inferCSN_srm_model_cv_dense",
-        PACKAGE = "inferCSN",
+      m <- srm_model_cv_dense(
         x, y, loss, penalty, algorithm, regulators_num,
         nLambda, nGamma, gammaMax, gammaMin, partialSort,
         maxIters, rtol, atol, activeSet, activeSetNum, maxSwaps,
@@ -498,13 +488,16 @@ fit_sparse_regression <- function(
   settings[[1]] <- intercept
   names(settings) <- c("intercept")
 
-  # Remove potential support sizes exceeding regulators_num
   for (i in seq_along(m$SuppSize)) {
     last <- length(m$SuppSize[[i]])
     if (m$SuppSize[[i]][last] > regulators_num) {
       if (last == 1) {
-        warning("Only 1 element in path with support size > regulators_num.
-              Try increasing regulators_num to resolve the issue.")
+        log_message(
+          "only 1 element in path with support size > regulators_num.
+              Try increasing 'regulators_num' to resolve the issue.",
+          message_type = "warning",
+          verbose = verbose
+        )
       } else {
         m$SuppSize[[i]] <- m$SuppSize[[i]][-last]
         m$Converged[[i]] <- m$Converged[[i]][-last]

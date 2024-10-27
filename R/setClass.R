@@ -70,7 +70,6 @@ Regions <- setClass(
   )
 )
 
-
 #' @title The RegularotyNetwork class
 #' @description
 #'  The RegularotyNetwork object is the core data structure in Pando.

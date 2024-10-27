@@ -60,9 +60,18 @@ reference:
 
 - subtitle: "Plotting functions"
 - contents:
-  - plot_scatter
+  - plot_coefficient
+  - plot_coefficients
   - plot_embedding
   - plot_histogram
+  - plot_scatter
+
+- subtitle: "ggplot2 theme"
+- contents:
+  - no_legend
+  - no_margin
+  - no_x_text
+  - no_y_text
 
 - subtitle: "Network evaluation"
 - contents:
@@ -102,7 +111,6 @@ reference:
 - subtitle: "RNA data processing"
 - contents:
   - normalize.seurat.object
-  - generate_aggregated_data
   - aggregating_data
   - as.slam.matrix
   - as_sparse
@@ -198,47 +206,18 @@ reference:
 
 - subtitle: "Utils functions"
 - contents:
+  - '%s%'
   - as_matrix
   - check_sparsity
   - coef.srm
   - coef.srm_cv
   - coef.CSNObject
   - crossweight
-  - network_format
-  - normalization
-  - table_to_matrix
-  - filter_sort_matrix
-  - print.logo
-  - print.srm
-  - print.srm_cv
-  - print.RegulatoryNetwork
-  - predict.srm
-  - predict.srm_cv
-  - peaks.split
-  - ranges.for.coords
-  - get.tf.gene
-  - transcript.mode
-  - is.sparse
-  - parallelize_fun
-  - mean_module_expression
-  - mean_subnetwork_expression
-  - meta_cells
-  - no_legend
-  - no_margin
-  - no_x_text
-  - no_y_text
-  - order_genes
-  - peaks.split
-  - pre_pseudotime_matrix
-  - ranges.for.coords
-  - rough_hierarchy
-  - sample_and_epoch_reconstruct
-  - score_targets
-  - sparse_cor
-  - sparse_covcor
   - dMcast
   - edge_rank
   - fast_aggregate
+  - filter_sort_matrix
+  - get.tf.gene
   - get_umap
   - ig_NiceGraph
   - ig_convertLarge
@@ -249,6 +228,33 @@ reference:
   - ig_exemplars
   - ig_scaleV
   - ig_tabToIgraph
+  - is.sparse
+  - matrix_to_table
+  - mean_module_expression
+  - mean_subnetwork_expression
+  - meta_cells
+  - network_format
+  - normalization
+  - table_to_matrix
+  - ranges.for.coords
+  - transcript.mode
+  - order_genes
+  - parallelize_fun
+  - pearson_correlation
+  - peaks.split
+  - pre_pseudotime_matrix
+  - print.logo
+  - print.srm
+  - print.srm_cv
+  - print.RegulatoryNetwork
+  - predict.srm
+  - predict.srm_cv
+  - ranges.for.coords
+  - rough_hierarchy
+  - sample_and_epoch_reconstruct
+  - score_targets
+  - sparse_cor
+  - split_indices
   - log_message
   - r_square
 

@@ -97,7 +97,94 @@ asMatrixParallel <- function(rp, cp, z, nrows, ncols) {
     .Call('_inferCSN_asMatrixParallel', PACKAGE = 'inferCSN', rp, cp, z, nrows, ncols)
 }
 
+matrixToTable <- function(network_matrix) {
+    .Call('_inferCSN_matrixToTable', PACKAGE = 'inferCSN', network_matrix)
+}
+
+#' @title Format network table
+#'
+#' @param network_table The weight data table of network.
+#' @param regulators Regulators list.
+#' @param targets Targets list.
+#' @param abs_weight Logical value, default is *`TRUE`*,
+#' whether to perform absolute value on weights,
+#' and when set `abs_weight` to *`TRUE`*,
+#' the output of weight table will create a new column named `Interaction`.
+#'
+#' @md
+#' @return Formated network table
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' network_table <- inferCSN(example_matrix)
+#'
+#' network_format(
+#'   network_table,
+#'   regulators = "g1"
+#' )
+#'
+#' network_format(
+#'   network_table,
+#'   regulators = "g1",
+#'   abs_weight = FALSE
+#' )
+#'
+#' network_format(
+#'   network_table,
+#'   targets = "g3"
+#' )
+#'
+#' network_format(
+#'   network_table,
+#'   regulators = c("g1", "g3"),
+#'   targets = c("g3", "g5")
+#' )
+network_format <- function(network_table, regulators = NULL, targets = NULL, abs_weight = TRUE) {
+    .Call('_inferCSN_network_format', PACKAGE = 'inferCSN', network_table, regulators, targets, abs_weight)
+}
+
+sparseCovCor <- function(x, y_nullable = NULL) {
+    .Call('_inferCSN_sparseCovCor', PACKAGE = 'inferCSN', x, y_nullable)
+}
+
+#' @title Split indices.
+#'
+#' @description An optimised version of split for the special case of splitting row indices into groups.
+#'
+#' @param group Integer indices
+#' @param n The largest integer (may not appear in index).
+#' This is hint: if the largest value of \code{group} is bigger than \code{n},
+#' the output will silently expand.
+#' @useDynLib inferCSN
+#' @return A list of vectors of indices.
+#'
+#' @references
+#' https://github.com/hadley/plyr/blob/d57f9377eb5d56107ba3136775f2f0f005f33aa3/src/split-numeric.cpp#L20
+#' @export
+#' @examples
+#' split_indices(sample(10, 100, rep = TRUE))
+#' split_indices(sample(10, 100, rep = TRUE), 10)
+split_indices <- function(group, n = 0L) {
+    .Call('_inferCSN_split_indices', PACKAGE = 'inferCSN', group, n)
+}
+
 tableToMatrix <- function(weight_table) {
     .Call('_inferCSN_tableToMatrix', PACKAGE = 'inferCSN', weight_table)
+}
+
+#' @title Weight sift
+#' @description Remove edges with smaller weights in the reverse direction.
+#'
+#' @param table A data frame with three columns: "regulator", "target", and "weight".
+#'
+#' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' network_table <- inferCSN(example_matrix)
+#' weight_sift(network_table) |> head()
+weight_sift <- function(table) {
+    .Call('_inferCSN_weight_sift', PACKAGE = 'inferCSN', table)
 }
 
