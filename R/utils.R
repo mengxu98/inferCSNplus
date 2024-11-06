@@ -103,7 +103,7 @@ parallelize_fun <- function(
 
     "%dopar%" <- foreach::"%dopar%"
     output_list <- foreach::foreach(
-      i = 1:length(x),
+      i = seq_along(x),
       .export = export_fun
     ) %dopar% {
       fun(x[[i]])
@@ -578,120 +578,9 @@ check_sparsity <- function(x) {
   return(sparsity)
 }
 
-#' @title Filter and sort matrix
-#'
-#' @inheritParams network_format
-#' @param network_matrix The matrix of network weight.
-#'
-#' @return Filtered and sorted matrix
-#' @export
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix)
-#' network_matrix <- table_to_matrix(network_table)
-#' filter_sort_matrix(network_matrix)[1:6, 1:6]
-#'
-#' filter_sort_matrix(
-#'   network_matrix,
-#'   regulators = c("g1", "g2"),
-#'   targets = c("g3", "g4")
-#' )
-filter_sort_matrix <- function(
-    network_matrix,
-    regulators = NULL,
-    targets = NULL) {
-  network_matrix[is.na(network_matrix)] <- 0
-  if (!is.null(regulators)) {
-    regulators <- intersect(rownames(network_matrix), regulators)
-  } else {
-    regulators <- rownames(network_matrix)
-  }
-  if (!is.null(targets)) {
-    targets <- intersect(colnames(network_matrix), targets)
-  } else {
-    targets <- colnames(network_matrix)
-  }
-
-  unique_regulators <- gtools::mixedsort(unique(regulators))
-  unique_targets <- gtools::mixedsort(unique(targets))
-  network_matrix <- network_matrix[unique_regulators, unique_targets]
-
-  return(network_matrix)
-}
-
-#' @title Switch network table to matrix
-#'
-#' @inheritParams network_format
-#'
-#' @return Weight matrix
-#' @export
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix)
-#' head(network_table)
-#'
-#' table_to_matrix(network_table)[1:6, 1:6]
-#'
-#' table_to_matrix(
-#'   network_table,
-#'   regulators = c("g1", "g2"),
-#'   targets = c("g3", "g4")
-#' )
-table_to_matrix <- function(
-    network_table,
-    regulators = NULL,
-    targets = NULL) {
-  network_table <- network_format(
-    network_table,
-    abs_weight = FALSE
-  )
-  network_matrix <- tableToMatrix(network_table)
-  network_matrix <- filter_sort_matrix(
-    network_matrix,
-    regulators = regulators,
-    targets = targets
-  )
-
-  return(network_matrix)
-}
-
-#' @title Switch matrix to network table
-#'
-#' @inheritParams table_to_matrix
-#' @param network_matrix The matrix of network weight.
-#'
-#' @return Network table
-#' @export
-#'
-#' @examples
-#' data("example_matrix")
-#' network_table <- inferCSN(example_matrix)
-#' network_matrix <- table_to_matrix(network_table)
-#' network_table_new <- matrix_to_table(network_matrix)
-#' head(network_table)
-#' head(network_table_new)
-#' identical(
-#'   network_table,
-#'   network_table_new
-#' )
-matrix_to_table <- function(
-    network_matrix,
-    regulators = NULL,
-    targets = NULL) {
-  filter_sort_matrix(
-    network_matrix,
-    regulators = regulators,
-    targets = targets
-  ) |>
-    matrixToTable() |>
-    network_format(abs_weight = FALSE)
-}
-
 #' @title Extracts a specific solution in the regularization path
 #'
-#' @inheritParams inferCSN
+#' @inheritParams single_network
 #' @param object The output of \code{\link{fit_sparse_regression}}.
 #' @param lambda The value of lambda at which to extract the solution.
 #' @param gamma The value of gamma at which to extract the solution.
@@ -730,8 +619,8 @@ coef.srm <- function(
 
   indices <- NULL
   if (!is.null(lambda)) {
-    diffLambda <- abs(lambda - object$lambda[[gamma_index]])
-    indices <- which(diffLambda == min(diffLambda))
+    diff_lambda <- abs(lambda - object$lambda[[gamma_index]])
+    indices <- which(diff_lambda == min(diff_lambda))
   } else if (!is.null(regulators_num)) {
     diff_regulators_num <- abs(
       regulators_num - object$suppSize[[gamma_index]]
@@ -819,7 +708,8 @@ print.srm_cv <- function(x, ...) {
 #' @method predict srm
 #'
 #' @details
-#' If both lambda and gamma are not supplied, then a matrix of predictions for all the solutions in the regularization path is returned.
+#' If both lambda and gamma are not supplied,
+#' then a matrix of predictions for all the solutions in the regularization path is returned.
 #' If lambda is supplied but gamma is not, the smallest value of gamma is used.
 #' In case of logistic regression, probability values are returned.
 #'

@@ -40,7 +40,6 @@ setMethod(
       r_threshold = 0,
       regulators = NULL,
       targets = NULL,
-      regulators_num = NULL,
       cores = 1,
       verbose = FALSE,
       aggregate = TRUE,
@@ -122,7 +121,6 @@ setMethod(
           r_threshold = r_threshold,
           regulators = regulators,
           targets = targets,
-          regulators_num = regulators_num,
           verbose = verbose,
           cores = cores,
           ...
@@ -185,7 +183,6 @@ setMethod(
           r_threshold = r_threshold,
           regulators = targets,
           targets = targets,
-          regulators_num = regulators_num,
           verbose = verbose,
           cores = cores,
           chr,
@@ -253,7 +250,6 @@ setMethod(
     r_threshold = 0,
     regulators = NULL,
     targets = NULL,
-    regulators_num = NULL,
     verbose = FALSE,
     cores = 1,
     chr,
@@ -339,7 +335,6 @@ setMethod(
           subsampling_method = subsampling_method,
           subsampling_ratio = subsampling_ratio,
           r_threshold = r_threshold,
-          regulators_num = regulators_num,
           verbose = verbose
         )
       }
@@ -389,7 +384,6 @@ setMethod(
           subsampling_method = subsampling_method,
           subsampling_ratio = subsampling_ratio,
           r_threshold = r_threshold,
-          regulators_num = regulators_num,
           verbose = verbose
         )
       }
@@ -522,7 +516,6 @@ setMethod(
       r_threshold = 0,
       regulators = NULL,
       targets = NULL,
-      regulators_num = NULL,
       cores = 1,
       verbose = TRUE,
       genes = NULL,
@@ -885,7 +878,6 @@ setMethod(
       r_threshold = 0,
       regulators = NULL,
       targets = NULL,
-      regulators_num = NULL,
       cores = 1,
       verbose = TRUE,
       genes = NULL,
