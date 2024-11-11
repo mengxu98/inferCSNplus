@@ -139,7 +139,7 @@ Collate:
     'setMethod-get_pseudotime.R'
     'setMethod-infer_vector.R'
     'sparse_regression.R'
-    'subsampling_fun.R'
+    'subsampling.R'
     'utils.R'
     'utils_2.R'
     'utils_network.R'

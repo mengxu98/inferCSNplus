@@ -75,8 +75,7 @@ reference:
 
 - subtitle: "Network evaluation"
 - contents:
-  - calculate_auc
-  - calculate_acc
+  - calculate_metrics
   - JI_across_topregs
 
 - subtitle: "Sparse regression model"

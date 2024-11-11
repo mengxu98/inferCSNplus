@@ -3,37 +3,33 @@
 #' @description This function detects metacells from a single-cell gene expression matrix
 #' using dimensionality reduction and clustering techniques.
 #'
-#' @param matrix Log-normalized gene expression matrix with rows as genes and columns as cells.
-#' @param genes_use A vector of genes used to compute PCA, default is *`NULL`*.
-#' @param genes_exclude A vector of genes to be excluded when computing PCA, default is *`NULL`*.
-#' @param var_genes_num If *`genes_use`* is not provided, *`var_genes_num`* genes with the largest
-#'   variation are used. Default is *`min(1000, nrow(matrix))`*.
-#' @param gamma Graining level of data (proportion of number of single cells in the initial dataset
-#'   to the number of metacells in the final dataset), default is *`10`*.
-#' @param knn_k Parameter to compute single-cell kNN network, default is *`5`*.
-#' @param do_scale Logical value, default is *`TRUE`*, whether to scale gene expression matrix
-#'   when computing PCA.
-#' @param pc_num Number of principal components to use for construction of single-cell kNN network,
-#'   default is *`25`*.
-#' @param fast_pca Logical value, default is *`TRUE`*, use \link[irlba]{irlba} as a faster version
-#'   of prcomp.
-#' @param do_approx Logical value, default is *`FALSE`*, compute approximate kNN in case of a large
-#'   dataset (>50'000).
-#' @param approx_num Number of cells to subsample for an approximate approach, default is *`20000`*.
-#' @param directed Logical value, default is *`FALSE`*, whether to use directed graph.
-#' @param use_nn2 Logical value, default is *`TRUE`*, whether to use nn2 function.
-#' @param seed Seed to use to subsample cells for an approximate approach, default is *`1`*.
-#' @param cluster_method Clustering method to identify metacells, default is *`walktrap`*.
+#' @param matrix Gene expression matrix with rows as genes and columns as cells.
+#' @param genes_use Default is *`NULL`*. A vector of genes used to compute PCA.
+#' @param genes_exclude Default is *`NULL`*. A vector of genes to be excluded when computing PCA.
+#' @param var_genes_num Default is *`min(1000, nrow(matrix))`*. If *`genes_use`* is not provided,
+#'   *`var_genes_num`* genes with the largest variation are used.
+#' @param gamma Default is *`10`*. Graining level of data (proportion of number of single cells
+#'   in the initial dataset to the number of metacells in the final dataset).
+#' @param knn_k Default is *`5`*. Parameter to compute single-cell kNN network.
+#' @param do_scale Default is *`TRUE`*. Whether to scale gene expression matrix when computing PCA.
+#' @param pc_num Default is *`25`*. Number of principal components to use for construction of
+#'   single-cell kNN network.
+#' @param fast_pca Default is *`TRUE`*. Use \link[irlba]{irlba} as a faster version of prcomp.
+#' @param do_approx Default is *`FALSE`*. Compute approximate kNN in case of a large dataset (>50,000).
+#' @param approx_num Default is *`20000`*. Number of cells to subsample for an approximate approach.
+#' @param directed Default is *`FALSE`*. Whether to use directed graph.
+#' @param use_nn2 Default is *`TRUE`*. Whether to use nn2 function.
+#' @param seed Default is *`1`*. Seed to use to subsample cells for an approximate approach.
+#' @param cluster_method Default is *`walktrap`*. Clustering method to identify metacells.
 #'   Available methods are *`walktrap`* and *`louvain`* (not recommended, gamma is ignored).
-#' @param block_size Number of cells to map to the nearest metacell at a time (for approx
-#'   coarse-graining), default is *`10000`*.
-#' @param weights Vector of cell weights (NULL by default),
-#' used for computing average gene expression within cluster of metacells.
-#' @param do_median_norm Logical value, default is *`FALSE`*,
-#' whether to normalize by median value.
+#' @param block_size Default is *`10,000`*. Number of cells to map to the nearest metacell at a time
+#'   (for approx coarse-graining).
+#' @param weights Default is *`NULL`*. Vector of cell weights, used for computing average gene
+#'   expression within cluster of metacells.
+#' @param do_median_norm Default is *`FALSE`*. Whether to normalize by median value.
 #' @param ... Additional parameters passed to other methods.
 #'
-#' @return A metacell matrix where rows represent metacells and columns represent genes.
+#' @return A matrix where rows represent metacells and columns represent genes.
 #' @export
 #'
 #' @md
@@ -201,7 +197,7 @@ meta_cells <- function(
   if (do_approx) {
     pca_averaged_sc <- as.matrix(
       Matrix::t(
-        .supercell_ge(
+        .meta_cell_ge(
           Matrix::t(
             pca_results$x[, pc_num]
           ),
@@ -304,7 +300,7 @@ meta_cells <- function(
   )
 }
 
-.supercell_ge <- function(
+.meta_cell_ge <- function(
     ge,
     groups,
     mode = c("average", "sum"),
@@ -374,7 +370,7 @@ meta_cells <- function(
     k = 5,
     from = c("dist", "coordinates"),
     use_nn2 = TRUE,
-    return_neighbors_order = F,
+    return_neighbors_order = FALSE,
     dist_method = "euclidean",
     cor_method = "pearson",
     p = 2,
@@ -383,7 +379,6 @@ meta_cells <- function(
   method <- match.arg(from, c("dist", "coordinates"))
 
   if (method == "coordinates") {
-    # from coordinates
     if (use_nn2) {
       if (dist_method != "euclidean") {
         stop(
@@ -445,7 +440,6 @@ meta_cells <- function(
     )
   }
 
-  # now matrix is distance in any case
   return(
     .build_knnd(
       D = matrix,
@@ -468,7 +462,7 @@ meta_cells <- function(
     D <- stats::as.dist(D)
   }
 
-  cells_num <- (1 + sqrt(1 + 8 * length(D))) / 2 # number of cells
+  cells_num <- (1 + sqrt(1 + 8 * length(D))) / 2
 
   if (k >= cells_num) {
     stop("Not enought neighbors in data set!")
@@ -497,7 +491,7 @@ meta_cells <- function(
     })
   )
 
-  adj.knn <- split(
+  adj_knn <- split(
     neighbors,
     rep(
       1:nrow(neighbors),
@@ -506,7 +500,7 @@ meta_cells <- function(
   )
 
   graph_knn <- igraph::graph_from_adj_list(
-    adj.knn,
+    adj_knn,
     duplicate = FALSE,
     mode = mode
   )

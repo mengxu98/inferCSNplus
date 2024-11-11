@@ -429,11 +429,10 @@ sparse_cor <- function(
 
   if (is.null(y)) {
     colnames(corr_mat) <- colnames(x)
-    rownames(corr_mat) <- colnames(x)
   } else {
     colnames(corr_mat) <- colnames(y)
-    rownames(corr_mat) <- colnames(x)
   }
+  rownames(corr_mat) <- colnames(x)
 
   if (remove_na) {
     corr_mat[is.na(corr_mat)] <- 0
