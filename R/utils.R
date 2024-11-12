@@ -165,7 +165,7 @@ parallelize_fun <- function(
 
   match.arg(
     subsampling_method,
-    c("sample", "meta_cells")
+    c("sample", "meta_cells", "pseudobulk")
   )
 
   if (!(is.numeric(subsampling_ratio) && subsampling_ratio > 0 && subsampling_ratio <= 1)) {
