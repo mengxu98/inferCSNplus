@@ -7,22 +7,26 @@
 fit_cvglmnet(formula, data, family = gaussian, alpha = 0.5, ...)
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{family}{A description of the error distribution and link function to be used in the model.
-See \code{\link[stats]{family}} for mode details.}
+\item{family}{A description of the error distribution and link function.
+See \emph{\code{stats::family}} for details.}
 
-\item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
+\item{alpha}{The elasticnet mixing parameter, between 0 and 1.
+See \emph{\code{glmnet::glmnet}} for details.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to \emph{\code{glmnet::cv.glmnet}}.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Cross-validated performance metrics
+\item \emph{\code{coefs}} - Coefficients selected by cross-validation
+}
 }
 \description{
-Cross-validation for regularized generalized linear models
+Performs cross-validation to select optimal regularization parameters for GLMnet models.
 }

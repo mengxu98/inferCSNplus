@@ -2,7 +2,7 @@
 % Please edit documentation in R/models.R
 \name{fit_bagging_ridge}
 \alias{fit_bagging_ridge}
-\title{Fit a bagging ridge regression model as implemented in scikit-learn (python)}
+\title{Fit a bagging ridge regression model via scikit-learn}
 \usage{
 fit_bagging_ridge(
   formula,
@@ -16,28 +16,42 @@ fit_bagging_ridge(
 )
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{alpha}{Positive float indicating the regularization strength.}
+\item{alpha}{Positive float specifying the regularization strength.}
 
-\item{solver}{Solver to use in the computational routines.
-Options include ‘auto’, ‘svd’, ‘cholesky’, ‘lsqr’, ‘sparse_cg’, ‘sag’, ‘saga’.}
+\item{solver}{Algorithm to use for optimization:
+\itemize{
+\item \emph{\code{auto}} - Automatically chosen based on data
+\item \emph{\code{svd}} - Singular Value Decomposition
+\item \emph{\code{cholesky}} - Cholesky decomposition
+\item \emph{\code{lsqr}} - Least Squares
+\item \emph{\code{sparse_cg}} - Conjugate Gradient for sparse matrices
+\item \emph{\code{sag}}, \emph{\code{saga}} - Stochastic Average Gradient descent
+}}
 
-\item{bagging_number}{The number of ridge regression model in the bagging.}
+\item{bagging_number}{Number of base estimators in ensemble.}
 
-\item{n_jobs}{The number of cores used to fit the model.}
+\item{n_jobs}{Number of parallel jobs (-1 for all cores).}
 
-\item{p_method}{The test used to calculate p-values. Options are 't' for \code{t.test}, and 'wilcox' for \code{wilcox.test}}
+\item{p_method}{Method for calculating p-values:
+\itemize{
+\item \emph{\code{t}} - Student's t-test
+\item \emph{\code{wilcox}} - Wilcoxon test
+}}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to scikit-learn.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Ensemble model performance metrics
+\item \emph{\code{coefs}} - Aggregated coefficient estimates with p-values
+}
 }
 \description{
-Fit a bagging ridge regression model as implemented in scikit-learn (python)
+Fits an ensemble of ridge regression models using scikit-learn's BaggingRegressor.
 }

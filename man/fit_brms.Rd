@@ -13,24 +13,27 @@ fit_brms(
 )
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{family}{A description of the error distribution and link function to be used in the model.
-See \code{\link[stats]{family}} for mode details.}
+\item{family}{A description of the error distribution and link function.
+See \emph{\code{stats::family}} for details.}
 
-\item{prior}{The prior distribution of the coefficients.
-See \code{\link[brms]{set_prior}} for mode details.
-The default (\code{prior(normal(0,1))}) results in ridge regularization.}
+\item{prior}{The prior distribution specification for coefficients.
+Default \emph{\code{normal(0,1)}} provides ridge-like regularization.
+See \emph{\code{brms::set_prior}} for details.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to \emph{\code{brms::brm}}.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Bayesian R-squared and model fit metrics
+\item \emph{\code{coefs}} - Posterior estimates with uncertainty intervals
+}
 }
 \description{
-Fit a Bayesian regression model with brms and Stan
+Fits a Bayesian regression model using the brms interface to Stan.
 }

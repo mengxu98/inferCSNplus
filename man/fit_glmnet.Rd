@@ -7,22 +7,30 @@
 fit_glmnet(formula, data, family = gaussian, alpha = 0.5, ...)
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{family}{A description of the error distribution and link function to be used in the model.
-See \code{\link[stats]{family}} for mode details.}
+\item{family}{A description of the error distribution and link function.
+See \emph{\code{stats::family}} for details.}
 
-\item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
+\item{alpha}{The elasticnet mixing parameter, between 0 and 1:
+\itemize{
+\item \emph{\code{alpha = 1}}: Lasso penalty
+\item \emph{\code{alpha = 0}}: Ridge penalty
+\item \emph{\verb{0 < alpha < 1}}: Elastic net penalty
+}}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to \emph{\code{glmnet::glmnet}}.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Goodness of fit measures including lambda and R-squared
+\item \emph{\code{coefs}} - Regularized coefficient estimates
+}
 }
 \description{
-Fit regularized generalized linear model
+Fits a regularized GLM using elastic net penalties via glmnet.
 }

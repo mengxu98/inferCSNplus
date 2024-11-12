@@ -2,22 +2,25 @@
 % Please edit documentation in R/models.R
 \name{fit_cvsrm}
 \alias{fit_cvsrm}
-\title{Fit a sparse regression model}
+\title{Cross-validation for sparse regression models}
 \usage{
 fit_cvsrm(formula, data, ...)
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to the cross-validation function.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Cross-validated goodness of fit measures
+\item \emph{\code{coefs}} - Coefficients selected through cross-validation
+}
 }
 \description{
-Fit a sparse regression model
+Performs cross-validation for sparse regression models to select optimal parameters.
 }

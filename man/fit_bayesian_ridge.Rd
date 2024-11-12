@@ -2,22 +2,25 @@
 % Please edit documentation in R/models.R
 \name{fit_bayesian_ridge}
 \alias{fit_bayesian_ridge}
-\title{Fit a bayesian ridge regression model as implemented in scikit-learn (python)}
+\title{Fit a Bayesian ridge regression model via scikit-learn}
 \usage{
 fit_bayesian_ridge(formula, data, ...)
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to scikit-learn's BayesianRidge.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Model performance metrics
+\item \emph{\code{coefs}} - Coefficient estimates with uncertainty measures
+}
 }
 \description{
-Fit a bayesian ridge regression model as implemented in scikit-learn (python)
+Fits a Bayesian ridge regression model using scikit-learn's implementation.
 }

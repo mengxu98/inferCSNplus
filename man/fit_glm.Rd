@@ -7,20 +7,23 @@
 fit_glm(formula, data, family = gaussian, ...)
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{family}{A description of the error distribution and link function to be used in the model.
-See \code{\link[stats]{family}} for mode details.}
+\item{family}{A description of the error distribution and link function.
+See \emph{\code{stats::family}} for details.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to \emph{\code{stats::glm}}.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Goodness of fit measures including R-squared
+\item \emph{\code{coefs}} - Fitted coefficients with standard errors and p-values
+}
 }
 \description{
-Fit generalized linear model
+Fits a generalized linear model using standard maximum likelihood estimation.
 }

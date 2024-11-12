@@ -2,7 +2,7 @@
 % Please edit documentation in R/models.R
 \name{fit_model}
 \alias{fit_model}
-\title{Fit (regularized) generalized linear model}
+\title{Fit model}
 \usage{
 fit_model(
   formula,
@@ -15,41 +15,39 @@ fit_model(
 )
 }
 \arguments{
-\item{formula}{An object of class \code{formula} with a symbolic description
+\item{formula}{An object of class \emph{\code{formula}} with a symbolic description
 of the model to be fitted.}
 
-\item{data}{A \code{data.frame} containing the variables in the model.}
+\item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
 \item{method}{A character string indicating the method to fit the model.
+This can take any of the following choices:
 \itemize{
-\item \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
-\item \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-\item \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-\item \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
-\item \code{'bagging_ridge'} - Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-\item \code{'bayesian_ridge'} - Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-\code{\link[cli:ansi_strip]{cli::ansi_strip()}} \code{\link[stats:glm]{stats::glm()}}
-}
-\itemize{
-\item \code{'glm'}. Generalized Liner Model with \code{\link[stats]{glm}}.
-\item \code{'glmnet'}, \code{'cv.glmnet'}. Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-\item \code{'brms'}. Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-\item \code{'xgb'}. Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
-\item \code{'bagging_ridge'}. Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-\item \code{'bayesian_ridge'}. Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
+\item \emph{\code{srm}} - Sparse Regression Model
+\item \emph{\code{glm}} - Generalized Linear Model using \emph{\code{stats::glm}}
+\item \emph{\code{glmnet}}, \emph{\code{cv.glmnet}} - Regularized GLM using \emph{\code{glmnet::glmnet}}
+\item \emph{\code{brms}} - Bayesian Regression using \emph{\code{brms}} package
+\item \emph{\code{xgb}} - Gradient Boosting using \emph{\code{xgboost}}
+\item \emph{\code{bagging_ridge}} - Bagging Ridge Regression via scikit-learn
+\item \emph{\code{bayesian_ridge}} - Bayesian Ridge Regression via scikit-learn
 }}
 
-\item{family}{A description of the error distribution and link function to be used in the model.
-See \code{\link[stats]{family}} for mode details.}
+\item{family}{A description of the error distribution and link function.
+See \emph{\code{stats::family}} for details.}
 
-\item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
+\item{alpha}{The elasticnet mixing parameter, between 0 and 1.
+See \emph{\code{glmnet::glmnet}} for details.}
 
-\item{...}{Other parameters for the model fitting function.}
+\item{...}{Additional parameters passed to the underlying model fitting function.}
 }
 \value{
-A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-\code{coefs} contains the fitted coefficients.
+A list containing two data frames:
+\itemize{
+\item \emph{\code{gof}} - Goodness of fit measures
+\item \emph{\code{coefs}} - Fitted coefficients
+}
 }
 \description{
-Fit (regularized) generalized linear model
+Fits various types of regression models including generalized linear models,
+regularized models, Bayesian models, and machine learning approaches.
 }

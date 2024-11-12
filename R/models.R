@@ -1,48 +1,62 @@
-#' @title Fit (regularized) generalized linear model
+#' @title Fit model
+#'
+#' @description
+#' Fits various types of regression models including generalized linear models,
+#' regularized models, Bayesian models, and machine learning approaches.
 #'
 #' @md
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
+#'
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
 #' @param method A character string indicating the method to fit the model.
-#' 
-#' * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
-#' 
-#' * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-#' * \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-#' * \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
-#' * \code{'bagging_ridge'} - Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-#' * \code{'bayesian_ridge'} - Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-#' [cli::ansi_strip()] [stats::glm()] 
+#' This can take any of the following choices:
 #'
-#' - \code{'glm'}. Generalized Liner Model with \code{\link[stats]{glm}}.
-#' 
-#' - \code{'glmnet'}, \code{'cv.glmnet'}. Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-#' 
-#' - \code{'brms'}. Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-#' 
-#' - \code{'xgb'}. Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
-#' 
-#' - \code{'bagging_ridge'}. Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-#' - \code{'bayesian_ridge'}. Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-#' 
-#' 
-#' @param family A description of the error distribution and link function to be used in the model.
-#' See \code{\link[stats]{family}} for mode details.
-#' @param alpha The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.
-#' @param ... Other parameters for the model fitting function.
+#' * *`srm`* - Sparse Regression Model
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' * *`glm`* - Generalized Linear Model using *`stats::glm`*
+#'
+#' * *`glmnet`*, *`cv.glmnet`* - Regularized GLM using *`glmnet::glmnet`*
+#'
+#' * *`brms`* - Bayesian Regression using *`brms`* package
+#'
+#' * *`xgb`* - Gradient Boosting using *`xgboost`*
+#'
+#' * *`bagging_ridge`* - Bagging Ridge Regression via scikit-learn
+#'
+#' * *`bayesian_ridge`* - Bayesian Ridge Regression via scikit-learn
+#'
+#' @param family A description of the error distribution and link function.
+#' See *`stats::family`* for details.
+#'
+#' @param alpha The elasticnet mixing parameter, between 0 and 1.
+#' See *`glmnet::glmnet`* for details.
+#'
+#' @param ... Additional parameters passed to the underlying model fitting function.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Goodness of fit measures
+#' * *`coefs`* - Fitted coefficients
 #'
 #' @export
 fit_model <- function(
     formula,
     data,
-    method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge", "bayesian_ridge"),
+    method = c(
+      "srm",
+      "glm",
+      "glmnet",
+      "cv.glmnet",
+      "brms",
+      "xgb",
+      "bagging_ridge",
+      "bayesian_ridge"
+    ),
     family = gaussian,
     alpha = 1,
-    ...) {
+    ...
+  ) {
   # Match args
   method <- match.arg(method)
   result <- switch(method,
@@ -59,15 +73,22 @@ fit_model <- function(
   return(result)
 }
 
-#' Fit a sparse regression model
+#' @title Fit a sparse regression model
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a sparse regression model using specialized algorithms for high-dimensional data.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param ... Additional parameters passed to the underlying sparse regression function.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Goodness of fit measures
+#' * *`coefs`* - Fitted coefficients with sparse structure
 #'
 #' @export
 fit_srm <- function(
@@ -120,16 +141,22 @@ fit_srm <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-
-#' Fit a sparse regression model
+#' @title Cross-validation for sparse regression models
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Performs cross-validation for sparse regression models to select optimal parameters.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param ... Additional parameters passed to the cross-validation function.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Cross-validated goodness of fit measures
+#' * *`coefs`* - Coefficients selected through cross-validation
 #'
 #' @export
 fit_cvsrm <- function(
@@ -213,17 +240,25 @@ fit_cvsrm <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-#' Fit generalized linear model
+#' @title Fit generalized linear model
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a generalized linear model using standard maximum likelihood estimation.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param family A description of the error distribution and link function to be used in the model.
-#' See \code{\link[stats]{family}} for mode details.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param family A description of the error distribution and link function.
+#' See *`stats::family`* for details.
+#'
+#' @param ... Additional parameters passed to *`stats::glm`*.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Goodness of fit measures including R-squared
+#' * *`coefs`* - Fitted coefficients with standard errors and p-values
 #'
 #' @export
 fit_glm <- function(
@@ -248,18 +283,30 @@ fit_glm <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-#' Fit regularized generalized linear model
+#' @title Fit regularized generalized linear model
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a regularized GLM using elastic net penalties via glmnet.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param family A description of the error distribution and link function to be used in the model.
-#' See \code{\link[stats]{family}} for mode details.
-#' @param alpha The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param family A description of the error distribution and link function.
+#' See *`stats::family`* for details.
+#'
+#' @param alpha The elasticnet mixing parameter, between 0 and 1:
+#' * *`alpha = 1`*: Lasso penalty
+#' * *`alpha = 0`*: Ridge penalty
+#' * *`0 < alpha < 1`*: Elastic net penalty
+#'
+#' @param ... Additional parameters passed to *`glmnet::glmnet`*.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Goodness of fit measures including lambda and R-squared
+#' * *`coefs`* - Regularized coefficient estimates
 #'
 #' @export
 fit_glmnet <- function(
@@ -292,19 +339,28 @@ fit_glmnet <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-
-#' Cross-validation for regularized generalized linear models
+#' @title Cross-validation for regularized generalized linear models
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Performs cross-validation to select optimal regularization parameters for GLMnet models.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param family A description of the error distribution and link function to be used in the model.
-#' See \code{\link[stats]{family}} for mode details.
-#' @param alpha The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param family A description of the error distribution and link function.
+#' See *`stats::family`* for details.
+#'
+#' @param alpha The elasticnet mixing parameter, between 0 and 1.
+#' See *`glmnet::glmnet`* for details.
+#'
+#' @param ... Additional parameters passed to *`glmnet::cv.glmnet`*.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Cross-validated performance metrics
+#' * *`coefs`* - Coefficients selected by cross-validation
 #'
 #' @export
 fit_cvglmnet <- function(
@@ -335,21 +391,29 @@ fit_cvglmnet <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-
-#' Fit a Bayesian regression model with brms and Stan
+#' @title Fit a Bayesian regression model with brms and Stan
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a Bayesian regression model using the brms interface to Stan.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param family A description of the error distribution and link function to be used in the model.
-#' See \code{\link[stats]{family}} for mode details.
-#' @param prior The prior distribution of the coefficients.
-#' See \code{\link[brms]{set_prior}} for mode details.
-#' The default (\code{prior(normal(0,1))}) results in ridge regularization.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param family A description of the error distribution and link function.
+#' See *`stats::family`* for details.
+#'
+#' @param prior The prior distribution specification for coefficients.
+#' Default *`normal(0,1)`* provides ridge-like regularization.
+#' See *`brms::set_prior`* for details.
+#'
+#' @param ... Additional parameters passed to *`brms::brm`*.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Bayesian R-squared and model fit metrics
+#' * *`coefs`* - Posterior estimates with uncertainty intervals
 #'
 #' @export
 fit_brms <- function(
@@ -386,19 +450,31 @@ fit_brms <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-
-#' Fit a gradient boosting regression model with XGBoost
+#' @title Fit a gradient boosting regression model with XGBoost
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a gradient boosted tree model using the XGBoost implementation.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param params A list with model parameters. For details, see \code{\link[xgboost]{xgb.train}}
-#' @param nrounds Max number of boosting iterations.
-#' @param nthread nthread.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param params A list of XGBoost parameters including:
+#' * *`max_depth`* - Maximum tree depth
+#' * *`eta`* - Learning rate
+#' * *`objective`* - Loss function to optimize
+#'
+#' @param nrounds Maximum number of boosting iterations.
+#'
+#' @param nthread Number of parallel threads used (-1 for all cores).
+#'
+#' @param ... Additional parameters passed to *`xgboost::xgboost`*.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Model performance metrics
+#' * *`coefs`* - Feature importance measures
 #'
 #' @export
 fit_xgb <- function(
@@ -442,21 +518,40 @@ fit_xgb <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-#' Fit a bagging ridge regression model as implemented in scikit-learn (python)
+#' @title Fit a bagging ridge regression model via scikit-learn
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits an ensemble of ridge regression models using scikit-learn's BaggingRegressor.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param alpha Positive float indicating the regularization strength.
-#' @param solver Solver to use in the computational routines.
-#' Options include ‘auto’, ‘svd’, ‘cholesky’, ‘lsqr’, ‘sparse_cg’, ‘sag’, ‘saga’.
-#' @param bagging_number The number of ridge regression model in the bagging.
-#' @param n_jobs The number of cores used to fit the model.
-#' @param p_method The test used to calculate p-values. Options are 't' for \code{t.test}, and 'wilcox' for \code{wilcox.test}
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param alpha Positive float specifying the regularization strength.
+#'
+#' @param solver Algorithm to use for optimization:
+#' * *`auto`* - Automatically chosen based on data
+#' * *`svd`* - Singular Value Decomposition
+#' * *`cholesky`* - Cholesky decomposition
+#' * *`lsqr`* - Least Squares
+#' * *`sparse_cg`* - Conjugate Gradient for sparse matrices
+#' * *`sag`*, *`saga`* - Stochastic Average Gradient descent
+#'
+#' @param bagging_number Number of base estimators in ensemble.
+#'
+#' @param n_jobs Number of parallel jobs (-1 for all cores).
+#'
+#' @param p_method Method for calculating p-values:
+#' * *`t`* - Student's t-test
+#' * *`wilcox`* - Wilcoxon test
+#'
+#' @param ... Additional parameters passed to scikit-learn.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Ensemble model performance metrics
+#' * *`coefs`* - Aggregated coefficient estimates with p-values
 #'
 #' @export
 fit_bagging_ridge <- function(
@@ -535,16 +630,22 @@ fit_bagging_ridge <- function(
   return(list(gof = gof, coefs = coefs))
 }
 
-
-#' Fit a bayesian ridge regression model as implemented in scikit-learn (python)
+#' @title Fit a Bayesian ridge regression model via scikit-learn
 #'
-#' @param formula An object of class \code{formula} with a symbolic description
+#' @description
+#' Fits a Bayesian ridge regression model using scikit-learn's implementation.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#' @param data A \code{data.frame} containing the variables in the model.
-#' @param ... Other parameters for the model fitting function.
 #'
-#' @return A list with two data frames: \code{gof} contains goodness of fit measures of the fit and
-#' \code{coefs} contains the fitted coefficients.
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param ... Additional parameters passed to scikit-learn's BayesianRidge.
+#'
+#' @return A list containing two data frames:
+#' * *`gof`* - Model performance metrics
+#' * *`coefs`* - Coefficient estimates with uncertainty measures
 #'
 #' @export
 fit_bayesian_ridge <- function(
