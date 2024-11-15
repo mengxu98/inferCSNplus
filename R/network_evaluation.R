@@ -240,7 +240,7 @@ calculate_metrics <- function(
       ggplot(aes(x = x, y = y)) +
       geom_line(color = line_color, linewidth = line_width) +
       labs(
-        title = auprc,
+        title = paste("AUPRC:", auprc),
         x = "Recall",
         y = "Precision"
       ) +
@@ -257,6 +257,9 @@ calculate_metrics <- function(
       geom_text(aes(label = count), color = "white") +
       scale_fill_gradient(low = "#4ECDC4", high = "#FF6B6B") +
       theme_minimal() +
+      labs(
+        title = "Confusion Matrix"
+      ) +
       theme(legend.position = "none") +
       coord_fixed()
 
@@ -268,7 +271,9 @@ calculate_metrics <- function(
           x = target,
           fill = type
         ),
-        color = "white"
+        color = "white",
+        width = 0.9,
+        height = 0.9
       ) +
       scale_fill_manual(values = c(
         "Predicted Only" = "#FF6B6B",
@@ -282,10 +287,17 @@ calculate_metrics <- function(
         x = "Target"
       ) +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.x = element_text(
+          angle = 45,
+          hjust = 1,
+          vjust = 1,
+          size = 7
+        ),
+        axis.text.y = element_text(size = 7),
         legend.position = "bottom",
         legend.title = element_blank(),
-        panel.grid = element_line(color = "gray95")
+        panel.grid = element_line(color = "gray95"),
+        plot.margin = margin(b = 20)
       ) +
       coord_fixed()
 
@@ -346,9 +358,13 @@ calculate_metrics <- function(
         y = "Count"
       ) +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.x = element_text(angle = 30, hjust = 1),
         legend.position = "bottom",
         legend.title = element_blank()
+      ) +
+      scale_y_continuous(
+        expand = expansion(mult = c(0, 0.1)),
+        limits = function(x) c(0, max(x) * 1.05)
       )
 
     ratio_metrics <- data.frame(
@@ -364,7 +380,7 @@ calculate_metrics <- function(
     ) +
       geom_bar(stat = "identity", fill = line_color, alpha = 0.8) +
       geom_text(aes(label = Value),
-        vjust = -0.5, size = 3
+        vjust = -0.5
       ) +
       theme_minimal() +
       labs(
@@ -373,7 +389,10 @@ calculate_metrics <- function(
         y = "Score"
       ) +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1)
+        axis.text.x = element_text(angle = 30, hjust = 1)
+      ) +
+      scale_y_continuous(
+        expand = expansion(mult = c(0, 0.1))
       )
 
     final_plot <- patchwork::wrap_plots(
@@ -384,7 +403,7 @@ calculate_metrics <- function(
       ncol = 3,
       nrow = 2,
       widths = c(1, 1, 1),
-      heights = c(1, 0.8)
+      heights = c(1, 1)
     )
 
     print(final_plot)
