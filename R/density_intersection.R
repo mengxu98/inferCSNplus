@@ -3,7 +3,7 @@
 #' @param meta_data meta_data
 #' @param cluster_list cluster_list
 #' @param method method
-#' @param cluster_by cluster_by
+#' @param celltype_by celltype_by
 #' @param group_column group_column
 #' @param pseudotime_column pseudotime_column
 #' @param min_cells min_cells
@@ -53,7 +53,7 @@ density_points <- function(
     meta_data,
     cluster_list = NULL,
     method = "combine",
-    cluster_by = NULL,
+    celltype_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
     min_cells = 100,
@@ -73,12 +73,12 @@ density_points <- function(
   meta_data <- meta_data[, c("cluster", "pseudotime")]
 
   if (is.null(cluster_list)) {
-    cluster_by <- unique(meta_data$cluster)
+    celltype_by <- unique(meta_data$cluster)
   } else{
-    cluster_by <- unique(unlist(cluster_list))
+    celltype_by <- unique(unlist(cluster_list))
   }
   meta_data <- purrr::map_dfr(
-    cluster_by, function(x) {
+    celltype_by, function(x) {
       res <- dplyr::filter(meta_data, cluster == x)
       if (nrow(res) >= min_cells) {
         return(res)
@@ -381,7 +381,7 @@ density_points <- function(
 #' @param meta_data meta_data
 #' @param cluster_list cluster_list
 #' @param bin_points bin_points
-#' @param cluster_by cluster_by
+#' @param celltype_by celltype_by
 #' @param group_column group_column
 #' @param pseudotime_column pseudotime_column
 #' @param min_cells min_cells
@@ -394,7 +394,7 @@ dynamic_windowing <- function(
     meta_data,
     bin_points = NULL,
     cluster_list = NULL,
-    cluster_by = NULL,
+    celltype_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
     min_cells = 100,
@@ -409,22 +409,22 @@ dynamic_windowing <- function(
   meta_data <- meta_data[, c("cluster", "pseudotime", "cells")]
 
   if (is.null(cluster_list)) {
-    cluster_by <- unique(meta_data$cluster)
+    celltype_by <- unique(meta_data$cluster)
   } else{
-    cluster_by <- unique(unlist(cluster_list))
+    celltype_by <- unique(unlist(cluster_list))
   }
   meta_data <- purrr::map_dfr(
-    cluster_by, function(x) {
+    celltype_by, function(x) {
       res <- filter(meta_data, cluster == x)
       if (nrow(res) >= min_cells) {
         return(res)
       }
     }
   )
-  cluster_by <- unique(meta_data$cluster)
+  celltype_by <- unique(meta_data$cluster)
 
   res <- purrr::map_dfr(
-    cluster_by, function(x) {
+    celltype_by, function(x) {
       meta_data_sub <- dplyr::filter(meta_data, cluster == x)
       pseudotime <- meta_data_sub$pseudotime
       xlim <- c(min(pseudotime), max(pseudotime))

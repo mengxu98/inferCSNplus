@@ -8,7 +8,7 @@ density_points(
   meta_data,
   cluster_list = NULL,
   method = "combine",
-  cluster_by = NULL,
+  celltype_by = NULL,
   group_column = "cluster",
   pseudotime_column = "pseudotime",
   min_cells = 100,
@@ -27,7 +27,7 @@ density_points(
 
 \item{method}{method}
 
-\item{cluster_by}{cluster_by}
+\item{celltype_by}{celltype_by}
 
 \item{group_column}{group_column}
 

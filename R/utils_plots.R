@@ -1,40 +1,223 @@
-#' Removes legend from plot.
+#' @include setGenerics.R
+
+#' @param p_thresh Float indicating the significance threshold on the adjusted p-value.
+#' @param rsq_thresh Float indicating the \eqn{R^2} threshold on the adjusted p-value.
+#' @param nvar_thresh Integer indicating the minimum number of variables in the model.
+#' @param min_genes_per_module Integer indicating the minimum number of genes in a module.
+#' @param xgb_method Method to get modules from xgb models
+#' * \code{'tf'} - Choose top targets for each TF.
+#' * \code{'target'} - Choose top TFs for each target gene.
+#' @param xgb_top Interger indicating how many top targets/TFs to return.
+#' @param verbose Print messages.
 #'
+#' @return A Network object.
+#'
+#' @rdname find_modules
 #' @export
-no_legend <- function() {
-  theme(
-    legend.position = "none"
+#' @method find_modules Network
+find_modules.Network <- function(
+    object,
+    p_thresh = 0.05,
+    rsq_thresh = 0.1,
+    nvar_thresh = 10,
+    min_genes_per_module = 5,
+    xgb_method = c("tf", "target"),
+    xgb_top = 50,
+    verbose = TRUE,
+    ...) {
+  fit_method <- NetworkParams(object)$method
+  xgb_method <- match.arg(xgb_method)
+
+  if (!fit_method %in% c("srm", "glm", "cv.glmnet", "glmnet", "brms", "xgb")) {
+    stop(
+      paste0(
+        'find_modules() is not yet implemented for "',
+        fit_method,
+        '" models'
+      )
+    )
+  }
+
+  models_use <- metrics(object) %>%
+    dplyr::filter(rsq > rsq_thresh & nvariables > nvar_thresh) %>%
+    dplyr::pull(target) %>%
+    unique()
+
+  modules <- coef(object) %>%
+    dplyr::filter(target %in% models_use)
+
+  if (fit_method %in% c("srm", "cv.glmnet", "glmnet")) {
+    modules <- modules %>%
+      dplyr::filter(coefficient != 0)
+  } else if (fit_method == "xgb") {
+    modules <- modules %>%
+      dplyr::group_by_at(xgb_method) %>%
+      dplyr::top_n(xgb_top, gain) %>%
+      dplyr::mutate(coefficient = sign(corr) * gain)
+  } else {
+    modules <- modules %>%
+      dplyr::filter(ifelse(is.na(padj), T, padj < p_thresh))
+  }
+
+  modules <- modules %>%
+    dplyr::group_by(target) %>%
+    dplyr::mutate(nvars = dplyr::n()) %>%
+    dplyr::group_by(target, tf) %>%
+    dplyr::mutate(tf_sites_per_gene = dplyr::n()) %>%
+    dplyr::group_by(target) %>%
+    dplyr::mutate(
+      tf_per_gene = length(unique(tf)),
+      peak_per_gene = length(unique(region))
+    ) %>%
+    dplyr::group_by(tf) %>%
+    dplyr::mutate(gene_per_tf = length(unique(target))) %>%
+    dplyr::group_by(target, tf)
+
+  if (fit_method %in% c("srm", "cv.glmnet", "glmnet", "xgb")) {
+    modules <- modules %>%
+      dplyr::reframe(
+        coefficient = sum(coefficient),
+        n_regions = peak_per_gene,
+        n_genes = gene_per_tf,
+        n_tfs = tf_per_gene,
+        regions = paste(region, collapse = ";")
+      )
+  } else {
+    modules <- modules %>%
+      dplyr::reframe(
+        coefficient = sum(coefficient),
+        n_regions = peak_per_gene,
+        n_genes = gene_per_tf,
+        n_tfs = tf_per_gene,
+        regions = paste(region, collapse = ";"),
+        pval = min(pval),
+        padj = min(padj)
+      )
+  }
+
+  modules <- modules %>%
+    dplyr::distinct() %>%
+    dplyr::arrange(tf)
+
+  module_pos <- modules %>%
+    dplyr::filter(coefficient > 0) %>%
+    dplyr::group_by(tf) %>%
+    dplyr::filter(dplyr::n() > min_genes_per_module) %>%
+    dplyr::group_split() %>%
+    {
+      names(.) <- purrr::map_chr(., function(x) x$tf[[1]])
+      .
+    } %>%
+    purrr::map(function(x) x$target)
+
+  module_neg <- modules %>%
+    dplyr::filter(coefficient < 0) %>%
+    dplyr::group_by(tf) %>%
+    dplyr::filter(dplyr::n() > min_genes_per_module) %>%
+    dplyr::group_split() %>%
+    {
+      names(.) <- purrr::map_chr(., function(x) x$tf[[1]])
+      .
+    } %>%
+    purrr::map(function(x) x$target)
+
+  regions_pos <- modules %>%
+    dplyr::filter(coefficient > 0) %>%
+    dplyr::group_by(tf) %>%
+    dplyr::filter(dplyr::n() > min_genes_per_module) %>%
+    dplyr::group_split() %>%
+    {
+      names(.) <- purrr::map_chr(., function(x) x$tf[[1]])
+      .
+    } %>%
+    purrr::map(function(x) unlist(stringr::str_split(x$regions, ";")))
+
+  regions_neg <- modules %>%
+    dplyr::filter(coefficient < 0) %>%
+    dplyr::group_by(tf) %>%
+    dplyr::filter(dplyr::n() > min_genes_per_module) %>%
+    dplyr::group_split() %>%
+    {
+      names(.) <- purrr::map_chr(., function(x) x$tf[[1]])
+      .
+    } %>%
+    purrr::map(function(x) unlist(stringr::str_split(x$regions, ";")))
+
+  module_feats <- list(
+    "genes_pos" = module_pos,
+    "genes_neg" = module_neg,
+    "regions_pos" = regions_pos,
+    "regions_neg" = regions_neg
   )
+
+  log_message(
+    "Found ", length(unique(modules$tf)), " TF modules",
+    verbose = verbose
+  )
+
+  module_meta <- dplyr::select(
+    modules,
+    tf,
+    target,
+    tidyselect::everything()
+  )
+  object@modules@meta <- module_meta
+  object@modules@features <- module_feats
+  object@modules@params <- list(
+    p_thresh = p_thresh,
+    rsq_thresh = rsq_thresh,
+    nvar_thresh = nvar_thresh,
+    min_genes_per_module = min_genes_per_module
+  )
+
+  return(object)
 }
 
-#' Removes margins from plot.
+#' @param object An object.
+#' @param network Name of the network to use.
+#'
+#' @rdname find_modules
+#' @method find_modules CSNObject
 #'
 #' @export
-no_margin <- function() {
-  theme(
-    plot.margin = margin(0, 0, 0, 0, unit = "lines")
+#' @return A CSNObject object.
+find_modules.CSNObject <- function(
+    object,
+    network = DefaultNetwork(object),
+    p_thresh = 0.05,
+    rsq_thresh = 0.1,
+    nvar_thresh = 10,
+    min_genes_per_module = 5,
+    ...) {
+  params <- Params(object)
+  regions <- NetworkRegions(object)
+  net_obj <- GetNetwork(object, network = network)
+  net_obj <- find_modules(
+    net_obj,
+    p_thresh = p_thresh,
+    rsq_thresh = rsq_thresh,
+    nvar_thresh = nvar_thresh,
+    min_genes_per_module = min_genes_per_module
   )
-}
+  modules <- NetworkModules(net_obj)
 
+  reg2peaks <- rownames(
+    GetAssay(object, assay = params$peak_assay)
+  )[regions@peaks]
+  names(reg2peaks) <- Signac::GRangesToString(regions@ranges)
+  peaks_pos <- modules@features$regions_pos %>%
+    purrr::map(
+      function(x) unique(reg2peaks[x])
+    )
+  peaks_neg <- modules@features$regions_neg %>%
+    purrr::map(
+      function(x) unique(reg2peaks[x])
+    )
+  modules@features[["peaks_pos"]] <- peaks_pos
+  modules@features[["peaks_neg"]] <- peaks_neg
+  object@csn@networks[[network]]@modules <- modules
 
-#' Removes x axis text.
-#'
-#' @export
-no_x_text <- function() {
-  theme(
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-  )
-}
-
-#' Removes y axis text.
-#'
-#' @export
-no_y_text <- function() {
-  theme(
-    axis.text.y = element_blank(),
-    axis.ticks.y = element_blank()
-  )
+  return(object)
 }
 
 #' Compute UMAP embedding
@@ -63,7 +246,6 @@ get_umap <- function(
   return(umap_tbl)
 }
 
-
 #' Plot goodness-of-fit metrics.
 #'
 #' @param object An object.
@@ -86,11 +268,13 @@ plot_gof.CSNObject <- function(
     stop("No modules found, please run `find_modules()` first.")
   }
 
-  gof <- gof(object, network = network) %>%
+  metrics <- metrics(object, network = network) %>%
     dplyr::filter(rsq <= 1, rsq >= 0) %>%
-    dplyr::mutate(nice = rsq > module_params$rsq_thresh & nvariables > module_params$nvar_thresh)
+    dplyr::mutate(
+      nice = rsq > module_params$rsq_thresh & nvariables > module_params$nvar_thresh
+    )
 
-  p1 <- ggplot(gof, aes(rsq, nvariables, alpha = nice)) +
+  p1 <- ggplot(metrics, aes(rsq, nvariables, alpha = nice)) +
     ggpointdensity::geom_pointdensity(size = point_size, shape = 16) +
     geom_hline(
       yintercept = module_params$nvar_thresh,
@@ -119,13 +303,23 @@ plot_gof.CSNObject <- function(
       strip.text = element_blank()
     )
 
-  p2 <- ggplot(gof, aes(rsq)) +
-    geom_histogram(fill = "darkgray", bins = 20, color = "black", size = 0.2) +
+  p2 <- ggplot(metrics, aes(rsq)) +
+    geom_histogram(
+      fill = "darkgray",
+      bins = 20,
+      color = "black",
+      size = 0.2
+    ) +
     theme_void() +
     no_legend()
 
-  p3 <- ggplot(gof, aes(nvariables)) +
-    geom_histogram(fill = "darkgray", bins = 20, color = "black", size = 0.2) +
+  p3 <- ggplot(metrics, aes(nvariables)) +
+    geom_histogram(
+      fill = "darkgray",
+      bins = 20,
+      color = "black",
+      size = 0.2
+    ) +
     scale_x_continuous(
       trans = scales::pseudo_log_trans(base = 10),
       breaks = c(0, 1, 10, 100, 1000, 10000, 100000)
@@ -259,7 +453,11 @@ get_network_graph.CSNObject <- function(
   }
 
   if (is.null(features)) {
-    features <- NetworkFeatures(object, network = network)
+    features <- get_attribute(
+      object,
+      attribute = "targets",
+      active_network = network
+    )
   }
 
   if (umap_method == "weighted") {
@@ -286,8 +484,8 @@ get_network_graph.CSNObject <- function(
       }
 
     reg_mat <- gene_net %>%
-      dplyr::select(target, tf, estimate) %>%
-      tidyr::pivot_wider(names_from = tf, values_from = estimate, values_fill = 0) %>%
+      dplyr::select(target, tf, coefficient) %>%
+      tidyr::pivot_wider(names_from = tf, values_from = coefficient, values_fill = 0) %>%
       tibble::column_to_rownames("target") %>%
       as.matrix()
 
@@ -296,7 +494,12 @@ get_network_graph.CSNObject <- function(
     reg_factor_mat <- abs(reg_mat) + 1
     coex_mat <- gene_cor[rownames(reg_factor_mat), colnames(reg_factor_mat)] * sqrt(reg_factor_mat)
   } else if (umap_method == "corr") {
-    net_features <- NetworkFeatures(object, network = network)
+    net_features <- get_attribute(
+      object,
+      celltypes = NULL,
+      attribute = "targets",
+      active_network = network
+    )
     rna_expr <- t(LayerData(object, assay = rna_assay, layer = rna_layer))
 
     if (!is.null(features)) {
@@ -333,8 +536,8 @@ get_network_graph.CSNObject <- function(
       dplyr::group_by(target)
 
     coex_mat <- gene_net %>%
-      dplyr::select(target, tf, estimate) %>%
-      tidyr::pivot_wider(names_from = tf, values_from = estimate, values_fill = 0) %>%
+      dplyr::select(target, tf, coefficient) %>%
+      tidyr::pivot_wider(names_from = tf, values_from = coefficient, values_fill = 0) %>%
       tibble::column_to_rownames("target") %>%
       as.matrix()
   } else if (umap_method == "none" | is.null(umap_method)) {
@@ -349,7 +552,7 @@ get_network_graph.CSNObject <- function(
     gene_graph <- tidygraph::as_tbl_graph(gene_net) %>%
       tidygraph::activate(edges) %>%
       dplyr::mutate(from_node = tidygraph::.N()$name[from], to_node = tidygraph::.N()$name[to]) %>%
-      dplyr::mutate(dir = sign(estimate)) %>%
+      dplyr::mutate(dir = sign(coefficient)) %>%
       tidygraph::activate(nodes) %>%
       dplyr::mutate(centrality = tidygraph::centrality_pagerank())
 
@@ -365,7 +568,7 @@ get_network_graph.CSNObject <- function(
   gene_graph <- tidygraph::as_tbl_graph(gene_net) %>%
     tidygraph::activate(edges) %>%
     dplyr::mutate(from_node = tidygraph::.N()$name[from], to_node = tidygraph::.N()$name[to]) %>%
-    dplyr::mutate(dir = sign(estimate)) %>%
+    dplyr::mutate(dir = sign(coefficient)) %>%
     tidygraph::activate(nodes) %>%
     dplyr::mutate(centrality = tidygraph::centrality_pagerank()) %>%
     dplyr::inner_join(coex_umap, by = c("name" = "gene"))
@@ -502,7 +705,12 @@ get_tf_network.CSNObject <- function(
   gene_graph_nodes <- gene_graph %N>% tibble::as_tibble()
 
   if (is.null(features)) {
-    features <- NetworkFeatures(object, network = network)
+    features <- get_attribute(
+      object,
+      celltypes = NULL,
+      attribute = "targets",
+      active_network = network
+    )
   }
 
   features <- intersect(features, gene_graph_nodes$name)
@@ -535,11 +743,11 @@ get_tf_network.CSNObject <- function(
       tibble::as_tibble()
 
     edg_dir <- edg_graph %>%
-      dplyr::pull(estimate) %>%
+      dplyr::pull(coefficient) %>%
       sign() %>%
       prod()
     edg_est <- edg_graph %>%
-      dplyr::pull(estimate) %>%
+      dplyr::pull(coefficient) %>%
       mean()
     path_df <- tibble::tibble(
       start_node = edg[1],

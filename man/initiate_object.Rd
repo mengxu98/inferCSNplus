@@ -4,47 +4,88 @@
 \alias{initiate_object}
 \alias{initiate_object.Seurat}
 \alias{initiate_object.CSNObject}
-\title{Initiate the \code{RegulatoryNetwork} object}
+\title{Initiate the \code{CSNObject} object}
 \usage{
 initiate_object(object, ...)
 
 \method{initiate_object}{Seurat}(
   object,
-  regions = NULL,
+  celltype = NULL,
+  celltype_by = NULL,
+  filter_mode = c("variable", "celltype", "all"),
+  filter_by = c("all", "celltype"),
   rna_assay = "RNA",
-  peak_assay = "peaks",
+  rna_min_pct = 0.1,
+  rna_logfc_threshold = 0.25,
+  rna_test_method = "wilcox",
+  n_variable_genes = 2000,
+  peak_assay = NULL,
+  peak_min_pct = 0.05,
+  peak_logfc_threshold = 0.1,
+  peak_test_method = "LR",
+  n_variable_peaks = "q5",
+  regions = NULL,
   exclude_exons = TRUE,
+  only_pos = TRUE,
+  verbose = TRUE,
+  p_value = 0.05,
   ...
 )
 
-\method{initiate_object}{CSNObject}(
-  object,
-  regions = NULL,
-  peak_assay = "peaks",
-  rna_assay = "RNA",
-  exclude_exons = TRUE,
-  ...
-)
+\method{initiate_object}{CSNObject}(object, ...)
 }
 \arguments{
-\item{object}{The input data, a seurat object.}
+\item{object}{A Seurat object containing gene expression and/or chromatin accessibility data.}
 
-\item{...}{Arguments for other methods}
+\item{...}{Additional arguments passed to marker detection functions.}
 
-\item{regions}{Candidate regions to consider for binding site inference.
-If \code{NULL}, all peaks regions are considered.}
+\item{celltype}{Selected celltype(s) to analyze. If NULL, all cells will be used.}
+
+\item{celltype_by}{Column name in Seurat meta.data for cell type information.
+If NULL, all cells will be treated as one group.}
+
+\item{filter_mode}{Filter mode for identifying cell-type specific features.}
+
+\item{filter_by}{Character. When filter_mode is "variable",
+specify whether to calculate variable features using "all" cells or by "celltype".
+Default is "all".}
 
 \item{rna_assay}{A character vector indicating the name of the gene expression
 assay in the \code{Seurat} object.}
 
+\item{rna_min_pct}{Minimum percentage of cells expressing the gene in either population.}
+
+\item{rna_logfc_threshold}{Minimum log fold-change threshold for RNA data.}
+
+\item{rna_test_method}{Statistical test to use for gene markers identification.}
+
+\item{n_variable_genes}{Number of variable features to select when not comparing between groups.}
+
 \item{peak_assay}{A character vector indicating the name of the chromatin
-accessibility assay in the \code{Seurat} object.}
+accessibility assay in the \code{Seurat} object. If NULL, only RNA-seq data will be processed.}
+
+\item{peak_min_pct}{Minimum percentage of cells expressing the peak in either population.}
+
+\item{peak_logfc_threshold}{Minimum log fold-change threshold for peak data.}
+
+\item{peak_test_method}{Statistical test to use for peak markers identification.}
+
+\item{n_variable_peaks}{Number of variable peaks to select ("q5" by default).}
+
+\item{regions}{Candidate regions to consider for binding site inference.
+If \code{NULL}, all peaks regions are considered.}
 
 \item{exclude_exons}{Logical. Whether to consider exons for binding site inference.}
+
+\item{only_pos}{Only return positive markers.}
+
+\item{verbose}{Print progress messages.}
+
+\item{p_value}{Significance level threshold for filtering features (default: 0.05).}
 }
 \value{
-A CSNObject object containing a RegulatoryNetwork object.
+CSNObject object.
 }
 \description{
-Initiate the \code{RegulatoryNetwork} object
+Initiate the \code{CSNObject} object
 }

@@ -54,7 +54,7 @@ single_network <- function(
   x <- matrix[, regulators]
   y <- matrix[, target]
 
-  coefficients <- sparse_regression(
+  result <- sparse_regression(
     x, y,
     cross_validation = cross_validation,
     seed = seed,
@@ -66,9 +66,11 @@ single_network <- function(
     r_threshold = r_threshold,
     verbose = verbose,
     ...
-  ) |> normalization(
-    method = "sum", ...
   )
+
+  coefficients <- result$coefficients$coefficient |>
+    normalization(method = "unit_vector", ...)
+
   if (length(coefficients) != ncol(x)) {
     coefficients <- rep(0, ncol(x))
   }
@@ -88,7 +90,7 @@ single_network <- function(
 #' @inheritParams single_network
 #' @param x The matrix of regulators.
 #' @param y The vector of target.
-#' @param computation_method The method used to compute `r``.
+#' @param computation_method The method used to compute `r` value.
 #'
 #' @md
 #'
@@ -113,6 +115,8 @@ sparse_regression <- function(
     computation_method = "cor",
     verbose = TRUE,
     ...) {
+  # TODO:
+  # how to handle computation_method in CSNObject and other objects compatible?
   if (cross_validation) {
     fit <- try(
       fit_sparse_regression(
@@ -147,7 +151,13 @@ sparse_regression <- function(
         )
       )
       if (any(class(fit) == "try-error")) {
-        return(rep(0, ncol(x)))
+        return(list(
+          metrics = list(rsq = 0),
+          coefficients = list(
+            variable = colnames(x),
+            coefficient = rep(0, ncol(x))
+          )
+        ))
       }
       fit_inf <- print(fit)
       lambda <- fit_inf$lambda[which.max(fit_inf$suppSize)]
@@ -180,7 +190,13 @@ sparse_regression <- function(
       )
     )
     if (any(class(fit) == "try-error")) {
-      return(rep(0, ncol(x)))
+      return(list(
+        metrics = list(rsq = 0),
+        coefficients = list(
+          variable = colnames(x),
+          coefficient = rep(0, ncol(x))
+        )
+      ))
     }
     fit_inf <- print(fit)
     lambda <- fit_inf$lambda[which.max(fit_inf$suppSize)]
@@ -208,22 +224,34 @@ sparse_regression <- function(
       r <- 0
     }
   } else {
-    return(rep(0, ncol(x)))
+    return(list(
+      metrics = list(rsq = 0),
+      coefficients = list(
+        variable = colnames(x),
+        coefficient = rep(0, ncol(x))
+      )
+    ))
   }
 
   if (r >= r_threshold) {
-    return(
-      as.vector(
-        coef(
-          fit,
-          lambda = lambda,
-          gamma = gamma
-        )
-      )[-1]
-    )
+    coefficients <- as.vector(
+      coef(
+        fit,
+        lambda = lambda,
+        gamma = gamma
+      )
+    )[-1]
   } else {
-    return(rep(0, ncol(x)))
+    coefficients <- rep(0, ncol(x))
   }
+
+  return(list(
+    metrics = list(rsq = r),
+    coefficients = list(
+      variable = colnames(x),
+      coefficient = coefficients
+    )
+  ))
 }
 
 #' @title Fit a sparse regression model

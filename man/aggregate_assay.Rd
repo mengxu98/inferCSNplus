@@ -4,7 +4,13 @@
 \alias{aggregate_assay}
 \title{Aggregate Seurat assay over groups}
 \usage{
-aggregate_assay(object, group_name, fun = "mean", assay = "RNA", slot = "data")
+aggregate_assay(
+  object,
+  group_name,
+  fun = "mean",
+  assay = "RNA",
+  layer = "data"
+)
 }
 \arguments{
 \item{object}{The csn object.}
@@ -15,7 +21,7 @@ aggregate_assay(object, group_name, fun = "mean", assay = "RNA", slot = "data")
 
 \item{assay}{The assay to summarize.}
 
-\item{slot}{The slot to summarize.}
+\item{layer}{The layer to summarize.}
 }
 \value{
 A Seurat object.

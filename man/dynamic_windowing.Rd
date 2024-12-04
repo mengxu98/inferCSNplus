@@ -8,7 +8,7 @@ dynamic_windowing(
   meta_data,
   bin_points = NULL,
   cluster_list = NULL,
-  cluster_by = NULL,
+  celltype_by = NULL,
   group_column = "cluster",
   pseudotime_column = "pseudotime",
   min_cells = 100,
@@ -23,7 +23,7 @@ dynamic_windowing(
 
 \item{cluster_list}{cluster_list}
 
-\item{cluster_by}{cluster_by}
+\item{celltype_by}{celltype_by}
 
 \item{group_column}{group_column}
 

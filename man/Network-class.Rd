@@ -3,25 +3,27 @@
 \docType{class}
 \name{Network-class}
 \alias{Network-class}
-\alias{Network}
 \title{The Network class}
 \description{
 The Network object stores the inferred network itself, information about the fitting
-process as well as graph representations of the network.
+ process as well as graph representations of the network.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{modules}}{A list TF modules.}
 
-\item{\code{features}}{A named list containing the transcription factors and
-target genes included in the network.}
+\item{\code{regulators}}{A named list containing the transcription factors included in the network.}
+
+\item{\code{targets}}{A named list containing the target genes included in the network.}
 
 \item{\code{fit}}{A dataframe with goodness of fit measures.}
 
-\item{\code{coefs}}{A dataframe with the fitted coefficients.}
+\item{\code{coefficients}}{A dataframe with the fitted coefficients.}
 
 \item{\code{graphs}}{Graphical representations of the inferred network.}
+
+\item{\code{network}}{A dataframe containing the network edges and their properties.}
 
 \item{\code{params}}{A named list with GRN inference parameters.}
 }}

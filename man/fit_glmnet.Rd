@@ -27,8 +27,8 @@ See \emph{\code{stats::family}} for details.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Goodness of fit measures including lambda and R-squared
-\item \emph{\code{coefs}} - Regularized coefficient estimates
+\item \emph{\code{metrics}} - Goodness of fit measures including lambda and R-squared
+\item \emph{\code{coefficients}} - Regularized coefficient estimates
 }
 }
 \description{

@@ -23,10 +23,6 @@
 #'
 #' * *`xgb`* - Gradient Boosting using *`xgboost`*
 #'
-#' * *`bagging_ridge`* - Bagging Ridge Regression via scikit-learn
-#'
-#' * *`bayesian_ridge`* - Bayesian Ridge Regression via scikit-learn
-#'
 #' @param family A description of the error distribution and link function.
 #' See *`stats::family`* for details.
 #'
@@ -36,8 +32,8 @@
 #' @param ... Additional parameters passed to the underlying model fitting function.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Goodness of fit measures
-#' * *`coefs`* - Fitted coefficients
+#' * *`metrics`* - Goodness of fit measures
+#' * *`coefficients`* - Fitted coefficients
 #'
 #' @export
 fit_model <- function(
@@ -49,25 +45,35 @@ fit_model <- function(
       "glmnet",
       "cv.glmnet",
       "brms",
-      "xgb",
-      "bagging_ridge",
-      "bayesian_ridge"
+      "xgb"
     ),
     family = gaussian,
     alpha = 1,
-    ...
-  ) {
-  # Match args
+    ...) {
   method <- match.arg(method)
   result <- switch(method,
-    "srm" = fit_srm(formula, data, ...),
-    "glm" = fit_glm(formula, data, family = family, ...),
-    "glmnet" = fit_glmnet(formula, data, family = family, alpha = alpha, ...),
-    "cv.glmnet" = fit_cvglmnet(formula, data, family = family, alpha = alpha, ...),
-    "brms" = fit_brms(formula, data, family = family, ...),
-    "xgb" = fit_xgb(formula, data, ...),
-    "bagging_ridge" = fit_bagging_ridge(formula, data, alpha = alpha, ...),
-    "bayesian_ridge" = fit_bayesian_ridge(formula, data, ...)
+    "srm" = fit_srm(
+      formula, data, ...
+    ),
+    "glm" = fit_glm(
+      formula, data,
+      family = family, ...
+    ),
+    "glmnet" = fit_glmnet(
+      formula, data,
+      family = family, alpha = alpha, ...
+    ),
+    "cv.glmnet" = fit_cvglmnet(
+      formula, data,
+      family = family, alpha = alpha, ...
+    ),
+    "brms" = fit_brms(
+      formula, data,
+      family = family, ...
+    ),
+    "xgb" = fit_xgb(
+      formula, data, ...
+    )
   )
 
   return(result)
@@ -81,16 +87,18 @@ fit_model <- function(
 #' @md
 #' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
-#'
 #' @param data A *`data.frame`* containing the variables in the model.
-#'
 #' @param ... Additional parameters passed to the underlying sparse regression function.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Goodness of fit measures
-#' * *`coefs`* - Fitted coefficients with sparse structure
+#' * *`metrics`* - Goodness of fit measures
+#' * *`coefficients`* - Fitted coefficients with sparse structure
 #'
 #' @export
+#' @examples
+#' data("example_matrix")
+#' df <- as.data.frame(example_matrix)
+#' fit_srm(g1 ~ ., data = df)
 fit_srm <- function(
     formula,
     data,
@@ -101,143 +109,52 @@ fit_srm <- function(
   )[, -1]
   response <- data[[formula[[2]]]]
 
-  fit <- fit_sparse_regression(
-    model_mat,
-    response,
+  result <- sparse_regression(
+    x = model_mat,
+    y = response,
     ...
   )
-  fit_inf <- print(fit)
-  lambda <- fit_inf$lambda[which.max(fit_inf$suppSize)]
-  gamma <- fit_inf$gamma[which.max(fit_inf$suppSize)]
 
-  y_pred <- predict(
-    fit,
-    newx = model_mat,
-    gamma = gamma,
-    lambda = lambda
-  )
-  gof <- tibble::tibble(
-    rsq = r2(response, y_pred)
-  )
-  coefs <- as.vector(
-    coef(
-      fit,
-      lambda = lambda,
-      gamma = gamma
-    )
-  )[-1]
-  coefs <- normalization(coefs, method = "sum")
-  if (length(coefs) != ncol(model_mat)) {
-    coefs <- rep(0, ncol(model_mat))
-  }
-  coefs <- tibble::as_tibble(
-    cbind(
-      as.data.frame(colnames(model_mat)),
-      as.data.frame(coefs)
-    )
-  )
-  colnames(coefs) <- c("term", "estimate")
-
-  return(list(gof = gof, coefs = coefs))
+  return(result)
 }
 
 #' @title Cross-validation for sparse regression models
 #'
 #' @description
-#' Performs cross-validation for sparse regression models to select optimal parameters.
+#' Fits a sparse regression model with cross-validation.
 #'
-#' @md
-#' @param formula An object of class *`formula`* with a symbolic description
-#' of the model to be fitted.
-#'
-#' @param data A *`data.frame`* containing the variables in the model.
-#'
-#' @param ... Additional parameters passed to the cross-validation function.
+#' @inheritParams fit_srm
+#' @param verbose If `TRUE`, show warning messages.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Cross-validated goodness of fit measures
-#' * *`coefs`* - Coefficients selected through cross-validation
+#' * `metrics` - Goodness of fit measures
+#' * `coefficients` - Fitted coefficients with sparse structure
 #'
 #' @export
+#' @examples
+#' data("example_matrix")
+#' df <- as.data.frame(example_matrix)
+#' fit_cvsrm(g1 ~ ., data = df)
 fit_cvsrm <- function(
     formula,
     data,
+    verbose = TRUE,
     ...) {
-  model_mat <- stats::model.matrix(formula, data = data)[, -1]
+  model_mat <- stats::model.matrix(
+    formula,
+    data = data
+  )[, -1]
   response <- data[[formula[[2]]]]
 
-  regulators_num <- ncol(model_mat)
-  fit <- try(
-    fit_sparse_regression(
-      model_mat, response,
-      cross_validation = TRUE,
-      seed = 1,
-      n_folds = 10
-    )
+  result <- sparse_regression(
+    x = model_mat,
+    y = response,
+    cross_validation = TRUE,
+    verbose = verbose,
+    ...
   )
 
-  if (any(class(fit) == "try-error")) {
-    if (verbose) message("Cross validation error, used fit instead.")
-    fit <- try(
-      fit_sparse_regression(
-        model_mat, response,
-        penalty = penalty,
-        algorithm = algorithm,
-        regulators_num = regulators_num
-      )
-    )
-    if (any(class(fit) == "try-error")) {
-      return(rep(0, ncol(model_mat)))
-    }
-    fit_inf <- print(fit)
-    lambda <- fit_inf$lambda[which.max(fit_inf$suppSize)]
-    gamma <- fit_inf$gamma[which.max(fit_inf$suppSize)]
-  } else {
-    gamma <- fit$fit$gamma[which(
-      unlist(lapply(
-        fit$cvMeans, min
-      )) == min(unlist(lapply(fit$cvMeans, min)))
-    )]
-    lambda_list <- dplyr::filter(print(fit), gamma == gamma)
-    if (regulators_num %in% lambda_list$regulators_num) {
-      lambda <- lambda_list$regulators_num[which(
-        lambda_list$regulators_num == regulators_num
-      )]
-    } else {
-      lambda <- min(lambda_list$lambda)
-    }
-  }
-
-  y_pred <- predict(
-    fit,
-    newx = model_mat,
-    gamma = gamma,
-    lambda = lambda
-  )
-  gof <- tibble::tibble(
-    rsq = r2(response, y_pred)
-  )
-  coefs <- as.vector(
-    coef(
-      fit,
-      lambda = lambda,
-      gamma = gamma
-    )
-  )[-1]
-  coefs <- normalization(coefs, method = "sum")
-  if (length(coefs) != ncol(model_mat)) {
-    coefs <- rep(0, ncol(model_mat))
-  }
-  coefs <- tibble::as_tibble(
-    cbind(
-      as.data.frame(colnames(model_mat)),
-      as.data.frame(coefs)
-    )
-  )
-
-  colnames(coefs) <- c("term", "estimate")
-
-  return(list(gof = gof, coefs = coefs))
+  return(result)
 }
 
 #' @title Fit generalized linear model
@@ -257,8 +174,8 @@ fit_cvsrm <- function(
 #' @param ... Additional parameters passed to *`stats::glm`*.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Goodness of fit measures including R-squared
-#' * *`coefs`* - Fitted coefficients with standard errors and p-values
+#' * *`metrics`* - Goodness of fit measures including R-squared
+#' * *`coefficients`* - Fitted coefficients with standard errors and p-values
 #'
 #' @export
 fit_glm <- function(
@@ -275,12 +192,22 @@ fit_glm <- function(
     )
   )
   s <- summary(fit)
-  gof <- tibble::tibble(
+  metrics <- tibble::tibble(
     rsq = with(s, 1 - deviance / null.deviance)
   )
-  coefs <- tibble::as_tibble(s$coefficients, rownames = "term")
-  colnames(coefs) <- c("term", "estimate", "std_err", "statistic", "pval")
-  return(list(gof = gof, coefs = coefs))
+  coefficients <- tibble::as_tibble(
+    s$coefficients,
+    rownames = "variable"
+  )
+  colnames(coefficients) <- c(
+    "variable", "coefficient", "std_err", "statistic", "pval"
+  )
+  return(
+    list(
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
 }
 
 #' @title Fit regularized generalized linear model
@@ -305,8 +232,8 @@ fit_glm <- function(
 #' @param ... Additional parameters passed to *`glmnet::glmnet`*.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Goodness of fit measures including lambda and R-squared
-#' * *`coefs`* - Regularized coefficient estimates
+#' * *`metrics`* - Goodness of fit measures including lambda and R-squared
+#' * *`coefficients`* - Regularized coefficient estimates
 #'
 #' @export
 fit_glmnet <- function(
@@ -325,18 +252,18 @@ fit_glmnet <- function(
   class(fit) <- "glmnet"
   which_max <- which(fit$dev.ratio > max(fit$dev.ratio) * 0.95)[1]
   lambda_choose <- fit$lambda[which_max]
-  gof <- tibble::tibble(
+  metrics <- tibble::tibble(
     lambda = lambda_choose,
     rsq = fit$dev.ratio[which_max],
     alpha = alpha
   )
-  coefs <- tibble::as_tibble(
+  coefficients <- tibble::as_tibble(
     as.matrix(coef(fit, s = lambda_choose)),
-    rownames = "term"
+    rownames = "variable"
   )
-  colnames(coefs) <- c("term", "estimate")
+  colnames(coefficients) <- c("variable", "coefficient")
 
-  return(list(gof = gof, coefs = coefs))
+  return(list(metrics = metrics, coefficients = coefficients))
 }
 
 #' @title Cross-validation for regularized generalized linear models
@@ -359,8 +286,8 @@ fit_glmnet <- function(
 #' @param ... Additional parameters passed to *`glmnet::cv.glmnet`*.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Cross-validated performance metrics
-#' * *`coefs`* - Coefficients selected by cross-validation
+#' * *`metrics`* - Cross-validated performance metrics
+#' * *`coefficients`* - Coefficients selected by cross-validation
 #'
 #' @export
 fit_cvglmnet <- function(
@@ -378,17 +305,17 @@ fit_cvglmnet <- function(
   )
   class(fit) <- "cv.glmnet"
   which_max <- fit$index["1se", ]
-  gof <- tibble::tibble(
+  metrics <- tibble::tibble(
     lambda = fit$lambda.1se,
     rsq = fit$glmnet.fit$dev.ratio[which_max],
     alpha = alpha
   )
-  coefs <- tibble::as_tibble(
+  coefficients <- tibble::as_tibble(
     as.matrix(coef(fit)),
-    rownames = "term"
+    rownames = "variable"
   )
-  colnames(coefs) <- c("term", "estimate")
-  return(list(gof = gof, coefs = coefs))
+  colnames(coefficients) <- c("variable", "coefficient")
+  return(list(metrics = metrics, coefficients = coefficients))
 }
 
 #' @title Fit a Bayesian regression model with brms and Stan
@@ -412,8 +339,8 @@ fit_cvglmnet <- function(
 #' @param ... Additional parameters passed to *`brms::brm`*.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Bayesian R-squared and model fit metrics
-#' * *`coefs`* - Posterior estimates with uncertainty intervals
+#' * *`metrics`* - Bayesian R-squared and model fit metrics
+#' * *`coefficients`* - Posterior estimates with uncertainty intervals
 #'
 #' @export
 fit_brms <- function(
@@ -436,18 +363,18 @@ fit_brms <- function(
       ...
     )
   )
-  gof <- tibble::tibble(
+  metrics <- tibble::tibble(
     rsq = as.matrix(brms::bayes_R2(fit))[, "Estimate"]
   )
-  coefs <- tibble::as_tibble(
+  coefficients <- tibble::as_tibble(
     as.matrix(
       brms::fixef(fit, probs = c(0.05, 0.95))
     ),
-    rownames = "term"
+    rownames = "variable"
   )
-  colnames(coefs) <- c("term", "estimate", "est_error", "q5", "q95")
-  coefs$pval <- bayestestR::p_map(fit)$p_MAP
-  return(list(gof = gof, coefs = coefs))
+  colnames(coefficients) <- c("variable", "coefficient", "est_error", "q5", "q95")
+  coefficients$pval <- bayestestR::p_map(fit)$p_MAP
+  return(list(metrics = metrics, coefficients = coefficients))
 }
 
 #' @title Fit a gradient boosting regression model with XGBoost
@@ -473,8 +400,8 @@ fit_brms <- function(
 #' @param ... Additional parameters passed to *`xgboost::xgboost`*.
 #'
 #' @return A list containing two data frames:
-#' * *`gof`* - Model performance metrics
-#' * *`coefs`* - Feature importance measures
+#' * *`metrics`* - Model performance metrics
+#' * *`coefficients`* - Feature importance measures
 #'
 #' @export
 fit_xgb <- function(
@@ -503,184 +430,17 @@ fit_xgb <- function(
     ...
   )
   y_pred <- predict(fit, newdata = model_mat)
-  gof <- tibble::tibble(
-    rsq = r2(response, y_pred)
+  metrics <- tibble::tibble(
+    rsq = r_square(response, y_pred)
   )
-  coefs <- tibble::as_tibble(
+  coefficients <- tibble::as_tibble(
     as.data.frame(
       xgboost::xgb.importance(
         model = fit
       )
     )
   )
-  colnames(coefs) <- c("term", "gain", "cover", "frequency")
+  colnames(coefficients) <- c("variable", "gain", "cover", "frequency")
 
-  return(list(gof = gof, coefs = coefs))
-}
-
-#' @title Fit a bagging ridge regression model via scikit-learn
-#'
-#' @description
-#' Fits an ensemble of ridge regression models using scikit-learn's BaggingRegressor.
-#'
-#' @md
-#' @param formula An object of class *`formula`* with a symbolic description
-#' of the model to be fitted.
-#'
-#' @param data A *`data.frame`* containing the variables in the model.
-#'
-#' @param alpha Positive float specifying the regularization strength.
-#'
-#' @param solver Algorithm to use for optimization:
-#' * *`auto`* - Automatically chosen based on data
-#' * *`svd`* - Singular Value Decomposition
-#' * *`cholesky`* - Cholesky decomposition
-#' * *`lsqr`* - Least Squares
-#' * *`sparse_cg`* - Conjugate Gradient for sparse matrices
-#' * *`sag`*, *`saga`* - Stochastic Average Gradient descent
-#'
-#' @param bagging_number Number of base estimators in ensemble.
-#'
-#' @param n_jobs Number of parallel jobs (-1 for all cores).
-#'
-#' @param p_method Method for calculating p-values:
-#' * *`t`* - Student's t-test
-#' * *`wilcox`* - Wilcoxon test
-#'
-#' @param ... Additional parameters passed to scikit-learn.
-#'
-#' @return A list containing two data frames:
-#' * *`gof`* - Ensemble model performance metrics
-#' * *`coefs`* - Aggregated coefficient estimates with p-values
-#'
-#' @export
-fit_bagging_ridge <- function(
-    formula,
-    data,
-    alpha = 1,
-    solver = "auto",
-    bagging_number = 200L,
-    n_jobs = 1,
-    p_method = c("wilcox", "t"),
-    ...) {
-  p_method <- match.arg(p_method)
-  if (!requireNamespace("reticulate", quietly = TRUE)) {
-    stop("The reticulate package is required to use bagging ridge models.")
-  }
-  np <- reticulate::import("numpy")
-  pd <- reticulate::import("pandas")
-  sklearn <- reticulate::import("sklearn")
-
-  model_mat <- stats::model.matrix(formula, data = data)[, -1]
-  if (is.null(ncol(model_mat))) {
-    stop("The bagging ridge model requires at least two variables.")
-  }
-  response <- data[[formula[[2]]]]
-
-  model <- sklearn$ensemble$BaggingRegressor(
-    base_estimator = sklearn$linear_model$Ridge(
-      alpha = alpha,
-      solver = solver,
-      random_state = as.integer(123),
-      ...
-    ),
-    n_estimators = as.integer(bagging_number),
-    bootstrap = TRUE,
-    max_features = 0.8,
-    n_jobs = as.integer(n_jobs),
-    verbose = FALSE
-  )
-  model <- model$fit(model_mat, response)
-
-  idx_features <- do.call(cbind, model$estimators_features_) + 1
-  coefs_features <- sapply(model$estimators_, function(x) x$coef_)
-  coefs <- t(sapply(1:bagging_number, function(i) {
-    coefs <- stats::setNames(rep(NaN, ncol(model_mat)), colnames(model_mat))
-    if (ncol(model_mat) > 2) {
-      coefs[idx_features[, i]] <- coefs_features[, i]
-    }
-    if (ncol(model_mat) == 2) {
-      coefs[idx_features[, i]] <- coefs_features[i]
-    }
-    return(coefs)
-  }))
-  p <- switch(p_method,
-    "t" = apply(
-      coefs, 2, function(x) {
-        stats::t.test(x[!is.nan(x)])$p.value
-      }
-    ),
-    "wilcox" = apply(
-      coefs, 2, function(x) {
-        stats::wilcox.test(x[!is.nan(x)])$p.value
-      }
-    )
-  )
-  coefs <- tibble::tibble(
-    term = colnames(model_mat),
-    estimate = colMeans(coefs, na.rm = TRUE),
-    pval = p,
-    neglog10p = -log10(ifelse(is.na(p), 1, p))
-  )
-  y_pred <- model_mat %*% matrix(coefs$estimate)
-  gof <- tibble::tibble(
-    rsq = r2(response, y_pred)
-  )
-
-  return(list(gof = gof, coefs = coefs))
-}
-
-#' @title Fit a Bayesian ridge regression model via scikit-learn
-#'
-#' @description
-#' Fits a Bayesian ridge regression model using scikit-learn's implementation.
-#'
-#' @md
-#' @param formula An object of class *`formula`* with a symbolic description
-#' of the model to be fitted.
-#'
-#' @param data A *`data.frame`* containing the variables in the model.
-#'
-#' @param ... Additional parameters passed to scikit-learn's BayesianRidge.
-#'
-#' @return A list containing two data frames:
-#' * *`gof`* - Model performance metrics
-#' * *`coefs`* - Coefficient estimates with uncertainty measures
-#'
-#' @export
-fit_bayesian_ridge <- function(
-    formula,
-    data,
-    ...) {
-  if (!requireNamespace("reticulate", quietly = TRUE)) {
-    stop("The reticulate package is required to use bayesian ridge models.")
-  }
-  np <- reticulate::import("numpy")
-  pd <- reticulate::import("pandas")
-  sklearn <- reticulate::import("sklearn")
-
-  model_mat <- stats::model.matrix(formula, data = data)[, -1]
-  if (is.null(ncol(model_mat))) {
-    stop("The bayesian ridge model requires at least two variables.")
-  }
-  response <- data[[formula[[2]]]]
-
-  model <- sklearn$linear_model$BayesianRidge(...)
-  model <- model$fit(model_mat, response)
-
-  coefs <- model$coef_
-  coef_var <- diag(model$sigma_)
-  p <- stats::pnorm(q = 0, mean = abs(coefs), sd = sqrt(coef_var)) * 2
-  coefs <- tibble::tibble(
-    term = colnames(model_mat),
-    estimate = coefs,
-    est_variance = coef_var,
-    pval = p,
-    neglog10p = -log10(ifelse(is.na(p), 1, p))
-  )
-  gof <- tibble::tibble(
-    rsq = model$score(model_mat, response)
-  )
-
-  return(list(gof = gof, coefs = coefs))
+  return(list(metrics = metrics, coefficients = coefficients))
 }

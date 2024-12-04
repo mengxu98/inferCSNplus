@@ -133,8 +133,8 @@ dynamic_genes.Seurat <- function(
 #'
 #' @param object properly normalized expression matrix
 #' @param meta_data sample table that includes pseudotime, rownames = cells, and a group column
-#' @param cluster_by vector of group names to include
-#' @param group_column column name in meta_data annotating groups in the cluster_by
+#' @param celltype_by vector of group names to include
+#' @param group_column column name in meta_data annotating groups in the celltype_by
 #' @param pseudotime_column column name in meta_data annotating pseudotime or latent time
 #' @param cores cores
 #'
@@ -144,7 +144,7 @@ dynamic_genes.Seurat <- function(
 findDynGenes <- function(
     object,
     meta_data,
-    cluster_by = NULL,
+    celltype_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
     cores = 1) {
@@ -154,12 +154,12 @@ findDynGenes <- function(
   meta_data$cluster <- meta_data[, group_column]
   meta_data$cells <- rownames(meta_data)
 
-  if (is.null(cluster_by)) {
-    cluster_by <- unique(meta_data[, group_column])
+  if (is.null(celltype_by)) {
+    celltype_by <- unique(meta_data[, group_column])
   }
 
   meta_data <- purrr::map_dfr(
-    cluster_by, function(x) {
+    celltype_by, function(x) {
       filter(meta_data, cluster == x)
     }
   )
@@ -198,8 +198,8 @@ findDynGenes <- function(
 #'
 #' @param object properly normalized expression matrix
 #' @param meta_data sample table that includes pseudotime, rownames = cells, and a group column
-#' @param cluster_by vector of group names to include
-#' @param group_column column name in meta_data annotating groups in the cluster_by
+#' @param celltype_by vector of group names to include
+#' @param group_column column name in meta_data annotating groups in the celltype_by
 #' @param pseudotime_column column name in meta_data annotating pseudotime or latent time
 #' @param min_cells min cells
 #' @param p_value p_value = 0.05
@@ -212,7 +212,7 @@ findDynGenes <- function(
 dynamic_genes_new <- function(
     object,
     meta_data,
-    cluster_by = NULL,
+    celltype_by = NULL,
     group_column = "cluster",
     pseudotime_column = "pseudotime",
     min_cells = 100,
@@ -232,9 +232,9 @@ dynamic_genes_new <- function(
     min_cells = min_cells
   )
 
-  cluster_by <- names(meta_data_list)
+  celltype_by <- names(meta_data_list)
   dynamic_genes_list <- purrr::map(
-    cluster_by, function(x) {
+    celltype_by, function(x) {
       cluster <- x
       x <- meta_data_list[[x]]
       if (is.null(x)) {
@@ -267,7 +267,7 @@ dynamic_genes_new <- function(
     }
   )
 
-  names(dynamic_genes_list) <- cluster_by
+  names(dynamic_genes_list) <- celltype_by
 
   meta_data_list <- meta_data_list[!purrr::map_lgl(meta_data_list, is.null)]
   dynamic_genes_list <- dynamic_genes_list[!purrr::map_lgl(dynamic_genes_list, is.null)]
@@ -518,7 +518,7 @@ assign_epochs_new1 <- function(
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
         t <- stats::t.test(chunk[gene, ], background[gene, ])
-        res <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        res <- data.frame(gene = gene, mean_diff = (t$coefficient[1] - t$coefficient[2]), pval = t$p.value)
         diffres <- rbind(diffres, res)
       }
 
@@ -671,7 +671,7 @@ assign_network <- function(
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
         t <- stats::t.test(chunk[gene, ], background[gene, ])
-        res <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        res <- data.frame(gene = gene, mean_diff = (t$coefficient[1] - t$coefficient[2]), pval = t$p.value)
         diffres <- rbind(diffres, res)
       }
 

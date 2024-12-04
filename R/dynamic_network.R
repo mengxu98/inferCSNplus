@@ -456,7 +456,7 @@ assign_epochs <- function(
       diffres <- data.frame(gene = character(), mean_diff = double(), pval = double())
       for (gene in rownames(exp)) {
         t <- stats::t.test(chunk[gene, ], background[gene, ])
-        ans <- data.frame(gene = gene, mean_diff = (t$estimate[1] - t$estimate[2]), pval = t$p.value)
+        ans <- data.frame(gene = gene, mean_diff = (t$coefficient[1] - t$coefficient[2]), pval = t$p.value)
         diffres <- rbind(diffres, ans)
       }
 

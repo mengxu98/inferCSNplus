@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #' @title ***inferCSN***: **infer**ring **C**ell-**S**pecific gene regulatory **N**etwork
 #'
 #' @description

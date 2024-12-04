@@ -1,28 +1,458 @@
-#' @param regions Candidate regions to consider for binding site inference.
-#' If \code{NULL}, all peaks regions are considered.
+#' @param object A Seurat object containing gene expression and/or chromatin accessibility data.
+#' @param celltype Selected celltype(s) to analyze. If NULL, all cells will be used.
+#' @param celltype_by Column name in Seurat meta.data for cell type information.
+#' If NULL, all cells will be treated as one group.
+#' @param filter_mode Filter mode for identifying cell-type specific features.
+#' @param filter_by Whether to calculate variable features using "all" cells or by "celltype".
 #' @param rna_assay A character vector indicating the name of the gene expression
 #' assay in the \code{Seurat} object.
+#' @param rna_min_pct Minimum percentage of cells expressing the gene in either population.
+#' @param rna_logfc_threshold Minimum log fold-change threshold for RNA data.
+#' @param rna_test_method Statistical test to use for gene markers identification.
+#' @param n_variable_genes Number of variable features to select when not comparing between groups.
 #' @param peak_assay A character vector indicating the name of the chromatin
-#' accessibility assay in the \code{Seurat} object.
+#' accessibility assay in the \code{Seurat} object. If NULL, only RNA-seq data will be processed.
+#' @param peak_min_pct Minimum percentage of cells expressing the peak in either population.
+#' @param peak_logfc_threshold Minimum log fold-change threshold for peak data.
+#' @param peak_test_method Statistical test to use for peak markers identification.
+#' @param n_variable_peaks Number of variable peaks to select ("q5" by default).
+#' @param regions Candidate regions to consider for binding site inference.
+#' If \code{NULL}, all peaks regions are considered.
 #' @param exclude_exons Logical. Whether to consider exons for binding site inference.
+#' @param only_pos Only return positive markers.
+#' @param verbose Print progress messages.
+#' @param filter_by Character. When filter_mode is "variable",
+#' specify whether to calculate variable features using "all" cells or by "celltype".
+#' Default is "all".
+#' @param p_value Significance level threshold for filtering features (default: 0.05).
+#' @param ... Additional arguments passed to marker detection functions.
 #'
-#' @return A CSNObject object containing a RegulatoryNetwork object.
+#' @return CSNObject object.
 #'
 #' @rdname initiate_object
 #' @export
 #' @method initiate_object Seurat
 initiate_object.Seurat <- function(
     object,
-    regions = NULL,
+    celltype = NULL,
+    celltype_by = NULL,
+    filter_mode = c("variable", "celltype", "all"),
+    filter_by = c("all", "celltype"),
     rna_assay = "RNA",
-    peak_assay = "peaks",
+    rna_min_pct = 0.1,
+    rna_logfc_threshold = 0.25,
+    rna_test_method = "wilcox",
+    n_variable_genes = 2000,
+    peak_assay = NULL,
+    peak_min_pct = 0.05,
+    peak_logfc_threshold = 0.1,
+    peak_test_method = "LR",
+    n_variable_peaks = "q5",
+    regions = NULL,
     exclude_exons = TRUE,
+    only_pos = TRUE,
+    verbose = TRUE,
+    p_value = 0.05,
     ...) {
+  if (!is.null(celltype_by) && celltype_by != "all") {
+    if (!celltype_by %in% colnames(object@meta.data)) {
+      stop(sprintf("Column '%s' not found in object metadata", celltype_by))
+    }
+    Seurat::Idents(object) <- celltype_by
+  } else {
+    Seurat::Idents(object) <- "all"
+  }
+
+  if (!is.null(celltype)) {
+    if (!all(celltype %in% Seurat::Idents(object))) {
+      stop("Some specified clusters not found in data")
+    }
+    object <- subset(object, idents = celltype)
+    if (length(celltype) == 1) {
+      Seurat::Idents(object) <- celltype
+    }
+  }
+
+  filter_mode <- match.arg(filter_mode)
+  filter_by <- match.arg(filter_by)
+  celltypes <- unique(Seurat::Idents(object))
+
+  Seurat::DefaultAssay(object) <- rna_assay
+  genes_markers <- process_features(
+    object = object,
+    celltypes = celltypes,
+    mode = filter_mode,
+    by = filter_by,
+    is_peak = FALSE,
+    params = list(
+      assay = rna_assay,
+      min_pct = rna_min_pct,
+      logfc_threshold = rna_logfc_threshold,
+      test_method = rna_test_method,
+      n_features = n_variable_genes,
+      only_pos = only_pos,
+      p_value = p_value
+    ),
+    verbose = verbose,
+    ...
+  )
+
+  log_message(
+    "No peak assay found.
+      Please specify the peak assay with 'peak_assay' in 'initiate_object'.",
+    verbose = verbose,
+    message_type = "warning"
+  )
+  peaks_markers <- NULL
+  if (!is.null(peak_assay)) {
+    Seurat::DefaultAssay(object) <- peak_assay
+    object$nCount_peaks <- colSums(
+      Seurat::GetAssayData(object, assay = peak_assay, layer = "data") > 0
+    )
+
+    peaks_markers <- process_features(
+      object = object,
+      celltypes = celltypes,
+      mode = filter_mode,
+      by = filter_by,
+      is_peak = TRUE,
+      params = list(
+        assay = peak_assay,
+        min_pct = peak_min_pct,
+        logfc_threshold = peak_logfc_threshold,
+        test_method = peak_test_method,
+        n_features = n_variable_peaks,
+        only_pos = only_pos,
+        latent.vars = "nCount_peaks",
+        p_value = p_value
+      ),
+      verbose = verbose,
+      ...
+    )
+  }
+
+  attributes <- process_attributes(
+    object = object,
+    celltypes = celltypes,
+    genes_markers = genes_markers,
+    peaks_markers = peaks_markers,
+    verbose = verbose,
+    p_value = p_value
+  )
+
+  regions_obj <- process_regions(
+    object = object,
+    regions = regions,
+    peak_assay = peak_assay,
+    exclude_exons = exclude_exons,
+    verbose = verbose,
+    ...
+  )
+
+  params <- list(
+    peak_assay = peak_assay,
+    rna_assay = rna_assay,
+    exclude_exons = exclude_exons,
+    filter_mode = filter_mode,
+    filter_by = filter_by
+  )
+
+  print_summary(
+    attributes,
+    celltypes,
+    peak_assay,
+    verbose
+  )
+
+  object <- methods::new(
+    Class = "CSNObject",
+    data = object,
+    metadata = list(
+      celltypes = celltypes,
+      n_celltypes = length(celltypes),
+      attributes = attributes,
+      summary = create_summary(
+        attributes,
+        celltypes,
+        peak_assay
+      )
+    ),
+    regions = regions_obj,
+    params = params
+  )
+
+  return(object)
+}
+
+process_features <- function(
+    object,
+    celltypes,
+    mode,
+    by,
+    is_peak,
+    params,
+    verbose,
+    ...) {
+  switch(
+    EXPR = mode,
+    "celltype" = process_celltype_features(
+      object,
+      celltypes,
+      is_peak,
+      params,
+      verbose,
+      ...
+    ),
+    "variable" = process_variable_features(
+      object,
+      celltypes,
+      by,
+      is_peak,
+      params,
+      verbose,
+      ...
+    ),
+    "all" = process_all_features(
+      object,
+      celltypes,
+      is_peak,
+      params
+    )
+  )
+}
+
+process_celltype_features <- function(
+    object,
+    celltypes,
+    is_peak,
+    params,
+    verbose,
+    ...) {
+  if (length(celltypes) <= 1) {
+    return(
+      process_variable_features(
+        object, celltypes, "all", is_peak, params, verbose, ...
+      )
+    )
+  }
+
+  feature_type <- if (is_peak) "peaks" else "genes"
+  log_message(
+    "Finding celltype-specific ", feature_type,
+    verbose = verbose
+  )
+
+  purrr::map_dfr(
+    celltypes, function(x) {
+      markers <- suppressWarnings(
+        Seurat::FindMarkers(
+          object = object,
+          ident.1 = x,
+          assay = params$assay,
+          min.pct = params$min_pct,
+          logfc.threshold = params$logfc_threshold,
+          test.use = params$test_method,
+          only.pos = params$only_pos,
+          verbose = FALSE,
+          ...
+        )
+      )
+
+      if (!is.null(markers) && nrow(markers) > 0) {
+        markers$celltype <- x
+        markers[[if (is_peak) "peak" else "gene"]] <- rownames(markers)
+      }
+
+      return(markers)
+    }
+  )
+}
+
+process_variable_features <- function(
+    object,
+    celltypes,
+    by,
+    is_peak,
+    params,
+    verbose,
+    ...) {
+  if (by == "all") {
+    object <- find_variable_features(
+      object,
+      is_peak,
+      params
+    )
+    var_features <- Seurat::VariableFeatures(object)
+    res <- create_feature_matrix(
+      var_features,
+      celltypes
+    )
+    return(res)
+  }
+
+  res <- purrr::map_dfr(
+    celltypes, function(x) {
+      cell_subset <- subset(object, idents = x)
+      cell_subset <- find_variable_features(
+        cell_subset,
+        is_peak,
+        params
+      )
+      var_features <- Seurat::VariableFeatures(cell_subset)
+      create_feature_matrix(var_features, x)
+    }
+  )
+  return(res)
+}
+
+process_all_features <- function(
+    object,
+    celltypes,
+    is_peak,
+    params,
+    ...) {
+  features <- rownames(
+    Seurat::GetAssayData(object, assay = params$assay)
+  )
+  res <- create_feature_matrix(features, celltypes)
+  return(res)
+}
+
+find_variable_features <- function(
+    object,
+    is_peak,
+    params) {
+  if (is_peak) {
+    Signac::FindTopFeatures(
+      object,
+      min.cutoff = params$n_features,
+      verbose = FALSE
+    )
+  } else {
+    Seurat::FindVariableFeatures(
+      object,
+      nfeatures = params$n_features,
+      verbose = FALSE
+    )
+  }
+}
+
+.create_feature_df <- function(
+    features,
+    celltype,
+    infinite_logfc = TRUE) {
+  data.frame(
+    avg_log2FC = rep(if (infinite_logfc) Inf else 1, length(features)),
+    p_val_adj = rep(0, length(features)),
+    celltype = celltype,
+    gene = features,
+    stringsAsFactors = FALSE
+  )
+}
+
+create_feature_matrix <- function(
+    features,
+    celltypes) {
+  if (length(celltypes) == 1) {
+    celltypes <- list(celltypes)
+  }
+  purrr::map_dfr(
+    celltypes,
+    ~ .create_feature_df(features, .x)
+  )
+}
+
+process_attributes <- function(
+    object,
+    celltypes,
+    genes_markers,
+    peaks_markers,
+    verbose = TRUE,
+    p_value = 0.05) {
+  res <- purrr::map(
+    celltypes, function(x) {
+      log_message(
+        "Processing results for ", x,
+        verbose = verbose
+      )
+
+      sig_genes <- filter_significant_features(
+        genes_markers, x, p_value
+      )
+      cells <- colnames(object)[Seurat::Idents(object) == x]
+      sig_peaks <- if (!is.null(peaks_markers)) {
+        filter_significant_features(peaks_markers, x, p_value)
+      } else {
+        NULL
+      }
+
+      list(
+        celltype = x,
+        cells = cells,
+        n_cells = length(cells),
+        genes = sig_genes,
+        n_genes = if (is.null(sig_genes)) 0 else nrow(sig_genes),
+        peaks = sig_peaks,
+        n_peaks = if (is.null(sig_peaks)) 0 else nrow(sig_peaks)
+      )
+    }
+  ) |>
+    purrr::set_names(celltypes)
+
+  return(res)
+}
+
+filter_significant_features <- function(
+    markers,
+    celltype,
+    p_value = 0.05) {
+  sig_features <- markers[
+    markers$celltype == celltype &
+      markers$p_val_adj < p_value,
+  ]
+  if (!is.null(sig_features) && nrow(sig_features) > 0) {
+    sig_features[order(sig_features$avg_log2FC, decreasing = TRUE), ]
+  } else {
+    sig_features
+  }
+
+  return(sig_features)
+}
+
+process_regions <- function(
+    object,
+    regions = NULL,
+    peak_assay = NULL,
+    exclude_exons = TRUE,
+    verbose = TRUE,
+    ...) {
+  if (is.null(peak_assay)) {
+    res <- methods::new(
+      Class = "Regions",
+      ranges = GenomicRanges::GRanges(
+        seqnames = character(0),
+        ranges = IRanges::IRanges(
+          start = integer(0),
+          end = integer(0)
+        )
+      ),
+      peaks = numeric(0),
+      motifs = NULL
+    )
+
+    return(res)
+  }
+
+  log_message(
+    "Processing candidate regions",
+    verbose = verbose
+  )
+
   gene_annot <- Signac::Annotation(object[[peak_assay]])
-  # Through error if NULL
   if (is.null(gene_annot)) {
     stop("Please provide a gene annotation for the ChromatinAssay.")
   }
+
   peak_ranges <- Signac::StringToGRanges(
     rownames(Seurat::GetAssay(object, assay = peak_assay))
   )
@@ -39,143 +469,107 @@ initiate_object.Seurat <- function(
     cand_ranges <- peak_ranges
   }
 
-  # Exclude exons because they are usually conserved
   if (exclude_exons) {
     exon_ranges <- gene_annot[gene_annot$type == "exon", ]
     names(exon_ranges@ranges) <- NULL
-    exon_ranges <- IRanges::intersect(exon_ranges, exon_ranges)
+    exon_ranges <- IRanges::intersect(
+      exon_ranges,
+      exon_ranges
+    )
     exon_ranges <- GenomicRanges::GRanges(
       seqnames = exon_ranges@seqnames,
       ranges = exon_ranges@ranges
     )
     cand_ranges <- GenomicRanges::subtract(
-      cand_ranges, exon_ranges,
+      cand_ranges,
+      exon_ranges,
       ignore.strand = TRUE
     ) |> unlist()
   }
 
-  # Match candidate ranges to peaks
-  peak_overlaps <- IRanges::findOverlaps(cand_ranges, peak_ranges)
+  peak_overlaps <- IRanges::findOverlaps(
+    cand_ranges,
+    peak_ranges
+  )
   peak_matches <- S4Vectors::subjectHits(peak_overlaps)
 
-  regions_obj <- methods::new(
+  res <- methods::new(
     Class = "Regions",
     ranges = cand_ranges,
     peaks = peak_matches,
     motifs = NULL
   )
 
-  params <- list(
-    peak_assay = peak_assay,
-    rna_assay = rna_assay,
-    exclude_exons = exclude_exons
+  return(res)
+}
+
+print_summary <- function(
+    attributes,
+    celltypes,
+    peak_assay,
+    verbose) {
+  log_message(
+    "Summary of cell-type specific features:",
+    verbose = verbose
+  )
+  for (ct in celltypes) {
+    attr <- attributes[[ct]]
+    if (!is.null(peak_assay)) {
+      log_message(
+        sprintf(
+          "   %s: %d cells, %d genes, %d peaks",
+          as.character(ct), attr$n_cells, attr$n_genes, attr$n_peaks
+        ),
+        verbose = verbose,
+        cli_model = FALSE
+      )
+    } else {
+      log_message(
+        sprintf(
+          "   %s: %d cells, %d genes",
+          as.character(ct), attr$n_cells, attr$n_genes
+        ),
+        verbose = verbose,
+        cli_model = FALSE
+      )
+    }
+  }
+}
+
+create_summary <- function(
+    attributes,
+    celltypes,
+    peak_assay) {
+  res <- do.call(
+    rbind,
+    lapply(
+      celltypes,
+      function(x) {
+        attr <- attributes[[x]]
+        if (!is.null(peak_assay)) {
+          data.frame(
+            celltype = x,
+            cells = attr$n_cells,
+            genes = attr$n_genes,
+            peaks = attr$n_peaks
+          )
+        } else {
+          data.frame(
+            celltype = x,
+            cells = attr$n_cells,
+            genes = attr$n_genes
+          )
+        }
+      }
+    )
   )
 
-  csn_obj <- methods::new(
-    Class = "RegulatoryNetwork",
-    regions = regions_obj,
-    params = params
-  )
-
-  object <- methods::new(
-    Class = "CSNObject",
-    csn = csn_obj,
-    data = object
-  )
-
-  return(object)
+  return(res)
 }
 
 #' @rdname initiate_object
 #' @export
 #' @method initiate_object CSNObject
-initiate_object.CSNObject <- function(
-    object,
-    regions = NULL,
-    peak_assay = "peaks",
-    rna_assay = "RNA",
-    exclude_exons = TRUE,
-    ...) {
-  initiate_object(
-    object@data,
-    regions = regions,
-    peak_assay = peak_assay,
-    rna_assay = rna_assay,
-    exclude_exons = exclude_exons,
-    ...
-  )
-}
-
-initiate_object_list.CSNObject <- function(
-    object,
-    cluster = NULL,
-    cluster_column = NULL,
-    verbose = TRUE,
-    peak_assay = "peak",
-    pfm = NULL,
-    genome = NULL) {
-  if (is.null(cluster_column)) {
-    return(inferCSN(object)) # ?
-  } else {
-    clusters <- unique(object@data@meta.data[cluster_column][, 1])
-
-    object_list <- purrr::map(
-      clusters, .f = function(x) {
-        log_message("Running for cluster: ", x, verbose = verbose)
-
-        object_sub <- subset_object(
-          object@data,
-          cluster_column = cluster_column,
-          cluster = x
-        )
-
-        object_sub <- methods::new(
-          Class = "CSNObject",
-          csn = object@csn,
-          data = object_sub
-        )
-
-        object_sub <- initiate_object(
-          object_sub,
-          peak_assay = peak_assay
-        )
-        # Scan candidate regions for TF binding motifs
-        object_sub <- find_motifs(
-          object_sub,
-          pfm = pfm,
-          genome = genome
-        )
-
-        return(object_sub)
-      }
-    )
-    names(object_list) <- clusters
-
-    object_list <- methods::new(
-      Class = "CSNObjectList",
-      data = object_list
-    )
-
-    return(object_list)
-  }
-}
-
-subset_object <- function(
-    object,
-    cluster = NULL,
-    cluster_column = NULL){
-  object[, object@meta.data[cluster_column] == cluster]
-}
-
-#' Standardize the values by rows
-#'
-#' This function standardize the values for a matrix by its rows
-#'
-#' @return a gene by cell (or pseudotime) expression matrix
-#' @author Wenpin Hou <whou10@jhu.edu>
-#' @param data a matrix.
-scale_matrix <- function(data) {
-  cm <- rowMeans(data)
-  csd <- apply(data, 1, sd)
-  (data - cm) / csd
+initiate_object.CSNObject <- function(object, ...) {
+  initiate_object(object@data, ...)
 }

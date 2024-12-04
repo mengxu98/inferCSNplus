@@ -23,22 +23,6 @@ NULL
 NULL
 
 #' @docType data
-#' @name promoter_regions_hg19
-#'
-#' @title promoter regions data
-#' @description promoter regions data
-#'
-NULL
-
-#' @docType data
-#' @name promoter_regions_hg38
-#'
-#' @title promoter regions data
-#' @description promoter regions data
-#'
-NULL
-
-#' @docType data
 #' @name EnsDb.Hsapiens.v93.annot.UCSC.hg38
 #'
 #' @title EnsDb.Hsapiens.v93.annot.UCSC.hg38

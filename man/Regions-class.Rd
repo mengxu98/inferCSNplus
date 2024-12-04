@@ -3,7 +3,6 @@
 \docType{class}
 \name{Regions-class}
 \alias{Regions-class}
-\alias{Regions}
 \title{The Regions class}
 \description{
 The Regions object stores the genomic regions that are considered by the model.
@@ -15,7 +14,7 @@ and motif matches.
 \describe{
 \item{\code{motifs}}{A \code{Motifs} object with matches of TF motifs.}
 
-\item{\code{tfs}}{tfs.}
+\item{\code{motifs2tfs}}{tfs.}
 
 \item{\code{ranges}}{A \code{GenomicRanges} object.}
 

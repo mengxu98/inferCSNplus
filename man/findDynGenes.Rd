@@ -7,7 +7,7 @@
 findDynGenes(
   object,
   meta_data,
-  cluster_by = NULL,
+  celltype_by = NULL,
   group_column = "cluster",
   pseudotime_column = "pseudotime",
   cores = 1
@@ -18,9 +18,9 @@ findDynGenes(
 
 \item{meta_data}{sample table that includes pseudotime, rownames = cells, and a group column}
 
-\item{cluster_by}{vector of group names to include}
+\item{celltype_by}{vector of group names to include}
 
-\item{group_column}{column name in meta_data annotating groups in the cluster_by}
+\item{group_column}{column name in meta_data annotating groups in the celltype_by}
 
 \item{pseudotime_column}{column name in meta_data annotating pseudotime or latent time}
 

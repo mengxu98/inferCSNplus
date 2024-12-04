@@ -17,10 +17,15 @@ of the model to be fitted.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Goodness of fit measures
-\item \emph{\code{coefs}} - Fitted coefficients with sparse structure
+\item \emph{\code{metrics}} - Goodness of fit measures
+\item \emph{\code{coefficients}} - Fitted coefficients with sparse structure
 }
 }
 \description{
 Fits a sparse regression model using specialized algorithms for high-dimensional data.
+}
+\examples{
+data("example_matrix")
+df <- as.data.frame(example_matrix)
+fit_srm(g1 ~ ., data = df)
 }

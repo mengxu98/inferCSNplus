@@ -1,3 +1,25 @@
+#' @title Initiate the \code{CSNObject} object
+#'
+#' @param object The input data, a seurat object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname initiate_object
+#' @export initiate_object
+initiate_object <- function(object, ...) {
+  UseMethod(generic = "initiate_object", object = object)
+}
+
+#' @title Scan for motifs in candidate regions
+#'
+#' @param object The input data, a csn object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname find_motifs
+#' @export find_motifs
+find_motifs <- function(object, ...) {
+  UseMethod(generic = "find_motifs", object = object)
+}
+
 #' @title Get dimensional information
 #'
 #' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
@@ -66,38 +88,7 @@ setGeneric(
   }
 )
 
-#' @title Initiate the \code{RegulatoryNetwork} object
-#'
-#' @param object The input data, a seurat object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname initiate_object
-#' @export initiate_object
-initiate_object <- function(object, ...) {
-  UseMethod(generic = "initiate_object", object = object)
-}
 
-#' @title Scan for motifs in candidate regions
-#'
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname find_motifs
-#' @export find_motifs
-find_motifs <- function(object, ...) {
-  UseMethod(generic = "find_motifs", object = object)
-}
-
-#' @title Fit models for gene expression
-#'
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname fit_models
-#' @export fit_models
-fit_models <- function(object, ...) {
-  UseMethod(generic = "fit_models", object = object)
-}
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
@@ -165,10 +156,10 @@ NetworkGraph <- function(object, ...) {
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
-#' @rdname GetGRN
-#' @export GetGRN
-GetGRN <- function(object, ...) {
-  UseMethod(generic = "GetGRN", object = object)
+#' @rdname summary_csn
+#' @export summary_csn
+summary_csn <- function(object, ...) {
+  UseMethod(generic = "summary_csn", object = object)
 }
 
 #' @param object The input data, a csn object.
@@ -178,15 +169,6 @@ GetGRN <- function(object, ...) {
 #' @export GetNetwork
 GetNetwork <- function(object, ...) {
   UseMethod(generic = "GetNetwork", object = object)
-}
-
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname NetworkFeatures
-#' @export NetworkFeatures
-NetworkFeatures <- function(object, ...) {
-  UseMethod(generic = "NetworkFeatures", object = object)
 }
 
 #' @param object The input data, a csn object.
@@ -246,10 +228,10 @@ DefaultNetwork <- function(object, ...) {
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
-#' @rdname gof
-#' @export gof
-gof <- function(object, ...) {
-  UseMethod(generic = "gof", object = object)
+#' @rdname metrics
+#' @export metrics
+metrics <- function(object, ...) {
+  UseMethod(generic = "metrics", object = object)
 }
 
 #' @title Find TF modules in regulatory network

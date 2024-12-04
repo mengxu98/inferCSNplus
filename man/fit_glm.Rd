@@ -20,8 +20,8 @@ See \emph{\code{stats::family}} for details.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Goodness of fit measures including R-squared
-\item \emph{\code{coefs}} - Fitted coefficients with standard errors and p-values
+\item \emph{\code{metrics}} - Goodness of fit measures including R-squared
+\item \emph{\code{coefficients}} - Fitted coefficients with standard errors and p-values
 }
 }
 \description{

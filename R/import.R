@@ -16,15 +16,6 @@
 NULL
 
 summary_fun <- list(
-  "mean" = sparseMatrixStats::colMeans2,
-  "median" = sparseMatrixStats::colMedians,
-  "max" = sparseMatrixStats::colMaxs,
-  "min" = sparseMatrixStats::colMins,
-  "count" = sparseMatrixStats::colCounts,
-  "any" = sparseMatrixStats::colAnys,
-  "all" = sparseMatrixStats::colAlls,
-  "sd" = sparseMatrixStats::colSds,
-  "mad" = sparseMatrixStats::colMads,
   "makeNindexFromArrayViewport" = DelayedArray::makeNindexFromArrayViewport
 )
 
@@ -58,10 +49,11 @@ utils::globalVariables(
     "edges",
     "end_node",
     "EnsDb.Hsapiens.v93.annot.UCSC.hg38",
-    "estimate",
+    "coefficient",
     "findTop",
     "from",
     "from_node",
+    "fold.enrichment",
     "g",
     "gain",
     "gene",
@@ -72,8 +64,11 @@ utils::globalVariables(
     "Interaction",
     "label_genes",
     "lda_data",
+    "mean_corr",
     "mean_estimate",
     "mean_padj",
+    "mean_weight",
+    "motif",
     "n_genes",
     "n_regions",
     "n_tfs",
@@ -90,6 +85,7 @@ utils::globalVariables(
     "penalty",
     "pseudotime",
     "pval",
+    "pvalue",
     "r2",
     "region",
     "region_",
@@ -99,6 +95,7 @@ utils::globalVariables(
     "start_node",
     "strand tf_",
     "strand",
+    "sum_weight",
     "supercell_GE",
     "target",
     "targets_num",

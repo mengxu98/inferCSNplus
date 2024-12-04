@@ -1,0 +1,70 @@
+---
+title: "usages_seurat"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{usages_seurat}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Load the necessary libraries and data.
+```{r setup}
+library(BSgenome.Hsapiens.UCSC.hg38)
+library(inferCSN)
+data(motifs)
+```
+
+Load the Seurat object and set the celltype identity.
+```{r}
+seurat_object <- readRDS(
+  "~/Study/research/_repositories/seurat_object_multiome_EN-neurons.RDS"
+)
+Seurat::Idents(seurat_object) <- "celltype"
+```
+
+Initiate the Seurat object to CSNObject without peak data.
+```{r}
+object <- initiate_object(
+  seurat_object,
+  filter_by = "all",
+  celltype_by = "celltype"
+)
+```
+
+The `find_motifs` function is used to find motifs for `CSNObject` when provided peak data. But it could run without peak data as well, and will return the object without any changes.
+```{r}
+object <- find_motifs(
+  object,
+  pfm = motifs,
+  genome = BSgenome.Hsapiens.UCSC.hg38
+)
+```
+
+The `inferCSN` function is used to infer the CSN for the given celltypes, regulators and targets.
+```{r}
+genes <- get_attribute(
+  object,
+  attribute = "genes"
+)[[1]]
+object <- inferCSN(
+  object,
+  n_cores = 1,
+  regulators = genes[1:200],
+  targets = genes[1:200]
+)
+```
+
+Export the inferred CSN as a network.
+```{r}
+networks <- export_csn(
+  object
+)
+head(networks[[1]])
+```

@@ -35,8 +35,8 @@ of the model to be fitted.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Model performance metrics
-\item \emph{\code{coefs}} - Feature importance measures
+\item \emph{\code{metrics}} - Model performance metrics
+\item \emph{\code{coefficients}} - Feature importance measures
 }
 }
 \description{

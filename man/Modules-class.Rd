@@ -3,7 +3,6 @@
 \docType{class}
 \name{Modules-class}
 \alias{Modules-class}
-\alias{Modules}
 \title{The Modules class}
 \description{
 The Modules object stores the TF modules extracted from the inferred network..

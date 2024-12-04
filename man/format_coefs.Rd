@@ -4,12 +4,12 @@
 \alias{format_coefs}
 \title{Format network coefficients}
 \usage{
-format_coefs(coefs, term = ":", adjust_method = "fdr")
+format_coefs(coefficients, variable = ":", adjust_method = "fdr")
 }
 \arguments{
-\item{coefs}{A data frame with coefficients}
+\item{coefficients}{A data frame with coefficients}
 
-\item{term}{term}
+\item{variable}{variable}
 
 \item{adjust_method}{adjust_method}
 }

@@ -6,9 +6,8 @@
 \alias{inferCSN,matrix-method}
 \alias{inferCSN,sparseMatrix-method}
 \alias{inferCSN,data.frame-method}
-\alias{inferCSN,Seurat-method}
 \alias{inferCSN,CSNObject-method}
-\alias{inferCSN,CSNObjectList-method}
+\alias{inferCSN,Seurat-method}
 \title{\strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork}
 \usage{
 inferCSN(
@@ -79,33 +78,6 @@ inferCSN(
   ...
 )
 
-\S4method{inferCSN}{Seurat}(
-  object,
-  penalty = "L0",
-  algorithm = "CD",
-  cross_validation = FALSE,
-  seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
-  subsampling_ratio = 1,
-  r_threshold = 0,
-  regulators = NULL,
-  targets = NULL,
-  cores = 1,
-  verbose = FALSE,
-  aggregate = TRUE,
-  k_neigh = 50,
-  atacbinary = TRUE,
-  max_overlap = 0.8,
-  reduction_name = NULL,
-  size_factor_normalize = FALSE,
-  genome_info = NULL,
-  high_corr_cutoff = NULL,
-  low_corr_cutoff = NULL,
-  rescued = TRUE,
-  ...
-)
-
 \S4method{inferCSN}{CSNObject}(
   object,
   penalty = "L0",
@@ -120,7 +92,7 @@ inferCSN(
   targets = NULL,
   cores = 1,
   verbose = TRUE,
-  genes = NULL,
+  celltypes = NULL,
   network_name = paste0(method, "_network"),
   peak_to_gene_method = c("Signac", "GREAT"),
   upstream = 1e+05,
@@ -128,12 +100,11 @@ inferCSN(
   extend = 1e+06,
   only_tss = FALSE,
   peak_to_gene_domains = NULL,
-  tf_cor = 0.1,
-  peak_cor = 0,
+  gene_cor_threshold = 0.1,
+  peak_cor_threshold = 0,
   aggregate_rna_col = NULL,
   aggregate_peaks_col = NULL,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge",
-    "bayesian_ridge"),
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb"),
   alpha = 0.5,
   family = "gaussian",
   interaction_term = ":",
@@ -142,7 +113,7 @@ inferCSN(
   ...
 )
 
-\S4method{inferCSN}{CSNObjectList}(
+\S4method{inferCSN}{Seurat}(
   object,
   penalty = "L0",
   algorithm = "CD",
@@ -156,26 +127,6 @@ inferCSN(
   targets = NULL,
   cores = 1,
   verbose = TRUE,
-  genes = NULL,
-  network_name = paste0(method, "_network"),
-  peak_to_gene_method = c("Signac", "GREAT"),
-  upstream = 1e+05,
-  downstream = 0,
-  extend = 1e+06,
-  only_tss = FALSE,
-  peak_to_gene_domains = NULL,
-  tf_cor = 0.1,
-  peak_cor = 0,
-  aggregate_rna_col = NULL,
-  aggregate_peaks_col = NULL,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge",
-    "bayesian_ridge"),
-  alpha = 0.5,
-  family = "gaussian",
-  interaction_term = ":",
-  adjust_method = "fdr",
-  scale = FALSE,
-  clusters = NULL,
   ...
 )
 }
@@ -213,28 +164,7 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{...}{Parameters for other methods.}
 
-\item{aggregate}{Logical, whether to aggregate the data.}
-
-\item{k_neigh}{Number of cells to be aggregated per cluster.}
-
-\item{atacbinary}{Logical, whether the aggregated scATAC-seq data need binary}
-
-\item{max_overlap}{The maximum overlapping ratio of two clusters.}
-
-\item{reduction_name}{The reduction name of extracting the cell coordinates used for aggregating.}
-
-\item{size_factor_normalize}{Logical, should accessibility values be normalized by size factor.}
-
-\item{genome_info}{Genome information.}
-
-\item{high_corr_cutoff}{atacbinary}
-
-\item{low_corr_cutoff}{atacbinary}
-
-\item{rescued}{Logical}
-
-\item{genes}{A character vector with the target genes to consider for CSN inference.
-Takes all \code{VariableFeatures} in the object per default.}
+\item{celltypes}{Character vector of cell types to infer networks for.}
 
 \item{network_name}{network_name.}
 
@@ -252,9 +182,9 @@ Only used of `peak_to_gene_method = 'GREAT'`.}
 
 \item{peak_to_gene_domains}{\code{GenomicRanges} object with regulatory regions for each gene.}
 
-\item{tf_cor}{Threshold for TF - target gene correlation.}
+\item{gene_cor_threshold}{Threshold for TF - target gene correlation.}
 
-\item{peak_cor}{Threshold for binding peak - target gene correlation.}
+\item{peak_cor_threshold}{Threshold for binding peak - target gene correlation.}
 
 \item{aggregate_rna_col}{aggregate_rna_col}
 
@@ -265,16 +195,14 @@ Only used of `peak_to_gene_method = 'GREAT'`.}
 * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
 * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
 * \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-* \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
-* \code{'bagging_ridge'} - Bagging Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.
-* \code{'bayesian_ridge'} - Bayesian Ridge Regression using scikit-learn via \link[reticulate]{reticulate}.}
+* \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.}
 
 \item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
 
 \item{family}{A description of the error distribution and link function to be used in the model.
 See \code{\link[stats]{family}} for mode details.}
 
-\item{interaction_term}{The interaction term to use in the model between TF and binding site.
+\item{interaction_term}{The interaction variable to use in the model between TF and binding site.
 * \code{'+'} for additive interaction.
 * \code{':'} for 'multiplicative' interaction.
 * \code{'*'} for crossing interaction, i.e. additive AND 'multiplicative'.
@@ -283,15 +211,11 @@ For more info, see \code{\link[stats]{formula}}}
 \item{adjust_method}{Method for adjusting p-values.}
 
 \item{scale}{Logical. Whether to z-transform the expression and accessibility matrices.}
-
-\item{clusters}{clusters.}
 }
 \value{
 A data table of regulator-target regulatory relationships
 
 A CSNObject.
-
-A CSNObject_list.
 }
 \description{
 \strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork
@@ -378,13 +302,6 @@ plot_weight_distribution(
   network_table
 ) + plot_weight_distribution(
   network_table_sparse_1
-)
-}
-\dontrun{
-data("promoter_regions_hg38")
-seurat_object <- inferCSN(
-  seurat_object,
-  genome_info = promoter_regions_hg38
 )
 }
 }

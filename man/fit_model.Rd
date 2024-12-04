@@ -7,8 +7,7 @@
 fit_model(
   formula,
   data,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "bagging_ridge",
-    "bayesian_ridge"),
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb"),
   family = gaussian,
   alpha = 1,
   ...
@@ -28,8 +27,6 @@ This can take any of the following choices:
 \item \emph{\code{glmnet}}, \emph{\code{cv.glmnet}} - Regularized GLM using \emph{\code{glmnet::glmnet}}
 \item \emph{\code{brms}} - Bayesian Regression using \emph{\code{brms}} package
 \item \emph{\code{xgb}} - Gradient Boosting using \emph{\code{xgboost}}
-\item \emph{\code{bagging_ridge}} - Bagging Ridge Regression via scikit-learn
-\item \emph{\code{bayesian_ridge}} - Bayesian Ridge Regression via scikit-learn
 }}
 
 \item{family}{A description of the error distribution and link function.
@@ -43,8 +40,8 @@ See \emph{\code{glmnet::glmnet}} for details.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Goodness of fit measures
-\item \emph{\code{coefs}} - Fitted coefficients
+\item \emph{\code{metrics}} - Goodness of fit measures
+\item \emph{\code{coefficients}} - Fitted coefficients
 }
 }
 \description{

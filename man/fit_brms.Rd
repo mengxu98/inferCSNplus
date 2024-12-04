@@ -30,8 +30,8 @@ See \emph{\code{brms::set_prior}} for details.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Bayesian R-squared and model fit metrics
-\item \emph{\code{coefs}} - Posterior estimates with uncertainty intervals
+\item \emph{\code{metrics}} - Bayesian R-squared and model fit metrics
+\item \emph{\code{coefficients}} - Posterior estimates with uncertainty intervals
 }
 }
 \description{

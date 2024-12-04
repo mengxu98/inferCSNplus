@@ -4,7 +4,7 @@
 \alias{fit_cvsrm}
 \title{Cross-validation for sparse regression models}
 \usage{
-fit_cvsrm(formula, data, ...)
+fit_cvsrm(formula, data, verbose = TRUE, ...)
 }
 \arguments{
 \item{formula}{An object of class \emph{\code{formula}} with a symbolic description
@@ -12,15 +12,20 @@ of the model to be fitted.}
 
 \item{data}{A \emph{\code{data.frame}} containing the variables in the model.}
 
-\item{...}{Additional parameters passed to the cross-validation function.}
+\item{verbose}{If `TRUE`, show warning messages.}
+
+\item{...}{Additional parameters passed to the underlying sparse regression function.}
 }
 \value{
 A list containing two data frames:
-\itemize{
-\item \emph{\code{gof}} - Cross-validated goodness of fit measures
-\item \emph{\code{coefs}} - Coefficients selected through cross-validation
-}
+* `metrics` - Goodness of fit measures
+* `coefficients` - Fitted coefficients with sparse structure
 }
 \description{
-Performs cross-validation for sparse regression models to select optimal parameters.
+Fits a sparse regression model with cross-validation.
+}
+\examples{
+data("example_matrix")
+df <- as.data.frame(example_matrix)
+fit_cvsrm(g1 ~ ., data = df)
 }

@@ -10,7 +10,7 @@ template:
 
 navbar:
   structure:
-    left:  [articles, reference, tutorials, news]
+    left:  [articles, vignettes, reference, news]
     right: [github, mengxu]
 
   components:
@@ -83,8 +83,6 @@ reference:
   - single_network
   - sparse_regression
   - fit_sparse_regression
-  - fit_bagging_ridge
-  - fit_bayesian_ridge
   - fit_brms
   - fit_cvglmnet
   - fit_cvsrm
@@ -109,28 +107,12 @@ reference:
 
 - subtitle: "RNA data processing"
 - contents:
-  - normalize.seurat.object
-  - aggregating_data
-  - as.slam.matrix
-  - as_sparse
-  - estimate.size.factors
-  - estimate.size.factors.dense
-  - estimate.size.factors.sparse
-  - estimate.t
   - aggregate_assay
   - aggregate_matrix
   - expression_ksmooth
-  - generate_aggregated_data
 
 - subtitle: "Peak data processing"
 - contents:
-  - extract_cre
-  - extract_cre.gene.links
-  - extract_links
-  - extract_network
-  - extract_nodes
-  - extract_peak.tf.links
-  - find.overlapping.coordinates
   - find_peaks_near_genes
 
 - subtitle: "Dynamic object"
@@ -144,16 +126,22 @@ reference:
 
 - subtitle: "Network processing"
 - contents:
+  - export_csn
+  - get_attribute
+  - metrics
+  - print.Network
+  - simulate_sparse_matrix
+  - subsampling
+  - summary_csn
+  - weight_sift
   - network_sift
   - add_interaction_type
   - add_type
   - DefaultNetwork
   - GetAssay
   - GetAssaySummary
-  - GetGRN
   - GetNetwork
   - LayerData
-  - NetworkFeatures
   - NetworkGraph
   - NetworkModules
   - NetworkParams
@@ -161,7 +149,6 @@ reference:
   - NetworkTFs
   - Params
   - VariableFeatures
-  - crossweight
   - define_epochs
   - define_epochs_new
   - density_points
@@ -175,7 +162,6 @@ reference:
   - compile_epochs
   - get_network_graph
   - get_tf_network
-  - gof
   - assign_epochs_simple
   - assign_epochs
   - assign_epochs_new1
@@ -196,7 +182,6 @@ reference:
   - find_motifs
   - find_targets
   - static_shortest_path
-  - scale_matrix
 
 - subtitle: "Calculate gene rank"
 - contents:
@@ -211,12 +196,10 @@ reference:
   - coef.srm
   - coef.srm_cv
   - coef.CSNObject
-  - crossweight
   - dMcast
   - edge_rank
   - fast_aggregate
   - filter_sort_matrix
-  - get.tf.gene
   - get_umap
   - ig_NiceGraph
   - ig_convertLarge
@@ -227,7 +210,6 @@ reference:
   - ig_exemplars
   - ig_scaleV
   - ig_tabToIgraph
-  - is.sparse
   - matrix_to_table
   - mean_module_expression
   - mean_subnetwork_expression
@@ -235,20 +217,15 @@ reference:
   - network_format
   - normalization
   - table_to_matrix
-  - ranges.for.coords
-  - transcript.mode
   - order_genes
   - parallelize_fun
   - pearson_correlation
-  - peaks.split
   - pre_pseudotime_matrix
   - print.logo
   - print.srm
   - print.srm_cv
-  - print.RegulatoryNetwork
   - predict.srm
   - predict.srm_cv
-  - ranges.for.coords
   - rough_hierarchy
   - sample_and_epoch_reconstruct
   - score_targets
@@ -261,19 +238,15 @@ reference:
 - contents:
   - initiate_object
   - CSNObject-class
-  - CSNObjectList-class
   - Modules-class
   - Network-class
   - Regions-class
-  - RegulatoryNetwork-class
 
-- subtitle: "Example data"
+- subtitle: "Example data and datasets"
 - contents:
   - example_matrix
   - example_ground_truth
   - example_meta_data
-  - promoter_regions_hg19
-  - promoter_regions_hg38
   - EnsDb.Hsapiens.v93.annot.UCSC.hg38
   - SCREEN.ccRE.UCSC.hg38
   - phastConsElements20Mammals.UCSC.hg38

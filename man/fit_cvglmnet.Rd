@@ -23,8 +23,8 @@ See \emph{\code{glmnet::glmnet}} for details.}
 \value{
 A list containing two data frames:
 \itemize{
-\item \emph{\code{gof}} - Cross-validated performance metrics
-\item \emph{\code{coefs}} - Coefficients selected by cross-validation
+\item \emph{\code{metrics}} - Cross-validated performance metrics
+\item \emph{\code{coefficients}} - Coefficients selected by cross-validation
 }
 }
 \description{

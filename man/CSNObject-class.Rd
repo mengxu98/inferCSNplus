@@ -3,7 +3,6 @@
 \docType{class}
 \name{CSNObject-class}
 \alias{CSNObject-class}
-\alias{CSNObject}
 \title{The CSNObject class}
 \description{
 The CSNObject object is an extended \code{Seurat} object
@@ -12,8 +11,18 @@ for the storage and analysis of Regulatory network data.
 \section{Slots}{
 
 \describe{
-\item{\code{csn}}{A named list containing \code{RegulatoryNetwork} objects with inferred networks.}
-
 \item{\code{data}}{Seurat object.}
+
+\item{\code{metadata}}{A list with metadata about the object.}
+
+\item{\code{regions}}{A \code{\linkS4class{Regions}} object containing information about
+the genomic regions included in the network.}
+
+\item{\code{networks}}{A \code{\linkS4class{Network}} object containing the inferred regulatory
+network and information about the model fit.}
+
+\item{\code{params}}{A list storing parameters for GRN inference.}
+
+\item{\code{active_network}}{A string indicating the active network.}
 }}
 

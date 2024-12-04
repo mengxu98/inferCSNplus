@@ -27,7 +27,6 @@ Imports:
     Rcpp,
     RcppArmadillo,
     RcppParallel,
-    slam,
     Signac,
     Seurat,
     SeuratObject,
@@ -45,6 +44,7 @@ Suggests:
     FNN,
     gam,
     gatepoints,
+    GenomeInfoDb,
     gganimate,
     gtools,
     grDevices,
@@ -57,7 +57,6 @@ Suggests:
     progress,
     scales,
     slingshot,
-    sparseMatrixStats,
     bayestestR,
     brms,
     cowplot,
@@ -69,7 +68,6 @@ Suggests:
     pbapply,
     plyr,
     reshape2,
-    reticulate,
     viridis,
     xgboost,
     pheatmap,
@@ -92,7 +90,9 @@ Suggests:
     topicmodels,
     RTransferEntropy,
     proxy,
-    RANN
+    RANN,
+    knitr,
+    rmarkdown
 LinkingTo: 
     Rcpp,
     RcppArmadillo,
@@ -106,19 +106,17 @@ RoxygenNote: 7.3.2
 Language: en-US
 Collate: 
     'RcppExports.R'
-    'aggregate.R'
     'calculate_gene_rank.R'
-    'crossweighting.R'
     'data.R'
     'density_intersection.R'
     'dynamic_network.R'
     'extract_genes.R'
-    'extract_network.R'
-    'find.overlapping.coordinates.R'
-    'import.R'
-    'inferCSN.R'
+    'find_motifs.R'
     'setGenerics.R'
     'setClass.R'
+    'fit_models.R'
+    'import.R'
+    'inferCSN.R'
     'inferCSN-methods.R'
     'inferCSN-package.R'
     'initiate_object.R'
@@ -131,18 +129,19 @@ Collate:
     'network_heatmap.R'
     'network_sift.R'
     'network_visualization.R'
-    'normalize.object.R'
+    'plot_motifs.R'
     'plotting_functions.R'
-    'regions.R'
     'setMethod-dynamic_genes.R'
     'setMethod-get_embedding.R'
     'setMethod-get_pseudotime.R'
     'setMethod-infer_vector.R'
+    'setMethod.R'
     'sparse_regression.R'
     'subsampling.R'
+    'theme.R'
     'utils.R'
     'utils_2.R'
     'utils_network.R'
     'utils_plots.R'
     'utils_vector.R'
-    'visualization.R'
+VignetteBuilder: knitr
