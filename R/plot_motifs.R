@@ -71,7 +71,6 @@ PlotTypeSpecificMotifs <- function(
   )
 }
 
-#' @export
 FormatPeakNames <- function(peaks) {
   peaks_info <- strsplit(peaks, "\\.")
   peaks_coords <- sapply(peaks_info, function(x) x[2])
@@ -86,7 +85,6 @@ FormatPeakNames <- function(peaks) {
   return(standard_peaks)
 }
 
-#' @export
 PlotMotifEnrichmentHeatmap <- function(
     object,
     cell_types = NULL,

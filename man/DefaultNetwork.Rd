@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{DefaultNetwork}
 \alias{DefaultNetwork}
-\alias{DefaultNetwork.CSNObject}
+\alias{DefaultNetwork,CSNObject-method}
 \title{Get active network}
 \usage{
 DefaultNetwork(object, ...)
 
-\method{DefaultNetwork}{CSNObject}(object, ...)
+\S4method{DefaultNetwork}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

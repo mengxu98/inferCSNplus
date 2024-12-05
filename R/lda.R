@@ -269,7 +269,7 @@ lda_analysis <- function(
   # Save genes and topic ids
   TopicWordProb <- apply(t(word_prob), 1, max)
   geneid <- apply(t(word_prob), 1, which.max)
-  write.table(
+  utils::write.table(
     data.frame(names(TopicWordProb), geneid, TopicWordProb),
     file = file.path(outdir, "genes_topicid.txt"),
     sep = "\t",
@@ -290,7 +290,7 @@ lda_analysis <- function(
       outdir,
       paste0("TFs_topicid_", celltypes[i], ".txt")
     )
-    write.table(
+    utils::write.table(
       data.frame(names(TopicProb), TFtopicid, TopicProb),
       file = tf_topic_file,
       sep = "\t",

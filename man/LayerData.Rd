@@ -2,17 +2,17 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{LayerData}
 \alias{LayerData}
-\alias{LayerData.CSNObject}
+\alias{LayerData,CSNObject-method}
 \title{Get layer data from CSNObject}
 \usage{
 LayerData(object, ...)
 
-\method{LayerData}{CSNObject}(object, ...)
+\S4method{LayerData}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
 
-\item{...}{other parameters}
+\item{...}{Arguments for other methods}
 }
 \description{
 Get layer data from CSNObject

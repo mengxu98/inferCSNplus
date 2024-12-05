@@ -1,3 +1,20 @@
+#' @title Get dynamic genes
+#'
+#' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
+#' @param ... Arguments for other methods
+#'
+#' @return A new object with dynamic genes
+#' @export
+#'
+#' @rdname dynamic_genes
+setGeneric(
+  "dynamic_genes",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("dynamic_genes")
+  }
+)
+
 gam_fit <- function(
     matrix,
     pseudotime,
@@ -44,8 +61,6 @@ gam_fit <- function(
 #'
 #' @export
 #'
-#' @method dynamic_genes default
-#'
 #' @rdname dynamic_genes
 #'
 #' @examples
@@ -63,71 +78,70 @@ gam_fit <- function(
 #'   pseudotime = vector_result$pseudotime[, 2]
 #' )
 #' }
-dynamic_genes.default <- function(
-    object,
-    pseudotime = NULL,
-    cores = 1,
-    verbose = TRUE,
-    adjust_method = "BH",
-    ...) {
-  if (is.null(pseudotime)) {
-    log_message(
-      "No pseudotime provided, using all genes.",
-      verbose = verbose
+setMethod(
+  "dynamic_genes",
+  signature = "matrix",
+  function(
+      object,
+      pseudotime = NULL,
+      cores = 1,
+      verbose = TRUE,
+      adjust_method = "BH",
+      ...) {
+    if (is.null(pseudotime)) {
+      log_message(
+        "No pseudotime provided, using all genes.",
+        verbose = verbose
+      )
+      return(colnames(object))
+    }
+
+    res <- gam_fit(
+      object,
+      pseudotime,
+      cores = cores,
+      verbose = verbose,
+      adjust_method = adjust_method
     )
-    return(colnames(object))
+
+    return(res)
   }
-  # sorted_genes <- names(
-  #   sort(
-  #     apply(object, 2, stats::var),
-  #     decreasing = TRUE
-  #   )
-  # )
-  # object <- object[, sorted_genes]
-
-  res <- gam_fit(
-    object,
-    pseudotime,
-    cores = cores,
-    verbose = verbose
-  )
-
-  return(res)
-}
+)
 
 #' @param pseudotime_column The column name in meta_data annotating pseudotime or latent time.
 #' @param layer The layer used in Seurat object.
 #'
 #' @export
 #'
-#' @method dynamic_genes Seurat
-#'
 #' @rdname dynamic_genes
-dynamic_genes.Seurat <- function(
-    object,
-    pseudotime_column,
-    cores = 1,
-    verbose = TRUE,
-    adjust_method = "BH",
-    layer = "data",
-    ...) {
-  if (!pseudotime_column %in% colnames(object@meta.data)) {
-    stop("pseudotime_column not existed in the provides Seurat object.")
+setMethod(
+  "dynamic_genes",
+  signature = "Seurat",
+  function(object,
+           pseudotime_column,
+           cores = 1,
+           verbose = TRUE,
+           adjust_method = "BH",
+           layer = "data",
+           ...) {
+    if (!pseudotime_column %in% colnames(object@meta.data)) {
+      stop("pseudotime_column not existed in the provides Seurat object.")
+    }
+
+    Seurat::Misc(object, "dynamic_genes") <- dynamic_genes(
+      Matrix::as.matrix(
+        Seurat::GetAssayData(object, layer = layer)
+      ),
+      pseudotime = object@meta.data[[pseudotime_column]],
+      cores = cores,
+      verbose = verbose,
+      adjust_method = adjust_method,
+      ...
+    )
+
+    return(object)
   }
-
-  Seurat::Misc(object, "dynamic_genes") <- dynamic_genes(
-    Matrix::as.matrix(
-      Seurat::GetAssayData(object, layer = layer)
-    ),
-    pseudotime = object@meta.data[[pseudotime_column]],
-    cores = cores,
-    verbose = verbose,
-    adjust_method = adjust_method,
-    ...
-  )
-
-  return(object)
-}
+)
 
 #' find genes expressed dynamically
 #'

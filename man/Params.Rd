@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{Params}
 \alias{Params}
-\alias{Params.CSNObject}
+\alias{Params,CSNObject-method}
 \title{Get GRN inference parameters}
 \usage{
 Params(object, ...)
 
-\method{Params}{CSNObject}(object, ...)
+\S4method{Params}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{GetAssay}
 \alias{GetAssay}
-\alias{GetAssay.CSNObject}
-\title{Get Seurat assay from CSNObject}
+\alias{GetAssay,CSNObject-method}
+\title{Get seurat assay}
 \usage{
 GetAssay(object, ...)
 
-\method{GetAssay}{CSNObject}(object, assay = NULL, ...)
+\S4method{GetAssay}{CSNObject}(object, assay = NULL, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
@@ -17,5 +17,7 @@ GetAssay(object, ...)
 \item{assay}{assay}
 }
 \description{
+Get seurat assay
+
 Get Seurat assay from CSNObject
 }

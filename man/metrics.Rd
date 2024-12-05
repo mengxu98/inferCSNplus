@@ -2,15 +2,15 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{metrics}
 \alias{metrics}
-\alias{metrics.CSNObject}
-\alias{metrics.Network}
-\title{Get goodness-of-fit info}
+\alias{metrics,CSNObject-method}
+\alias{metrics,Network-method}
+\title{Get metrics}
 \usage{
 metrics(object, ...)
 
-\method{metrics}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
+\S4method{metrics}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
 
-\method{metrics}{Network}(object, celltypes = NULL, ...)
+\S4method{metrics}{Network}(object, celltypes = NULL, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
@@ -22,5 +22,7 @@ metrics(object, ...)
 \item{celltypes}{cell types to analyze, NULL for all cell types}
 }
 \description{
+Get metrics
+
 Get goodness-of-fit info
 }

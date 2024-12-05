@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{VariableFeatures}
 \alias{VariableFeatures}
-\alias{VariableFeatures.CSNObject}
+\alias{VariableFeatures,CSNObject-method}
 \title{Get variable features from CSNObject}
 \usage{
 VariableFeatures(object, ...)
 
-\method{VariableFeatures}{CSNObject}(object, ...)
+\S4method{VariableFeatures}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

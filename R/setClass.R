@@ -1,6 +1,6 @@
 #' @title The Modules class
 #' @description
-#'  The Modules object stores the TF modules extracted from the inferred network..
+#'  The Modules object stores the TF modules extracted from the inferred network.
 #'
 #' @slot meta A dataframe with meta data about the modules.
 #' @slot features A named list with a set of fetures (genes/peaks) for each module.
@@ -20,8 +20,8 @@ setClass(
 
 #' @title The Network class
 #' @description
-#'  The Network object stores the inferred network itself, information about the fitting
-#'  process as well as graph representations of the network.
+#'  The Network object stores the inferred network itself,
+#'  information about the fitting process as well as graph representations of the network.
 #'
 #' @slot modules A list TF modules.
 #' @slot regulators A named list containing the transcription factors included in the network.
@@ -52,8 +52,8 @@ setClass(
 #' @title The Regions class
 #' @description
 #'  The Regions object stores the genomic regions that are considered by the model.
-#' It stores their genomic positions, how they map to the peaks in the Seurat object
-#' and motif matches.
+#'  It stores their genomic positions, how they map to the peaks in the Seurat object
+#'  and motif matches.
 #'
 #' @slot motifs A \code{Motifs} object with matches of TF motifs.
 #' @slot motifs2tfs tfs.
@@ -76,7 +76,7 @@ setClass(
 #' @title The CSNObject class
 #' @description
 #'  The CSNObject object is an extended \code{Seurat} object
-#' for the storage and analysis of Regulatory network data.
+#'  for the storage and analysis of celltype-specific gene regulatory networks.
 #'
 #' @slot data Seurat object.
 #' @slot metadata A list with metadata about the object.
@@ -84,7 +84,7 @@ setClass(
 #' the genomic regions included in the network.
 #' @slot networks A \code{\linkS4class{Network}} object containing the inferred regulatory
 #' network and information about the model fit.
-#' @slot params A list storing parameters for GRN inference.
+#' @slot params A list storing parameters for network inference.
 #' @slot active_network A string indicating the active network.
 #'
 #' @name CSNObject-class

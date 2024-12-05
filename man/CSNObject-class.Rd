@@ -6,7 +6,7 @@
 \title{The CSNObject class}
 \description{
 The CSNObject object is an extended \code{Seurat} object
-for the storage and analysis of Regulatory network data.
+ for the storage and analysis of celltype-specific gene regulatory networks.
 }
 \section{Slots}{
 
@@ -21,7 +21,7 @@ the genomic regions included in the network.}
 \item{\code{networks}}{A \code{\linkS4class{Network}} object containing the inferred regulatory
 network and information about the model fit.}
 
-\item{\code{params}}{A list storing parameters for GRN inference.}
+\item{\code{params}}{A list storing parameters for network inference.}
 
 \item{\code{active_network}}{A string indicating the active network.}
 }}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{GetNetwork}
 \alias{GetNetwork}
-\alias{GetNetwork.CSNObject}
+\alias{GetNetwork,CSNObject-method}
 \title{Get network}
 \usage{
 GetNetwork(object, ...)
 
-\method{GetNetwork}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
+\S4method{GetNetwork}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{NetworkTFs}
 \alias{NetworkTFs}
-\alias{NetworkTFs.CSNObject}
+\alias{NetworkTFs,CSNObject-method}
 \title{Get network TFs}
 \usage{
 NetworkTFs(object, ...)
 
-\method{NetworkTFs}{CSNObject}(object, ...)
+\S4method{NetworkTFs}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

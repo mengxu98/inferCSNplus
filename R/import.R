@@ -6,7 +6,7 @@
 #' @importFrom RcppArmadillo armadillo_version
 #' @importFrom RcppParallel RcppParallelLibs
 #' @importFrom stats coef predict cor na.omit sd
-#' @importFrom utils methods write.table
+#' @importFrom utils methods
 #' @importFrom stats family gaussian na.pass
 #' @importFrom methods as is new
 #' @importFrom DelayedArray makeNindexFromArrayViewport
@@ -69,6 +69,7 @@ utils::globalVariables(
     "mean_padj",
     "mean_weight",
     "motif",
+    "motif2tf",
     "n_genes",
     "n_regions",
     "n_tfs",

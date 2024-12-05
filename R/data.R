@@ -3,7 +3,6 @@
 #'
 #' @title Example matrix data
 #' @description The matrix used for reconstruct gene regulatory network.
-#'
 NULL
 
 #' @docType data
@@ -11,7 +10,6 @@ NULL
 #'
 #' @title Example ground truth data
 #' @description The data used for calculate the evaluating indicator.
-#'
 NULL
 
 #' @docType data
@@ -19,7 +17,6 @@ NULL
 #'
 #' @title Eexample_meta_data
 #' @description example_meta_data.
-#'
 NULL
 
 #' @docType data
@@ -27,7 +24,6 @@ NULL
 #'
 #' @title EnsDb.Hsapiens.v93.annot.UCSC.hg38
 #' @description EnsDb.Hsapiens.v93.annot.UCSC.hg38
-#'
 NULL
 
 #' @docType data
@@ -35,7 +31,6 @@ NULL
 #'
 #' @title motif2tf
 #' @description motif2tf
-#'
 NULL
 
 #' @docType data
@@ -43,7 +38,6 @@ NULL
 #'
 #' @title motifs
 #' @description motifs
-#'
 NULL
 
 #' @docType data
@@ -51,7 +45,6 @@ NULL
 #'
 #' @title phastConsElements20Mammals.UCSC.hg38
 #' @description phastConsElements20Mammals.UCSC.hg38
-#'
 NULL
 
 #' @docType data
@@ -59,5 +52,4 @@ NULL
 #'
 #' @title SCREEN.ccRE.UCSC.hg38
 #' @description SCREEN.ccRE.UCSC.hg38
-#'
 NULL

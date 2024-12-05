@@ -6,8 +6,8 @@
 \title{The Regions class}
 \description{
 The Regions object stores the genomic regions that are considered by the model.
-It stores their genomic positions, how they map to the peaks in the Seurat object
-and motif matches.
+ It stores their genomic positions, how they map to the peaks in the Seurat object
+ and motif matches.
 }
 \section{Slots}{
 

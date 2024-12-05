@@ -1,150 +1,341 @@
 #' @include setClass.R
+#' @include setGenerics.R
 
-#' @title Get network
-#'
 #' @param network network
 #' @param celltypes cell types to analyze, NULL for all cell types
 #'
 #' @rdname GetNetwork
-#' @method GetNetwork CSNObject
 #' @export
-GetNetwork.CSNObject <- function(
-    object,
-    network = DefaultNetwork(object),
-    celltypes = NULL,
-    ...) {
-  if (!is.null(celltypes)) {
-    return(lapply(celltypes, function(ct) object@networks[[network]][[ct]]))
+setMethod(
+  f = "GetNetwork",
+  signature = "CSNObject",
+  definition = function(
+      object,
+      network = DefaultNetwork(object),
+      celltypes = NULL,
+      ...) {
+    if (!is.null(celltypes)) {
+      return(
+        lapply(
+          celltypes,
+          function(x) {
+            object@networks[[network]][[x]]
+          }
+        )
+      )
+    }
+    return(object@networks[[network]])
   }
-  return(object@networks[[network]])
-}
+)
 
-#' @title Get network TFs
-#'
 #' @rdname NetworkTFs
-#' @method NetworkTFs CSNObject
 #' @export
-NetworkTFs.CSNObject <- function(object, ...) {
-  return(object@regions@motifs2tfs)
-}
+setMethod(
+  f = "NetworkTFs",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(object@regions@motifs2tfs)
+  }
+)
 
-#' @title Get network regions
-#'
 #' @rdname NetworkRegions
-#' @method NetworkRegions CSNObject
 #' @export
-NetworkRegions.CSNObject <- function(object, ...) {
-  return(object@regions)
-}
+setMethod(
+  f = "NetworkRegions",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(object@regions)
+  }
+)
 
-#' @title Get TF modules
-#'
 #' @param network network
 #' @param celltypes cell types to analyze, NULL for all cell types
 #'
 #' @rdname NetworkModules
-#' @method NetworkModules CSNObject
 #' @export
-NetworkModules.CSNObject <- function(
-    object,
-    network = DefaultNetwork(object),
-    celltypes = NULL,
-    ...) {
-  networks <- GetNetwork(
-    object,
-    network = network,
-    celltypes = celltypes
-  )
-  if (is.null(celltypes)) {
-    return(lapply(networks, function(net) net@modules))
-  }
-  return(lapply(networks, function(net) net@modules))
-}
-
-#' @rdname NetworkModules
-#' @method NetworkModules Network
-#' @export
-NetworkModules.Network <- function(object, ...) {
-  return(object@modules)
-}
-
-#' @title Get network parameters
-#'
-#' @param network network
-#' @param celltypes cell types to analyze, NULL for all cell types
-#'
-#' @rdname NetworkParams
-#' @method NetworkParams CSNObject
-#' @export
-NetworkParams.CSNObject <- function(
-    object,
-    network = DefaultNetwork(object),
-    celltypes = NULL,
-    ...) {
-  networks <- GetNetwork(object, network = network, celltypes = celltypes)
-  if (is.null(celltypes)) {
-    return(lapply(networks, function(net) net@params))
-  }
-  return(lapply(networks, function(net) net@params))
-}
-
-#' @rdname NetworkParams
-#' @method NetworkParams Network
-#' @export
-NetworkParams.Network <- function(object, ...) {
-  return(object@params)
-}
-
-#' @title Get network parameters
-#'
-#' @param network network
-#' @param graph graph
-#' @param celltypes cell types to analyze, NULL for all cell types
-#'
-#' @rdname NetworkGraph
-#' @method NetworkGraph CSNObject
-#' @export
-NetworkGraph.CSNObject <- function(
-    object,
-    network = DefaultNetwork(object),
-    graph = "module_graph",
-    celltypes = NULL,
-    ...) {
-  networks <- GetNetwork(object, network = network, celltypes = celltypes)
-  if (is.null(celltypes)) {
-    return(lapply(networks, function(net) NetworkGraph(net, graph = graph)))
-  }
-  return(lapply(networks, function(net) NetworkGraph(net, graph = graph)))
-}
-
-#' @param graph graph
-#'
-#' @rdname NetworkGraph
-#' @method NetworkGraph Network
-#' @export
-NetworkGraph.Network <- function(
-    object,
-    graph = "module_graph",
-    ...) {
-  if (!graph %in% names(object@graphs)) {
-    stop(
-      paste0(
-        "The requested graph '", graph, "' does not exist. ",
-        "Try (re-)running `get_network_graph()`."
+setMethod(
+  f = "NetworkModules",
+  signature = "CSNObject",
+  definition = function(object,
+                        network = DefaultNetwork(object),
+                        celltypes = NULL,
+                        ...) {
+    networks <- GetNetwork(
+      object,
+      network = network,
+      celltypes = celltypes
+    )
+    if (is.null(celltypes)) {
+      return(
+        lapply(
+          networks,
+          function(net) NetworkModules(net)
+        )
+      )
+    }
+    return(
+      lapply(
+        networks,
+        function(net) NetworkModules(net)
       )
     )
   }
-  return(object@graphs[[graph]])
-}
+)
+
+#' @rdname NetworkModules
+#' @export
+setMethod(
+  f = "NetworkModules",
+  signature = "Network",
+  definition = function(object, ...) {
+    return(object@modules)
+  }
+)
+
+#' @param network network
+#' @param celltypes cell types to analyze, NULL for all cell types
+#'
+#' @rdname NetworkParams
+#' @export
+setMethod(
+  f = "NetworkParams",
+  signature = "CSNObject",
+  definition = function(
+      object,
+      network = DefaultNetwork(object),
+      celltypes = NULL,
+      ...) {
+    networks <- GetNetwork(
+      object,
+      network = network,
+      celltypes = celltypes
+    )
+    if (is.null(celltypes)) {
+      return(
+        lapply(
+          networks,
+          function(net) NetworkParams(net)
+        )
+      )
+    }
+    return(
+      lapply(
+        networks, function(net) NetworkParams(net)
+      )
+    )
+  }
+)
+
+#' @rdname NetworkParams
+#' @export
+setMethod(
+  f = "NetworkParams",
+  signature = "Network",
+  definition = function(object, ...) {
+    return(object@params)
+  }
+)
+
+#' @param network network
+#' @param graph graph
+#' @param celltypes cell types to analyze, NULL for all cell types
+#'
+#' @rdname NetworkGraph
+#' @export
+setMethod(
+  f = "NetworkGraph",
+  signature = "CSNObject",
+  definition = function(
+      object,
+      network = DefaultNetwork(object),
+      graph = "module_graph",
+      celltypes = NULL,
+      ...) {
+    networks <- GetNetwork(
+      object,
+      network = network,
+      celltypes = celltypes
+    )
+    if (is.null(celltypes)) {
+      return(
+        lapply(
+          networks,
+          function(net) NetworkGraph(net, graph = graph)
+        )
+      )
+    }
+    return(
+      lapply(
+        networks,
+        function(net) NetworkGraph(net, graph = graph)
+      )
+    )
+  }
+)
+
+#' @rdname NetworkGraph
+#' @export
+setMethod(
+  f = "NetworkGraph",
+  signature = "Network",
+  definition = function(
+      object,
+      graph = "module_graph",
+      ...) {
+    if (!graph %in% names(object@graphs)) {
+      stop(
+        paste0(
+          "The requested graph '", graph, "' does not exist. ",
+          "Try (re-)running `get_network_graph()`."
+        )
+      )
+    }
+    return(object@graphs[[graph]])
+  }
+)
 
 #' @title Get active network
 #'
 #' @rdname DefaultNetwork
 #' @method DefaultNetwork CSNObject
 #' @export
-DefaultNetwork.CSNObject <- function(object, ...) {
-  return(object@active_network)
-}
+setMethod(
+  f = "DefaultNetwork",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(object@active_network)
+  }
+)
+
+#' @title Get GRN inference parameters
+#' @rdname Params
+#' @export
+setMethod(
+  f = "Params",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(object@params)
+  }
+)
+
+#' @param group_name group_name
+#' @param assay assay
+#' @param verbose verbose
+#'
+#' @rdname GetAssaySummary
+#' @export
+setMethod(
+  f = "GetAssaySummary",
+  signature = "Seurat",
+  definition = function(
+    object,
+    group_name,
+    assay = NULL,
+    verbose = TRUE,
+    ...) {
+    if (is.null(assay)) {
+      assay <- object@active.assay
+    }
+    smry <- Seurat::Misc(
+      object[[assay]]
+    )$summary[[group_name]]
+    if (is.null(smry)) {
+      log_message(
+        "summary of '", group_name, "' does not yet exist",
+        verbose = verbose,
+        message_type = "warning"
+      )
+      log_message(
+        "Summarizing information for '", group_name, "'",
+        verbose = verbose
+      )
+      object <- aggregate_assay(
+        object,
+        assay = assay,
+        group_name = group_name
+      )
+      smry <- GetAssaySummary(
+        object,
+        assay = assay,
+        group_name = group_name,
+        verbose = verbose
+      )
+    }
+    return(smry)
+  }
+)
+
+#' @title Get summary of seurat assay from CSNObject
+#'
+#' @param group_name group_name
+#' @param assay assay
+#' @param verbose verbose
+#'
+#' @rdname GetAssaySummary
+#' @export
+setMethod(
+  f = "GetAssaySummary",
+  signature = "CSNObject",
+  definition = function(
+    object,
+    group_name,
+    assay = NULL,
+    verbose = TRUE,
+    ...) {
+    return(
+      GetAssaySummary(
+        object@data,
+        group_name,
+        assay = assay,
+        verbose = verbose
+      )
+    )
+  }
+)
+
+#' @title Get Seurat assay from CSNObject
+#'
+#' @param assay assay
+#'
+#' @rdname GetAssay
+#' @method GetAssay CSNObject
+#' @export
+setMethod(
+  f = "GetAssay",
+  signature = "CSNObject",
+  definition = function(
+      object,
+      assay = NULL,
+      ...) {
+    return(
+      Seurat::GetAssay(
+        object@data,
+        assay = assay
+      )
+    )
+  }
+)
+
+#' @rdname LayerData
+#' @export
+setMethod(
+  f = "LayerData",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(SeuratObject::LayerData(object@data, ...))
+  }
+)
+
+#' @rdname VariableFeatures
+#' @export
+setMethod(
+  f = "VariableFeatures",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(Seurat::VariableFeatures(object@data, ...))
+  }
+)
+
 
 #' @title Get fitted coefficients
 #'
@@ -154,176 +345,66 @@ DefaultNetwork.CSNObject <- function(object, ...) {
 #' @param ... other parameters
 #'
 #' @rdname coef
-#' @method coef CSNObject
 #' @export
-coef.CSNObject <- function(
+setMethod(
+  f = "coef",
+  signature = "CSNObject",
+  definition = function(
     object,
     network = DefaultNetwork(object),
     celltypes = NULL,
     ...) {
-  networks <- GetNetwork(object, network = network, celltypes = celltypes)
-  if (is.null(celltypes)) {
+    networks <- GetNetwork(object, network = network, celltypes = celltypes)
+    if (is.null(celltypes)) {
+      return(lapply(networks, function(net) net@coefficients))
+    }
     return(lapply(networks, function(net) net@coefficients))
   }
-  return(lapply(networks, function(net) net@coefficients))
-}
+)
 
 #' @rdname coef
-#' @method coef Network
 #' @export
-coef.Network <- function(object, ...) {
-  return(object@coefficients)
-}
+setMethod(
+  f = "coef",
+  signature = "Network",
+  definition = function(object, ...) {
+    return(object@coefficients)
+  }
+)
 
 #' @title Get goodness-of-fit info
 #'
 #' @param network network
 #' @param celltypes cell types to analyze, NULL for all cell types
 #'
+# metrics methods
 #' @rdname metrics
-#' @method metrics CSNObject
 #' @export
-metrics.CSNObject <- function(
+setMethod(
+  f = "metrics",
+  signature = "CSNObject",
+  definition = function(
     object,
     network = DefaultNetwork(object),
     celltypes = NULL,
     ...) {
-  networks <- GetNetwork(object, network = network, celltypes = celltypes)
-  if (is.null(celltypes)) {
+    networks <- GetNetwork(object, network = network, celltypes = celltypes)
+    if (is.null(celltypes)) {
+      return(lapply(networks, function(net) net@fit))
+    }
     return(lapply(networks, function(net) net@fit))
   }
-  return(lapply(networks, function(net) net@fit))
-}
+)
 
 #' @rdname metrics
-#' @method metrics Network
 #' @export
-metrics.Network <- function(
-    object,
-    celltypes = NULL,
-    ...) {
-  return(object@fit)
-}
-
-#' @title Get GRN inference parameters
-#'
-#' @rdname Params
-#' @method Params CSNObject
-#' @export
-Params.CSNObject <- function(object, ...) {
-  return(object@params)
-}
-
-#' @title Get summary of seurat assay
-#'
-#' @param group_name group_name
-#' @param assay assay
-#' @param verbose verbose
-#'
-#' @rdname GetAssaySummary
-#' @method GetAssaySummary Seurat
-#' @export
-GetAssaySummary.Seurat <- function(
-    object,
-    group_name,
-    assay = NULL,
-    verbose = TRUE,
-    ...) {
-  if (is.null(assay)) {
-    assay <- object@active.assay
+setMethod(
+  f = "metrics",
+  signature = "Network",
+  definition = function(object, celltypes = NULL, ...) {
+    return(object@fit)
   }
-  smry <- Seurat::Misc(
-    object[[assay]]
-  )$summary[[group_name]]
-  if (is.null(smry)) {
-    log_message(
-      "summary of '", group_name, "' does not yet exist",
-      verbose = verbose,
-      message_type = "warning"
-    )
-    log_message(
-      "Summarizing information for '", group_name, "'",
-      verbose = verbose
-    )
-    object <- aggregate_assay(
-      object,
-      assay = assay,
-      group_name = group_name
-    )
-    smry <- GetAssaySummary(
-      object,
-      assay = assay,
-      group_name = group_name,
-      verbose = verbose
-    )
-  }
-
-  return(smry)
-}
-
-#' @title Get summary of seurat assay from CSNObject
-#'
-#' @param group_name group_name
-#' @param assay assay
-#' @param verbose verbose
-#'
-#' @rdname GetAssaySummary
-#' @method GetAssaySummary CSNObject
-#' @export
-GetAssaySummary.CSNObject <- function(
-    object,
-    group_name,
-    assay = NULL,
-    verbose = TRUE,
-    ...) {
-  return(
-    GetAssaySummary(
-      object@data,
-      group_name,
-      assay = assay,
-      verbose = verbose
-    )
-  )
-}
-
-#' @title Get Seurat assay from CSNObject
-#'
-#' @param assay assay
-#'
-#' @rdname GetAssay
-#' @method GetAssay CSNObject
-#' @export
-GetAssay.CSNObject <- function(
-    object,
-    assay = NULL,
-    ...) {
-  return(
-    Seurat::GetAssay(
-      object@data,
-      assay = assay
-    )
-  )
-}
-
-#' @title Get layer data from CSNObject
-#'
-#' @param ... other parameters
-#'
-#' @rdname LayerData
-#' @method LayerData CSNObject
-#' @export
-LayerData.CSNObject <- function(object, ...) {
-  return(SeuratObject::LayerData(object@data, ...))
-}
-
-#' @title Get variable features from CSNObject
-#'
-#' @rdname VariableFeatures
-#' @method VariableFeatures CSNObject
-#' @export
-VariableFeatures.CSNObject <- function(object, ...) {
-  return(Seurat::VariableFeatures(object@data, ...))
-}
+)
 
 #' @title Print Network objects
 #'
@@ -389,86 +470,13 @@ print.Regions <- function(x, ...) {
   ))
 }
 
-# setMethod(
-#   "show",
-#   signature = "Regions",
-#   function(object) {
-#     print(object)
-#   }
-# )
-
-
-#' @title Get network data
-#' @rdname summary_csn
-#' @method summary_csn CSNObject
-#' @export
-summary_csn.CSNObject <- function(object, ...) {
-  networks <- object@networks
-
-  tfs <- unique(unlist(lapply(networks, function(network) {
-    if (!is.null(network) && methods::is(network, "Network")) {
-      network_df <- methods::slot(network, "network")
-      if (!is.null(network_df) && nrow(network_df) > 0) {
-        unique(network_df$regulator)
-      }
-    }
-  })))
-
-  network_stats <- lapply(names(networks), function(celltype) {
-    network <- networks[[celltype]]
-    if (!is.null(network) && methods::is(network, "Network")) {
-      network_df <- methods::slot(network, "network")
-      if (!is.null(network_df) && nrow(network_df) > 0) {
-        data.frame(
-          celltype = celltype,
-          edges = nrow(network_df),
-          targets = length(unique(network_df$target)),
-          regulators = length(unique(network_df$regulator))
-        )
-      }
-    }
-  })
-  network_stats <- do.call(rbind, network_stats)
-
-  msg <- sprintf("A CSNObject object based on %d transcription factors\n\n", length(tfs))
-  msg <- paste0(msg, sprintf(
-    "%d inferred networks: %s\n\n",
-    length(names(networks)),
-    paste(names(networks), collapse = ", ")
-  ))
-
-  if (!is.null(network_stats)) {
-    msg <- paste0(msg, "Network statistics by celltype:\n")
-    for (i in 1:nrow(network_stats)) {
-      msg <- paste0(msg, sprintf(
-        "%s: %d edges (%d regulators -> %d targets)\n",
-        network_stats$celltype[i],
-        network_stats$edges[i],
-        network_stats$regulators[i],
-        network_stats$targets[i]
-      ))
-    }
+setMethod(
+  "show",
+  signature = "Regions",
+  function(object) {
+    print(object)
   }
-
-  result <- list(
-    networks = networks,
-    tfs = tfs,
-    network_stats = network_stats
-  )
-
-  class(result) <- "CSNSummary"
-
-  return(result)
-}
-
-#' @export
-print.CSNSummary <- function(x, ...) {
-  cat(sprintf("$networks\n%s\n\n", x$msg))
-  cat("$tfs\n")
-  print(x$tfs)
-  cat("\n$network_stats\n")
-  print(x$network_stats)
-}
+)
 
 #' @title Get regulatory genes
 #'
@@ -590,6 +598,10 @@ setMethod(
       attributes <- object@metadata$tfs
       return(attributes)
     }
+    if (attribute == "celltypes") {
+      attributes <- object@metadata$celltypes
+      return(attributes)
+    }
 
     attributes <- purrr::set_names(attributes, celltypes)
     if (length(attributes) == 1) {
@@ -668,22 +680,6 @@ setMethod(
 
   return(object)
 }
-
-#' @title Export network from CSN object
-#' @description Export network data from a CSN object with optional filtering
-#'
-#' @param object A CSNObject object
-#' @param ... Additional arguments
-#'
-#' @return A list of network data frames by cell type
-#'
-#' @export
-setGeneric(
-  "export_csn",
-  function(object, ...) {
-    standardGeneric("export_csn")
-  }
-)
 
 #' @param active_network Character string specifying which network to export
 #' @param celltypes Character vector of cell types to export

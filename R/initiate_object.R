@@ -3,7 +3,9 @@
 #' @param celltype_by Column name in Seurat meta.data for cell type information.
 #' If NULL, all cells will be treated as one group.
 #' @param filter_mode Filter mode for identifying cell-type specific features.
-#' @param filter_by Whether to calculate variable features using "all" cells or by "celltype".
+#' @param filter_by Character. When filter_mode is "variable",
+#' specify whether to calculate variable features using "aggregate" cells or by "celltype".
+#' Default is "aggregate".
 #' @param rna_assay A character vector indicating the name of the gene expression
 #' assay in the \code{Seurat} object.
 #' @param rna_min_pct Minimum percentage of cells expressing the gene in either population.
@@ -21,9 +23,6 @@
 #' @param exclude_exons Logical. Whether to consider exons for binding site inference.
 #' @param only_pos Only return positive markers.
 #' @param verbose Print progress messages.
-#' @param filter_by Character. When filter_mode is "variable",
-#' specify whether to calculate variable features using "all" cells or by "celltype".
-#' Default is "all".
 #' @param p_value Significance level threshold for filtering features (default: 0.05).
 #' @param ... Additional arguments passed to marker detection functions.
 #'
@@ -31,158 +30,173 @@
 #'
 #' @rdname initiate_object
 #' @export
-#' @method initiate_object Seurat
-initiate_object.Seurat <- function(
-    object,
-    celltype = NULL,
-    celltype_by = NULL,
-    filter_mode = c("variable", "celltype", "all"),
-    filter_by = c("all", "celltype"),
-    rna_assay = "RNA",
-    rna_min_pct = 0.1,
-    rna_logfc_threshold = 0.25,
-    rna_test_method = "wilcox",
-    n_variable_genes = 2000,
-    peak_assay = NULL,
-    peak_min_pct = 0.05,
-    peak_logfc_threshold = 0.1,
-    peak_test_method = "LR",
-    n_variable_peaks = "q5",
-    regions = NULL,
-    exclude_exons = TRUE,
-    only_pos = TRUE,
-    verbose = TRUE,
-    p_value = 0.05,
-    ...) {
-  if (!is.null(celltype_by) && celltype_by != "all") {
-    if (!celltype_by %in% colnames(object@meta.data)) {
-      stop(sprintf("Column '%s' not found in object metadata", celltype_by))
+setMethod(
+  f = "initiate_object",
+  signature = "Seurat",
+  definition = function(
+      object,
+      celltype = NULL,
+      celltype_by = NULL,
+      filter_mode = c("variable", "celltype", "unfiltered"),
+      filter_by = c("aggregate", "celltype"),
+      rna_assay = "RNA",
+      rna_min_pct = 0.1,
+      rna_logfc_threshold = 0.25,
+      rna_test_method = "wilcox",
+      n_variable_genes = 2000,
+      peak_assay = NULL,
+      peak_min_pct = 0.05,
+      peak_logfc_threshold = 0.1,
+      peak_test_method = "LR",
+      n_variable_peaks = "q5",
+      regions = NULL,
+      exclude_exons = TRUE,
+      only_pos = TRUE,
+      verbose = TRUE,
+      p_value = 0.05,
+      ...) {
+    if (!is.null(celltype_by) && celltype_by != "aggregate") {
+      if (!celltype_by %in% colnames(object@meta.data)) {
+        stop(sprintf("Column '%s' not found in object metadata", celltype_by))
+      }
+      Seurat::Idents(object) <- celltype_by
+    } else {
+      Seurat::Idents(object) <- "aggregate"
     }
-    Seurat::Idents(object) <- celltype_by
-  } else {
-    Seurat::Idents(object) <- "all"
-  }
 
-  if (!is.null(celltype)) {
-    if (!all(celltype %in% Seurat::Idents(object))) {
-      stop("Some specified clusters not found in data")
+    if (!is.null(celltype)) {
+      if (!all(celltype %in% Seurat::Idents(object))) {
+        stop("Some specified clusters not found in data")
+      }
+      object <- subset(object, idents = celltype)
+      if (length(celltype) == 1) {
+        Seurat::Idents(object) <- celltype
+      }
     }
-    object <- subset(object, idents = celltype)
-    if (length(celltype) == 1) {
-      Seurat::Idents(object) <- celltype
-    }
-  }
 
-  filter_mode <- match.arg(filter_mode)
-  filter_by <- match.arg(filter_by)
-  celltypes <- unique(Seurat::Idents(object))
+    filter_mode <- match.arg(filter_mode)
+    filter_by <- match.arg(filter_by)
+    celltypes <- unique(Seurat::Idents(object))
 
-  Seurat::DefaultAssay(object) <- rna_assay
-  genes_markers <- process_features(
-    object = object,
-    celltypes = celltypes,
-    mode = filter_mode,
-    by = filter_by,
-    is_peak = FALSE,
-    params = list(
-      assay = rna_assay,
-      min_pct = rna_min_pct,
-      logfc_threshold = rna_logfc_threshold,
-      test_method = rna_test_method,
-      n_features = n_variable_genes,
-      only_pos = only_pos,
-      p_value = p_value
-    ),
-    verbose = verbose,
-    ...
-  )
-
-  log_message(
-    "No peak assay found.
-      Please specify the peak assay with 'peak_assay' in 'initiate_object'.",
-    verbose = verbose,
-    message_type = "warning"
-  )
-  peaks_markers <- NULL
-  if (!is.null(peak_assay)) {
-    Seurat::DefaultAssay(object) <- peak_assay
-    object$nCount_peaks <- colSums(
-      Seurat::GetAssayData(object, assay = peak_assay, layer = "data") > 0
-    )
-
-    peaks_markers <- process_features(
+    Seurat::DefaultAssay(object) <- rna_assay
+    genes_markers <- process_features(
       object = object,
       celltypes = celltypes,
       mode = filter_mode,
       by = filter_by,
-      is_peak = TRUE,
+      is_peak = FALSE,
       params = list(
-        assay = peak_assay,
-        min_pct = peak_min_pct,
-        logfc_threshold = peak_logfc_threshold,
-        test_method = peak_test_method,
-        n_features = n_variable_peaks,
+        assay = rna_assay,
+        min_pct = rna_min_pct,
+        logfc_threshold = rna_logfc_threshold,
+        test_method = rna_test_method,
+        n_features = n_variable_genes,
         only_pos = only_pos,
-        latent.vars = "nCount_peaks",
         p_value = p_value
       ),
       verbose = verbose,
       ...
     )
-  }
 
-  attributes <- process_attributes(
-    object = object,
-    celltypes = celltypes,
-    genes_markers = genes_markers,
-    peaks_markers = peaks_markers,
-    verbose = verbose,
-    p_value = p_value
-  )
-
-  regions_obj <- process_regions(
-    object = object,
-    regions = regions,
-    peak_assay = peak_assay,
-    exclude_exons = exclude_exons,
-    verbose = verbose,
-    ...
-  )
-
-  params <- list(
-    peak_assay = peak_assay,
-    rna_assay = rna_assay,
-    exclude_exons = exclude_exons,
-    filter_mode = filter_mode,
-    filter_by = filter_by
-  )
-
-  print_summary(
-    attributes,
-    celltypes,
-    peak_assay,
-    verbose
-  )
-
-  object <- methods::new(
-    Class = "CSNObject",
-    data = object,
-    metadata = list(
-      celltypes = celltypes,
-      n_celltypes = length(celltypes),
-      attributes = attributes,
-      summary = create_summary(
-        attributes,
-        celltypes,
-        peak_assay
+    if (is.null(peak_assay)) {
+      log_message(
+        "No peak assay found.
+        Please specify the peak assay with 'peak_assay' in 'initiate_object'.",
+        verbose = verbose,
+        message_type = "warning"
       )
-    ),
-    regions = regions_obj,
-    params = params
-  )
+    }
+    peaks_markers <- NULL
+    if (!is.null(peak_assay)) {
+      Seurat::DefaultAssay(object) <- peak_assay
+      object$nCount_peaks <- colSums(
+        Seurat::GetAssayData(object, assay = peak_assay, layer = "data") > 0
+      )
 
-  return(object)
-}
+      peaks_markers <- process_features(
+        object = object,
+        celltypes = celltypes,
+        mode = filter_mode,
+        by = filter_by,
+        is_peak = TRUE,
+        params = list(
+          assay = peak_assay,
+          min_pct = peak_min_pct,
+          logfc_threshold = peak_logfc_threshold,
+          test_method = peak_test_method,
+          n_features = n_variable_peaks,
+          only_pos = only_pos,
+          latent.vars = "nCount_peaks",
+          p_value = p_value
+        ),
+        verbose = verbose,
+        ...
+      )
+    }
+
+    attributes <- process_attributes(
+      object = object,
+      celltypes = celltypes,
+      genes_markers = genes_markers,
+      peaks_markers = peaks_markers,
+      verbose = verbose,
+      p_value = p_value
+    )
+
+    regions_obj <- process_regions(
+      object = object,
+      regions = regions,
+      peak_assay = peak_assay,
+      exclude_exons = exclude_exons,
+      verbose = verbose,
+      ...
+    )
+
+    params <- list(
+      peak_assay = peak_assay,
+      rna_assay = rna_assay,
+      exclude_exons = exclude_exons,
+      filter_mode = filter_mode,
+      filter_by = filter_by
+    )
+
+    print_summary(
+      attributes,
+      celltypes,
+      peak_assay,
+      verbose
+    )
+
+    object <- methods::new(
+      Class = "CSNObject",
+      data = object,
+      metadata = list(
+        celltypes = celltypes,
+        n_celltypes = length(celltypes),
+        attributes = attributes,
+        summary = create_summary(
+          attributes,
+          celltypes,
+          peak_assay
+        )
+      ),
+      regions = regions_obj,
+      params = params
+    )
+
+    return(object)
+  }
+)
+
+#' @rdname initiate_object
+#' @export
+setMethod(
+  f = "initiate_object",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    initiate_object(object@data, ...)
+  }
+)
 
 process_features <- function(
     object,
@@ -212,7 +226,7 @@ process_features <- function(
       verbose,
       ...
     ),
-    "all" = process_all_features(
+    "unfiltered" = process_all_features(
       object,
       celltypes,
       is_peak,
@@ -231,7 +245,7 @@ process_celltype_features <- function(
   if (length(celltypes) <= 1) {
     return(
       process_variable_features(
-        object, celltypes, "all", is_peak, params, verbose, ...
+        object, celltypes, "aggregate", is_peak, params, verbose, ...
       )
     )
   }
@@ -276,7 +290,7 @@ process_variable_features <- function(
     params,
     verbose,
     ...) {
-  if (by == "all") {
+  if (by == "aggregate") {
     object <- find_variable_features(
       object,
       is_peak,
@@ -285,7 +299,8 @@ process_variable_features <- function(
     var_features <- Seurat::VariableFeatures(object)
     res <- create_feature_matrix(
       var_features,
-      celltypes
+      celltypes,
+      is_peak = is_peak
     )
     return(res)
   }
@@ -299,7 +314,7 @@ process_variable_features <- function(
         params
       )
       var_features <- Seurat::VariableFeatures(cell_subset)
-      create_feature_matrix(var_features, x)
+      create_feature_matrix(var_features, x, is_peak = is_peak)
     }
   )
   return(res)
@@ -312,9 +327,13 @@ process_all_features <- function(
     params,
     ...) {
   features <- rownames(
-    Seurat::GetAssayData(object, assay = params$assay)
+    Seurat::GetAssayData(
+      object,
+      assay = params$assay,
+      layer = "data"
+    )
   )
-  res <- create_feature_matrix(features, celltypes)
+  res <- create_feature_matrix(features, celltypes, is_peak = is_peak)
   return(res)
 }
 
@@ -340,25 +359,34 @@ find_variable_features <- function(
 .create_feature_df <- function(
     features,
     celltype,
-    infinite_logfc = TRUE) {
-  data.frame(
+    infinite_logfc = TRUE,
+    is_peak = FALSE) {
+  df <- data.frame(
     avg_log2FC = rep(if (infinite_logfc) Inf else 1, length(features)),
     p_val_adj = rep(0, length(features)),
     celltype = celltype,
-    gene = features,
     stringsAsFactors = FALSE
   )
+
+  if (is_peak) {
+    df$peak <- features
+  } else {
+    df$gene <- features
+  }
+
+  return(df)
 }
 
 create_feature_matrix <- function(
     features,
-    celltypes) {
+    celltypes,
+    is_peak = FALSE) {
   if (length(celltypes) == 1) {
     celltypes <- list(celltypes)
   }
   purrr::map_dfr(
     celltypes,
-    ~ .create_feature_df(features, .x)
+    ~ .create_feature_df(features, .x, is_peak = is_peak)
   )
 }
 
@@ -565,11 +593,4 @@ create_summary <- function(
   )
 
   return(res)
-}
-
-#' @rdname initiate_object
-#' @export
-#' @method initiate_object CSNObject
-initiate_object.CSNObject <- function(object, ...) {
-  initiate_object(object@data, ...)
 }

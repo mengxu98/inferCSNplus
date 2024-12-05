@@ -132,7 +132,6 @@ reference:
   - print.Network
   - simulate_sparse_matrix
   - subsampling
-  - summary_csn
   - weight_sift
   - network_sift
   - add_interaction_type
@@ -244,6 +243,8 @@ reference:
 
 - subtitle: "Example data and datasets"
 - contents:
+  - simulate_csn_data
+  - create_seurat_object
   - example_matrix
   - example_ground_truth
   - example_meta_data

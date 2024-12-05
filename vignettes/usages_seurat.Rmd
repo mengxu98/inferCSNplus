@@ -1,5 +1,5 @@
 ---
-title: "usages_seurat"
+title: "Usage of inferCSN with Seurat object"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{usages_seurat}
@@ -15,30 +15,51 @@ knitr::opts_chunk$set(
 ```
 
 Load the necessary libraries and data.
+
 ```{r setup}
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(inferCSN)
 data(motifs)
 ```
 
-Load the Seurat object and set the celltype identity.
+Simulate data and create a `Seurat` object.
+
 ```{r}
-seurat_object <- readRDS(
-  "~/Study/research/_repositories/seurat_object_multiome_EN-neurons.RDS"
-)
-Seurat::Idents(seurat_object) <- "celltype"
+sim_data <- simulate_csn_data()
+seurat_object <- create_seurat_object(sim_data)
 ```
 
-Initiate the Seurat object to CSNObject without peak data.
+Initiate the `Seurat` object to `CSNObject` containing peak data.
+
 ```{r}
 object <- initiate_object(
   seurat_object,
-  filter_by = "all",
+  peak_assay = "ATAC",
   celltype_by = "celltype"
 )
 ```
 
 The `find_motifs` function is used to find motifs for `CSNObject` when provided peak data. But it could run without peak data as well, and will return the object without any changes.
+
+```{r}
+object <- find_motifs(
+  object,
+  pfm = motifs,
+  genome = BSgenome.Hsapiens.UCSC.hg38
+)
+```
+
+Initiate the `Seurat` object to `CSNObject` without peak data.
+
+```{r}
+object <- initiate_object(
+  seurat_object,
+  celltype_by = "celltype"
+)
+```
+
+The `find_motifs` function is used to find motifs for `CSNObject` when provided peak data. But it could run without peak data as well, and will return the object without any changes.
+
 ```{r}
 object <- find_motifs(
   object,
@@ -48,20 +69,16 @@ object <- find_motifs(
 ```
 
 The `inferCSN` function is used to infer the CSN for the given celltypes, regulators and targets.
+
 ```{r}
-genes <- get_attribute(
-  object,
-  attribute = "genes"
-)[[1]]
 object <- inferCSN(
   object,
-  n_cores = 1,
-  regulators = genes[1:200],
-  targets = genes[1:200]
+  n_cores = 1
 )
 ```
 
 Export the inferred CSN as a network.
+
 ```{r}
 networks <- export_csn(
   object

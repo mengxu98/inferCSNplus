@@ -5,8 +5,8 @@
 \alias{Network-class}
 \title{The Network class}
 \description{
-The Network object stores the inferred network itself, information about the fitting
- process as well as graph representations of the network.
+The Network object stores the inferred network itself,
+ information about the fitting process as well as graph representations of the network.
 }
 \section{Slots}{
 

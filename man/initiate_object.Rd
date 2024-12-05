@@ -2,18 +2,18 @@
 % Please edit documentation in R/setGenerics.R, R/initiate_object.R
 \name{initiate_object}
 \alias{initiate_object}
-\alias{initiate_object.Seurat}
-\alias{initiate_object.CSNObject}
+\alias{initiate_object,Seurat-method}
+\alias{initiate_object,CSNObject-method}
 \title{Initiate the \code{CSNObject} object}
 \usage{
 initiate_object(object, ...)
 
-\method{initiate_object}{Seurat}(
+\S4method{initiate_object}{Seurat}(
   object,
   celltype = NULL,
   celltype_by = NULL,
-  filter_mode = c("variable", "celltype", "all"),
-  filter_by = c("all", "celltype"),
+  filter_mode = c("variable", "celltype", "unfiltered"),
+  filter_by = c("aggregate", "celltype"),
   rna_assay = "RNA",
   rna_min_pct = 0.1,
   rna_logfc_threshold = 0.25,
@@ -32,7 +32,7 @@ initiate_object(object, ...)
   ...
 )
 
-\method{initiate_object}{CSNObject}(object, ...)
+\S4method{initiate_object}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{A Seurat object containing gene expression and/or chromatin accessibility data.}
@@ -47,8 +47,8 @@ If NULL, all cells will be treated as one group.}
 \item{filter_mode}{Filter mode for identifying cell-type specific features.}
 
 \item{filter_by}{Character. When filter_mode is "variable",
-specify whether to calculate variable features using "all" cells or by "celltype".
-Default is "all".}
+specify whether to calculate variable features using "aggregate" cells or by "celltype".
+Default is "aggregate".}
 
 \item{rna_assay}{A character vector indicating the name of the gene expression
 assay in the \code{Seurat} object.}

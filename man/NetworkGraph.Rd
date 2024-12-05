@@ -2,13 +2,13 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{NetworkGraph}
 \alias{NetworkGraph}
-\alias{NetworkGraph.CSNObject}
-\alias{NetworkGraph.Network}
-\title{Get network parameters}
+\alias{NetworkGraph,CSNObject-method}
+\alias{NetworkGraph,Network-method}
+\title{Get network graph}
 \usage{
 NetworkGraph(object, ...)
 
-\method{NetworkGraph}{CSNObject}(
+\S4method{NetworkGraph}{CSNObject}(
   object,
   network = DefaultNetwork(object),
   graph = "module_graph",
@@ -16,7 +16,7 @@ NetworkGraph(object, ...)
   ...
 )
 
-\method{NetworkGraph}{Network}(object, graph = "module_graph", ...)
+\S4method{NetworkGraph}{Network}(object, graph = "module_graph", ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
@@ -30,5 +30,5 @@ NetworkGraph(object, ...)
 \item{celltypes}{cell types to analyze, NULL for all cell types}
 }
 \description{
-Get network parameters
+Get network graph
 }

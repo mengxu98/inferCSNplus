@@ -5,9 +5,13 @@
 #'
 #' @rdname initiate_object
 #' @export initiate_object
-initiate_object <- function(object, ...) {
-  UseMethod(generic = "initiate_object", object = object)
-}
+setGeneric(
+  "initiate_object",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("initiate_object")
+  }
+)
 
 #' @title Scan for motifs in candidate regions
 #'
@@ -16,9 +20,73 @@ initiate_object <- function(object, ...) {
 #'
 #' @rdname find_motifs
 #' @export find_motifs
-find_motifs <- function(object, ...) {
-  UseMethod(generic = "find_motifs", object = object)
-}
+setGeneric(
+  "find_motifs",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("find_motifs")
+  }
+)
+
+#' @title Get network regions
+#'
+#' @param object The input data, a csn object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname NetworkRegions
+#' @export NetworkRegions
+setGeneric(
+  "NetworkRegions",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("NetworkRegions")
+  }
+)
+
+#' @title Get network modules
+#'
+#' @param object The input data, a csn object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname NetworkModules
+#' @export NetworkModules
+setGeneric(
+  "NetworkModules",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("NetworkModules")
+  }
+)
+
+#' @title Get network parameters
+#'
+#' @param object The input data, a csn object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname NetworkParams
+#' @export NetworkParams
+setGeneric(
+  "NetworkParams",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("NetworkParams")
+  }
+)
+
+#' @title Get network graph
+#'
+#' @param object The input data, a csn object.
+#' @param ... Arguments for other methods
+#'
+#' @rdname NetworkGraph
+#' @export NetworkGraph
+setGeneric(
+  "NetworkGraph",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("NetworkGraph")
+  }
+)
 
 #' @title Get dimensional information
 #'
@@ -33,7 +101,7 @@ setGeneric(
   "get_embedding",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "get_embedding", object = object)
+    standardGeneric("get_embedding")
   }
 )
 
@@ -50,24 +118,7 @@ setGeneric(
   "infer_vector",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "infer_vector", object = object)
-  }
-)
-
-#' @title Get dynamic genes
-#'
-#' @param object The input data, a matrix with cells/samples by genes/features or a seurat object.
-#' @param ... Arguments for other methods
-#'
-#' @return A new object with dynamic genes
-#' @export
-#'
-#' @rdname dynamic_genes
-setGeneric(
-  "dynamic_genes",
-  signature = "object",
-  function(object, ...) {
-    UseMethod(generic = "dynamic_genes", object = object)
+    standardGeneric("infer_vector")
   }
 )
 
@@ -84,7 +135,7 @@ setGeneric(
   "get_pseudotime",
   signature = "object",
   function(object, ...) {
-    UseMethod(generic = "get_pseudotime", object = object)
+    standardGeneric("get_pseudotime")
   }
 )
 
@@ -95,144 +146,148 @@ setGeneric(
 #'
 #' @rdname plot_gof
 #' @export plot_gof
-plot_gof <- function(object, ...) {
-  UseMethod(generic = "plot_gof", object = object)
-}
+setGeneric(
+  "plot_gof",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("plot_gof")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname plot_module_metrics
 #' @export plot_module_metrics
-plot_module_metrics <- function(object, ...) {
-  UseMethod(generic = "plot_module_metrics", object = object)
-}
+setGeneric(
+  "plot_module_metrics",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("plot_module_metrics")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname get_network_graph
 #' @export get_network_graph
-get_network_graph <- function(object, ...) {
-  UseMethod(generic = "get_network_graph", object = object)
-}
+setGeneric(
+  "get_network_graph",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("get_network_graph")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname plot_network_graph
 #' @export plot_network_graph
-plot_network_graph <- function(object, ...) {
-  UseMethod(generic = "plot_network_graph", object = object)
-}
+setGeneric(
+  "plot_network_graph",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("plot_network_graph")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname get_tf_network
 #' @export get_tf_network
-get_tf_network <- function(object, ...) {
-  UseMethod(generic = "get_tf_network", object = object)
-}
+setGeneric(
+  "get_tf_network",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("get_tf_network")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname plot_tf_network
 #' @export plot_tf_network
-plot_tf_network <- function(object, ...) {
-  UseMethod(generic = "plot_tf_network", object = object)
-}
+setGeneric(
+  "plot_tf_network",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("plot_tf_network")
+  }
+)
 
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
+#' @title Get network
 #'
-#' @rdname NetworkGraph
-#' @export NetworkGraph
-NetworkGraph <- function(object, ...) {
-  UseMethod(generic = "NetworkGraph", object = object)
-}
-
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname summary_csn
-#' @export summary_csn
-summary_csn <- function(object, ...) {
-  UseMethod(generic = "summary_csn", object = object)
-}
-
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname GetNetwork
 #' @export GetNetwork
-GetNetwork <- function(object, ...) {
-  UseMethod(generic = "GetNetwork", object = object)
-}
-
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname NetworkRegions
-#' @export NetworkRegions
-NetworkRegions <- function(object, ...) {
-  UseMethod(generic = "NetworkRegions", object = object)
-}
+setGeneric(
+  "GetNetwork",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("GetNetwork")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname Params
 #' @export Params
-Params <- function(object, ...) {
-  UseMethod(generic = "Params", object = object)
-}
+setGeneric(
+  "Params",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("Params")
+  }
+)
 
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
+#' @title Get network TFs
 #'
-#' @rdname NetworkParams
-#' @export NetworkParams
-NetworkParams <- function(object, ...) {
-  UseMethod(generic = "NetworkParams", object = object)
-}
-
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname NetworkTFs
 #' @export NetworkTFs
-NetworkTFs <- function(object, ...) {
-  UseMethod(generic = "NetworkTFs", object = object)
-}
-
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname NetworkModules
-#' @export NetworkModules
-NetworkModules <- function(object, ...) {
-  UseMethod(generic = "NetworkModules", object = object)
-}
+setGeneric(
+  "NetworkTFs",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("NetworkTFs")
+  }
+)
 
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname DefaultNetwork
 #' @export DefaultNetwork
-DefaultNetwork <- function(object, ...) {
-  UseMethod(generic = "DefaultNetwork", object = object)
-}
-
+setGeneric(
+  "DefaultNetwork",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("DefaultNetwork")
+  }
+)
+#' @title Get metrics
+#'
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname metrics
 #' @export metrics
-metrics <- function(object, ...) {
-  UseMethod(generic = "metrics", object = object)
-}
+setGeneric(
+  "metrics",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("metrics")
+  }
+)
 
 #' @title Find TF modules in regulatory network
 #'
@@ -241,42 +296,86 @@ metrics <- function(object, ...) {
 #'
 #' @rdname find_modules
 #' @export find_modules
-find_modules <- function(object, ...) {
-  UseMethod(generic = "find_modules", object = object)
-}
+setGeneric(
+  "find_modules",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("find_modules")
+  }
+)
 
+#' @title Get summary of seurat assay
+#'
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname GetAssaySummary
 #' @export GetAssaySummary
-GetAssaySummary <- function(object, ...) {
-  UseMethod(generic = "GetAssaySummary", object = object)
-}
+setGeneric(
+  "GetAssaySummary",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("GetAssaySummary")
+  }
+)
 
+#' @title Get seurat assay
+#'
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname GetAssay
 #' @export GetAssay
-GetAssay <- function(object, ...) {
-  UseMethod(generic = "GetAssay", object = object)
-}
+setGeneric(
+  "GetAssay",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("GetAssay")
+  }
+)
 
+#' @title Get layer data from CSNObject
+#'
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname LayerData
 #' @export LayerData
-LayerData <- function(object, ...) {
-  UseMethod(generic = "LayerData", object = object)
-}
+setGeneric(
+  "LayerData",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("LayerData")
+  }
+)
 
+#' @title Get variable features from CSNObject
+#'
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'
 #' @rdname VariableFeatures
 #' @export VariableFeatures
-VariableFeatures <- function(object, ...) {
-  UseMethod(generic = "VariableFeatures", object = object)
-}
+setGeneric(
+  "VariableFeatures",
+  signature = "object",
+  function(object, ...) {
+    standardGeneric("VariableFeatures")
+  }
+)
+
+#' @title Export network from CSN object
+#' @description Export network data from a CSN object with optional filtering
+#'
+#' @param object A CSNObject object
+#' @param ... Additional arguments
+#'
+#' @return A list of network data frames by cell type
+#'
+#' @export
+setGeneric(
+  "export_csn",
+  function(object, ...) {
+    standardGeneric("export_csn")
+  }
+)

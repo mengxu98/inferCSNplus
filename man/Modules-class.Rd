@@ -5,7 +5,7 @@
 \alias{Modules-class}
 \title{The Modules class}
 \description{
-The Modules object stores the TF modules extracted from the inferred network..
+The Modules object stores the TF modules extracted from the inferred network.
 }
 \section{Slots}{
 

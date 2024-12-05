@@ -2,15 +2,15 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{GetAssaySummary}
 \alias{GetAssaySummary}
-\alias{GetAssaySummary.Seurat}
-\alias{GetAssaySummary.CSNObject}
+\alias{GetAssaySummary,Seurat-method}
+\alias{GetAssaySummary,CSNObject-method}
 \title{Get summary of seurat assay}
 \usage{
 GetAssaySummary(object, ...)
 
-\method{GetAssaySummary}{Seurat}(object, group_name, assay = NULL, verbose = TRUE, ...)
+\S4method{GetAssaySummary}{Seurat}(object, group_name, assay = NULL, verbose = TRUE, ...)
 
-\method{GetAssaySummary}{CSNObject}(object, group_name, assay = NULL, verbose = TRUE, ...)
+\S4method{GetAssaySummary}{CSNObject}(object, group_name, assay = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

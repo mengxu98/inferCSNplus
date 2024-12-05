@@ -2,12 +2,12 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{NetworkRegions}
 \alias{NetworkRegions}
-\alias{NetworkRegions.CSNObject}
+\alias{NetworkRegions,CSNObject-method}
 \title{Get network regions}
 \usage{
 NetworkRegions(object, ...)
 
-\method{NetworkRegions}{CSNObject}(object, ...)
+\S4method{NetworkRegions}{CSNObject}(object, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
