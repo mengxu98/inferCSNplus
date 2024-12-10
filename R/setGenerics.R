@@ -139,8 +139,6 @@ setGeneric(
   }
 )
 
-
-
 #' @param object The input data, a csn object.
 #' @param ... Arguments for other methods
 #'

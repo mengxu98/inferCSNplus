@@ -170,12 +170,12 @@ lda_analysis <- function(
   rownames(doc_prob) <- regulators
   word_prob <- modeltools::posterior(lda_result)$terms
 
-  pdf(
+  grDevices::pdf(
     file = file.path(outdir, paste0("lda_k", k, "_allcells", ".pdf")),
     width = 8,
     height = 5
   )
-  par(mfrow = c(1, 2))
+  graphics::par(mfrow = c(1, 2))
   image(
     t(doc_prob),
     main = "Document-Topic Probabilities",
@@ -184,7 +184,7 @@ lda_analysis <- function(
     col = custom_colors,
     axes = FALSE
   )
-  axis(
+  graphics::axis(
     1,
     at = seq(0, 1, length.out = ncol(doc_prob)),
     labels = colnames(doc_prob),
@@ -206,7 +206,7 @@ lda_analysis <- function(
     col = custom_colors,
     axes = FALSE
   )
-  axis(
+  graphics::axis(
     1,
     at = seq(0, 1, length.out = nrow(word_prob)),
     labels = rownames(word_prob),
@@ -220,18 +220,18 @@ lda_analysis <- function(
     legend.width = legend_width,
     legend.cex = legend_font_size
   )
-  dev.off()
+  grDevices::dev.off()
 
   docprob <- doc_prob
   topicid <- apply(docprob, 1, which.max)
   tforder <- order(topicid)
 
-  pdf(
+  grDevices::pdf(
     file = file.path(outdir, paste0("lda_k", k, "_tf-topicPercell.pdf")),
     width = 15,
     height = 10
   )
-  par(mfrow = c(2, 4))
+  graphics::par(mfrow = c(2, 4))
   for (i in seq_along(celltypes)) {
     id <- start_index[i]:end_index[i]
     idrm <- intersect(idrms, id)
@@ -249,7 +249,7 @@ lda_analysis <- function(
       col = custom_colors,
       axes = FALSE
     )
-    axis(
+    graphics::axis(
       1,
       at = seq(0, 1, length.out = ncol(doc_prob)),
       labels = colnames(doc_prob),
@@ -264,7 +264,7 @@ lda_analysis <- function(
       legend.cex = legend_font_size
     )
   }
-  dev.off()
+  grDevices::dev.off()
 
   # Save genes and topic ids
   TopicWordProb <- apply(t(word_prob), 1, max)
@@ -302,12 +302,12 @@ lda_analysis <- function(
     tfid <- apply(d1prob, 1, which.max)
     tforder <- order(tfid)
 
-    pdf(
+    grDevices::pdf(
       file = file.path(outdir, paste0("lda_k", k, "_tf-topicPercell.pdf")),
       width = 15,
       height = 10
     )
-    par(mfrow = c(2, 4))
+    graphics::par(mfrow = c(2, 4))
     for (i in seq_along(celltypes)) {
       id <- start_index[i]:end_index[i]
       idrm <- intersect(idrms, id)
@@ -325,7 +325,7 @@ lda_analysis <- function(
         col = custom_colors,
         axes = FALSE
       )
-      axis(
+      graphics::axis(
         1,
         at = seq(0, 1, length.out = ncol(d1prob[tforder, ])),
         labels = colnames(d1prob[tforder, ]),
@@ -341,7 +341,7 @@ lda_analysis <- function(
         legend.cex = legend_font_size
       )
     }
-    dev.off()
+    grDevices::dev.off()
   }
 
   genes_select_tables <- as.data.frame(
@@ -385,7 +385,7 @@ lda_analysis <- function(
       names(genes_select_table) <- paste0(celltypes[i], "_", celltypes[j])
       genes_select_tables <- cbind(genes_select_tables, genes_select_table)
 
-      pdf(
+      grDevices::pdf(
         file = file.path(
           outdir,
           paste0(
@@ -404,7 +404,7 @@ lda_analysis <- function(
         height = 8
       )
 
-      par(mfrow = c(1, 5))
+      graphics::par(mfrow = c(1, 5))
 
       image(
         t(d1prob[genes_select, ]),
@@ -412,13 +412,13 @@ lda_analysis <- function(
         col = custom_colors,
         axes = FALSE
       )
-      axis(
+      graphics::axis(
         1,
         at = seq(0, 1, length.out = ncol(d1prob)),
         labels = colnames(d1prob),
         cex.axis = font_size
       )
-      axis(
+      graphics::axis(
         2,
         at = seq(0, 1, length.out = ntop),
         labels = genes_select,
@@ -441,13 +441,13 @@ lda_analysis <- function(
         col = custom_colors,
         axes = FALSE
       )
-      axis(
+      graphics::axis(
         1,
         at = seq(0, 1, length.out = ncol(d2prob)),
         labels = colnames(d2prob),
         cex.axis = font_size
       )
-      axis(
+      graphics::axis(
         2,
         at = seq(0, 1, length.out = ntop),
         labels = genes_select,
@@ -477,7 +477,7 @@ lda_analysis <- function(
         cex = font_size,
         yaxt = "n"
       )
-      axis(
+      graphics::axis(
         2,
         at = seq_along(genes_select),
         labels = genes_select,
@@ -485,7 +485,7 @@ lda_analysis <- function(
         cex.axis = font_size
       )
 
-      barplot(
+      graphics::barplot(
         data1_reg_degree[genes_select],
         horiz = TRUE,
         main = paste(celltypes[i], "regulators"),
@@ -495,7 +495,7 @@ lda_analysis <- function(
         cex.names = font_size,
         names.arg = genes_select
       )
-      barplot(
+      graphics::barplot(
         data2_reg_degree[genes_select],
         horiz = TRUE,
         main = paste(celltypes[j], "regulators"),
@@ -505,7 +505,7 @@ lda_analysis <- function(
         cex.names = font_size,
         names.arg = genes_select
       )
-      dev.off()
+      grDevices::dev.off()
     }
   }
 

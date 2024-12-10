@@ -169,7 +169,6 @@ reference:
   - split_epochs_by_group
   - split_epochs_by_pseudotime
   - biglist_compute_betweenness_degree
-  - caoGenes
   - compute_JI_topregs
   - compute_betweenness_degree
   - compute_frobenius_distance

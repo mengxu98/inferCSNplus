@@ -1,11 +1,9 @@
 #' @import Matrix ggplot2 ggraph patchwork tidygraph ggnetwork
 #'
-#' @importFrom grDevices dev.off pdf
-#' @importFrom graphics axis barplot par
 #' @importFrom Rcpp evalCpp
 #' @importFrom RcppArmadillo armadillo_version
 #' @importFrom RcppParallel RcppParallelLibs
-#' @importFrom stats coef predict cor na.omit sd
+#' @importFrom stats coef predict
 #' @importFrom utils methods
 #' @importFrom stats family gaussian na.pass
 #' @importFrom methods as is new
@@ -44,13 +42,11 @@ utils::globalVariables(
     "corr",
     "count",
     "curvetype",
-    "cutreeDynamicTree",
     "degree",
     "edges",
     "end_node",
     "EnsDb.Hsapiens.v93.annot.UCSC.hg38",
     "coefficient",
-    "findTop",
     "from",
     "from_node",
     "fold.enrichment",
@@ -106,7 +102,6 @@ utils::globalVariables(
     "to",
     "to_node",
     "type",
-    "utils_myDist",
     "v",
     "v_new",
     "val",

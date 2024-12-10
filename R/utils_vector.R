@@ -390,7 +390,7 @@ vector_auto_center <- function(
     } else {
       this_dist <- apply(dist[used, this_index], 1, mean)
     }
-    this_cor <- cor(this_dist, center_value[used], method = "spearman")
+    this_cor <- stats::cor(this_dist, center_value[used], method = "spearman")
     dist_cor <- c(dist_cor, this_cor)
 
     dist_mean <- c(dist_mean, mean(this_dist))
@@ -419,9 +419,7 @@ vector_auto_center <- function(
       which(colnames(dist) == this_name),
       which(rownames(dist) %in% paste0("P", summit))
     ]
-    # this_value=center_value[used]
-    this_score <- min(this_dist) # sum(rank(-this_dist) * rank(this_value))
-    # this_cor=cor(-this_value, this_dist)#,method='spearman')
+    this_score <- min(this_dist)
     score <- c(score, this_score)
     PS <- c(PS, this_score)
     i <- i + 1

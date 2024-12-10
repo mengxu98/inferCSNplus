@@ -46,7 +46,7 @@ gam_fit <- function(
   res$adjust_p_value <- stats::p.adjust(
     res$p_value,
     method = adjust_method
-  ) |> na.omit()
+  ) |> stats::na.omit()
   res <- res[order(
     as.numeric(res$adjust_p_value),
     decreasing = FALSE

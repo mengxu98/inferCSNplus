@@ -524,7 +524,7 @@ cor_and_add_action <- function(
   matrix <- matrix[genes, ]
 
   corrs <- apply(spDF[, c("from", "to")], 1, function(x) {
-    cor(matrix[x[1], ], matrix[x[2], ])
+    stats::cor(matrix[x[1], ], matrix[x[2], ])
   })
   spDF$action_by_corr <- corrs
   spDF$action_by_corr <- ifelse(spDF$action_by_corr < 0, -1, 1)

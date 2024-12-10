@@ -1,4 +1,4 @@
-# Functions to define, assign, and extract the dynamic network 
+# Functions to define, assign, and extract the dynamic network
 
 define.epochs <- function(
     dynamic_object,
@@ -254,7 +254,7 @@ find_cuts_by_similarity <- function(
   }
 
   # compute PCC between all cells -- just easier this way
-  xcorr <- cor(matrix[, rownames(dynamic_object$cells)])
+  xcorr <- stats::cor(matrix[, rownames(dynamic_object$cells)])
   pShift <- rep(0, nrow(xcorr) - 1)
   end <- nrow(xcorr)
 
@@ -569,120 +569,8 @@ epochGRN <- function(
 
 
 
-# =================== Old function to cluster and order genes 
+# =================== Old function to cluster and order genes
 # useful for quick and simple epoch assignment, take the place of define_epochs and assign_epochs
-
-#' cluster and order genes
-#'
-#' @param expSmooth expression matrix
-#' @param matrix matrix
-#' @param dynamic_object result of running findDynGenes
-#' @param pThresh pval threshold
-#' @param k number of clusters
-#' @param method method
-#'
-#' @return data.frame of dynamically expressed genes, cluster, peakTime, ordered by peaktime
-#' @export
-caoGenes <- function(
-    expSmooth,
-    matrix, # for alt peakTimes
-    dynamic_object,
-    k = 3,
-    pThresh = 0.01,
-    method = "kmeans") {
-  # Find dyn genes
-  genes <- dynamic_object$genes
-  genes <- names(genes[which(genes < pThresh)])
-  if (length(genes) == 0) {
-    cat("no dynamic genes\n")
-    ans <- data.frame()
-  } else {
-    value <- t(scale(t(expSmooth[genes, ])))
-    cat("A\n")
-    # cluster
-    genedist <- utils_myDist(value)
-    geneTree <- stats::hclust(genedist, "ave")
-
-    if (method == "kmeans") {
-      kmeansRes <- stats::kmeans(genedist, centers = k)
-      geneMods2 <- as.character(kmeansRes$cluster)
-    } else {
-      if (method == "dct") {
-        geneMods <- cutreeDynamicTree(geneTree, deepSplit = FALSE, minModuleSize = 50)
-        geneMods2 <- as.character(geneMods)
-      } else {
-        if (method == "pam") {
-          geneMods <- pam(genedist, k = k, cluster.only = TRUE)
-          geneMods2 <- as.character(geneMods)
-        } else {
-          geneMods <- stats::cutree(geneTree, k = k)
-          geneMods2 <- as.character(geneMods)
-        }
-      }
-    }
-
-    names(geneMods2) <- genes
-    geneMods <- geneMods2
-
-    # find max peak
-    genesPeakTimes <- apply(expSmooth[genes, ], 1, which.max)
-    cat("B\n")
-    # the matrix won't have been pruned ordered
-    matrix <- matrix[, colnames(expSmooth)]
-    ### genesPeakTimesAlt = apply(matrix[genes,], 1, which.max)
-    genesPeakTimesRaw <- apply(matrix[genes, ], 1, findTop)
-    cat("C\n")
-
-    ### peakTime = names(sort(gemeakTime))
-
-    # order the clusters
-    clusterOrder <- vector()
-    clusterNames <- unique(geneMods)
-    meanPeakTimes <- rep(0, length(clusterNames))
-    names(meanPeakTimes) <- clusterNames
-    for (clu in clusterNames) {
-      cat(clu, "\t")
-      cgenes <- names(which(geneMods == clu))
-      cat(length(cgenes), "\t")
-      meanPeakTimes[clu] <- mean(genesPeakTimes[cgenes])
-      cat(meanPeakTimes[clu], "\n")
-    }
-
-    meanPeakTimes <- sort(meanPeakTimes)
-    cluOrdered <- names(meanPeakTimes)
-    # make the data.frame
-
-    ans <- data.frame()
-    for (clu in cluOrdered) {
-      cat(clu, "\n")
-      cgenes <- names(which(geneMods == clu))
-      ptX <- genesPeakTimes[cgenes]
-      ptX_raw <- genesPeakTimesRaw[cgenes]
-      genesOrdered <- names(sort(ptX))
-
-      ### tmpAns<-data.frame(gene = genesOrdered, peakTime = ptX, peakTimeRaw = ptX_raw, epoch = clu)
-
-      tmpAns <- data.frame(gene = genesOrdered, peakTime = ptX[genesOrdered], peakTimeRaw = ptX_raw[genesOrdered], epoch = clu)
-
-
-      rownames(tmpAns) <- genesOrdered
-      ans <- rbind(ans, tmpAns)
-    }
-  }
-
-  # now, re-label the clusters so they make sense
-  epochs <- unique(as.vector(ans$epoch))
-  newepochs <- as.vector(ans$epoch)
-  new_e <- 1
-  for (i in epochs) { # this should go in order they appear
-    newepochs[which(ans$epoch == i)] <- new_e
-    new_e <- new_e + 1
-  }
-
-  ans$epoch <- newepochs
-  ans
-}
-
 
 #' Assigns genes to epochs just based on which mean is maximal
 #'

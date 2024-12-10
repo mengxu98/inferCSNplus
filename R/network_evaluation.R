@@ -248,8 +248,8 @@ calculate_metrics <- function(
       coord_fixed()
 
     conf_plot <- data.frame(
-      Predicted = rep(c("Negative", "Positive"), each = 2),
-      Actual = rep(c("Negative", "Positive"), 2),
+      "Predicted" = rep(c("Negative", "Positive"), each = 2),
+      "Actual" = rep(c("Negative", "Positive"), 2),
       count = pre
     ) |>
       ggplot(aes(x = Actual, y = Predicted)) +

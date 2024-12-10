@@ -277,7 +277,7 @@ dMcast <- function(
         }
       }
       if (drop.unused.levels) {
-        if (nlevels(x) != length(na.omit(unique(x)))) {
+        if (nlevels(x) != length(stats::na.omit(unique(x)))) {
           x <- factor(as.character(x))
         }
       }
