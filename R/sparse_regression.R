@@ -152,7 +152,7 @@ sparse_regression <- function(
       )
       if (any(class(fit) == "try-error")) {
         return(list(
-          metrics = list(rsq = 0),
+          metrics = list(r_squared = 0),
           coefficients = list(
             variable = colnames(x),
             coefficient = rep(0, ncol(x))
@@ -191,7 +191,7 @@ sparse_regression <- function(
     )
     if (any(class(fit) == "try-error")) {
       return(list(
-        metrics = list(rsq = 0),
+        metrics = list(r_squared = 0),
         coefficients = list(
           variable = colnames(x),
           coefficient = rep(0, ncol(x))
@@ -225,7 +225,7 @@ sparse_regression <- function(
     }
   } else {
     return(list(
-      metrics = list(rsq = 0),
+      metrics = list(r_squared = 0),
       coefficients = list(
         variable = colnames(x),
         coefficient = rep(0, ncol(x))
@@ -246,7 +246,7 @@ sparse_regression <- function(
   }
 
   return(list(
-    metrics = list(rsq = r),
+    metrics = list(r_squared = r),
     coefficients = list(
       variable = colnames(x),
       coefficient = coefficients

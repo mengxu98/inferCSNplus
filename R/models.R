@@ -41,6 +41,7 @@ fit_model <- function(
     data,
     method = c(
       "srm",
+      "cvsrm",
       "glm",
       "glmnet",
       "cv.glmnet",
@@ -51,8 +52,12 @@ fit_model <- function(
     alpha = 1,
     ...) {
   method <- match.arg(method)
-  result <- switch(method,
+  result <- switch(
+    EXPR = method,
     "srm" = fit_srm(
+      formula, data, ...
+    ),
+    "cvsrm" = fit_cvsrm(
       formula, data, ...
     ),
     "glm" = fit_glm(
@@ -193,7 +198,7 @@ fit_glm <- function(
   )
   s <- summary(fit)
   metrics <- tibble::tibble(
-    rsq = with(s, 1 - deviance / null.deviance)
+    r_squared = with(s, 1 - deviance / null.deviance)
   )
   coefficients <- tibble::as_tibble(
     s$coefficients,
@@ -213,7 +218,7 @@ fit_glm <- function(
 #' @title Fit regularized generalized linear model
 #'
 #' @description
-#' Fits a regularized GLM using elastic net penalties via glmnet.
+#' Fits a regularized generalized linear model using elastic net penalties via glmnet.
 #'
 #' @md
 #' @param formula An object of class *`formula`* with a symbolic description
@@ -254,7 +259,7 @@ fit_glmnet <- function(
   lambda_choose <- fit$lambda[which_max]
   metrics <- tibble::tibble(
     lambda = lambda_choose,
-    rsq = fit$dev.ratio[which_max],
+    r_squared = fit$dev.ratio[which_max],
     alpha = alpha
   )
   coefficients <- tibble::as_tibble(
@@ -307,7 +312,7 @@ fit_cvglmnet <- function(
   which_max <- fit$index["1se", ]
   metrics <- tibble::tibble(
     lambda = fit$lambda.1se,
-    rsq = fit$glmnet.fit$dev.ratio[which_max],
+    r_squared = fit$glmnet.fit$dev.ratio[which_max],
     alpha = alpha
   )
   coefficients <- tibble::as_tibble(
@@ -364,7 +369,7 @@ fit_brms <- function(
     )
   )
   metrics <- tibble::tibble(
-    rsq = as.matrix(brms::bayes_R2(fit))[, "Estimate"]
+    r_squared = as.matrix(brms::bayes_R2(fit))[, "Estimate"]
   )
   coefficients <- tibble::as_tibble(
     as.matrix(
@@ -431,7 +436,7 @@ fit_xgb <- function(
   )
   y_pred <- predict(fit, newdata = model_mat)
   metrics <- tibble::tibble(
-    rsq = r_square(response, y_pred)
+    r_squared = r_square(response, y_pred)
   )
   coefficients <- tibble::as_tibble(
     as.data.frame(

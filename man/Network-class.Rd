@@ -11,13 +11,15 @@ The Network object stores the inferred network itself,
 \section{Slots}{
 
 \describe{
+\item{\code{data}}{A matrix.}
+
 \item{\code{modules}}{A list TF modules.}
 
 \item{\code{regulators}}{A named list containing the transcription factors included in the network.}
 
 \item{\code{targets}}{A named list containing the target genes included in the network.}
 
-\item{\code{fit}}{A dataframe with goodness of fit measures.}
+\item{\code{metrics}}{A dataframe with goodness of fit measures.}
 
 \item{\code{coefficients}}{A dataframe with the fitted coefficients.}
 

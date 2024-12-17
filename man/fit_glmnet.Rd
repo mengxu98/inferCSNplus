@@ -32,5 +32,5 @@ A list containing two data frames:
 }
 }
 \description{
-Fits a regularized GLM using elastic net penalties via glmnet.
+Fits a regularized generalized linear model using elastic net penalties via glmnet.
 }

@@ -2,11 +2,14 @@
 % Please edit documentation in R/setGenerics.R, R/initiate_object.R
 \name{initiate_object}
 \alias{initiate_object}
+\alias{initiate_object,matrix-method}
 \alias{initiate_object,Seurat-method}
 \alias{initiate_object,CSNObject-method}
 \title{Initiate the \code{CSNObject} object}
 \usage{
 initiate_object(object, ...)
+
+\S4method{initiate_object}{matrix}(object, regulators = character(0), targets = character(0), ...)
 
 \S4method{initiate_object}{Seurat}(
   object,
@@ -38,6 +41,10 @@ initiate_object(object, ...)
 \item{object}{A Seurat object containing gene expression and/or chromatin accessibility data.}
 
 \item{...}{Additional arguments passed to marker detection functions.}
+
+\item{regulators}{Regulators to consider for CSN inference.}
+
+\item{targets}{Targets to consider for CSN inference.}
 
 \item{celltype}{Selected celltype(s) to analyze. If NULL, all cells will be used.}
 

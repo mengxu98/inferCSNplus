@@ -1,4 +1,43 @@
 #' @param object A Seurat object containing gene expression and/or chromatin accessibility data.
+#' @param regulators Regulators to consider for CSN inference.
+#' @param targets Targets to consider for CSN inference.
+#'
+#' @rdname initiate_object
+#' @export
+setMethod(
+  f = "initiate_object",
+  signature = "matrix",
+  definition = function(object,
+                        regulators = character(0),
+                        targets = character(0),
+                        ...) {
+    if (length(regulators) == 0) {
+      regulators <- colnames(object)
+    } else {
+      regulators <- intersect(
+        regulators, colnames(object)
+      )
+    }
+    if (length(targets) == 0) {
+      targets <- colnames(object)
+    } else {
+      targets <- intersect(
+        targets, colnames(object)
+      )
+    }
+
+    object <- methods::new(
+      Class = "Network",
+      data = object,
+      regulators = regulators,
+      targets = targets
+    )
+
+    return(object)
+  }
+)
+
+#' @param object A Seurat object containing gene expression and/or chromatin accessibility data.
 #' @param celltype Selected celltype(s) to analyze. If NULL, all cells will be used.
 #' @param celltype_by Column name in Seurat meta.data for cell type information.
 #' If NULL, all cells will be treated as one group.
@@ -33,28 +72,27 @@
 setMethod(
   f = "initiate_object",
   signature = "Seurat",
-  definition = function(
-      object,
-      celltype = NULL,
-      celltype_by = NULL,
-      filter_mode = c("variable", "celltype", "unfiltered"),
-      filter_by = c("aggregate", "celltype"),
-      rna_assay = "RNA",
-      rna_min_pct = 0.1,
-      rna_logfc_threshold = 0.25,
-      rna_test_method = "wilcox",
-      n_variable_genes = 2000,
-      peak_assay = NULL,
-      peak_min_pct = 0.05,
-      peak_logfc_threshold = 0.1,
-      peak_test_method = "LR",
-      n_variable_peaks = "q5",
-      regions = NULL,
-      exclude_exons = TRUE,
-      only_pos = TRUE,
-      verbose = TRUE,
-      p_value = 0.05,
-      ...) {
+  definition = function(object,
+                        celltype = NULL,
+                        celltype_by = NULL,
+                        filter_mode = c("variable", "celltype", "unfiltered"),
+                        filter_by = c("aggregate", "celltype"),
+                        rna_assay = "RNA",
+                        rna_min_pct = 0.1,
+                        rna_logfc_threshold = 0.25,
+                        rna_test_method = "wilcox",
+                        n_variable_genes = 2000,
+                        peak_assay = NULL,
+                        peak_min_pct = 0.05,
+                        peak_logfc_threshold = 0.1,
+                        peak_test_method = "LR",
+                        n_variable_peaks = "q5",
+                        regions = NULL,
+                        exclude_exons = TRUE,
+                        only_pos = TRUE,
+                        verbose = TRUE,
+                        p_value = 0.05,
+                        ...) {
     if (!is.null(celltype_by) && celltype_by != "aggregate") {
       if (!celltype_by %in% colnames(object@meta.data)) {
         stop(sprintf("Column '%s' not found in object metadata", celltype_by))

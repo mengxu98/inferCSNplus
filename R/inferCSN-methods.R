@@ -2,6 +2,122 @@
 #' @include setGenerics.R
 #' @include inferCSN.R
 
+#' @rdname inferCSN
+#' @method inferCSN Network
+#' @export
+setMethod(
+  f = "inferCSN",
+  signature = signature(object = "Network"),
+  definition = function(object,
+                        penalty = "L0",
+                        algorithm = "CD",
+                        cross_validation = FALSE,
+                        seed = 1,
+                        n_folds = 10,
+                        subsampling_method = "sample",
+                        subsampling_ratio = 1,
+                        r_threshold = 0,
+                        regulators = NULL,
+                        targets = NULL,
+                        cores = 1,
+                        verbose = TRUE,
+                        method = "srm",
+                        gene_cor_threshold = 0,
+                        ...) {
+    matrix <- as_matrix(object@data)
+    if (is.null(regulators)) {
+      regulators <- object@regulators
+      if (length(regulators) == 0) {
+        regulators <- colnames(matrix)
+      }
+    } else {
+      regulators <- intersect(
+        regulators,
+        colnames(matrix)
+      )
+    }
+    if (is.null(targets)) {
+      targets <- object@targets
+      if (length(targets) == 0) {
+        targets <- colnames(matrix)
+      }
+    } else {
+      targets <- intersect(
+        targets,
+        colnames(matrix)
+      )
+    }
+
+    model_fits <- fit_models(
+      object = matrix,
+      regulators = regulators,
+      targets = targets,
+      gene_cor_threshold = gene_cor_threshold,
+      method = method,
+      scale = FALSE,
+      cores = cores,
+      verbose = verbose,
+      ...
+    )
+    model_fits <- model_fits[!purrr::map_lgl(model_fits, is.null)]
+    if (length(model_fits) == 0) {
+      log_message(
+        "fitting model failed for all genes.",
+        verbose = verbose == 2,
+        message_type = "warning"
+      )
+    }
+
+    coefficients <- purrr::map_dfr(
+      model_fits,
+      function(x) x$coefficients,
+      .id = "target"
+    )
+    coefficients <- format_coefs(
+      coefficients,
+      variable = NULL,
+      adjust_method = "fdr"
+    )
+    corrs <- purrr::map_dfr(
+      model_fits,
+      function(x) x$corr,
+      .id = "target"
+    )
+    if (nrow(coefficients) > 0) {
+      coefficients <- suppressMessages(
+        dplyr::left_join(coefficients, corrs)
+      )
+    }
+    object@metrics <- purrr::map_dfr(
+      model_fits,
+      function(x) x$metrics,
+      .id = "target"
+    )
+
+    object@coefficients <- coefficients
+    object@regulators <- regulators
+    object@targets <- targets
+    object@params <- list(
+      method = method,
+      penalty = penalty,
+      algorithm = algorithm,
+      cross_validation = cross_validation,
+      seed = seed,
+      n_folds = n_folds,
+      subsampling_method = subsampling_method,
+      subsampling_ratio = subsampling_ratio,
+      gene_cor_threshold = gene_cor_threshold,
+      r_threshold = r_threshold,
+      cores = cores,
+      verbose = verbose
+    )
+    object <- .process_Network(object)
+    object@network <- export_csn(object)
+
+    return(object)
+  }
+)
+
 #' @param celltypes Character vector of cell types to infer networks for.
 #' @param network_name network_name.
 #' @param peak_to_gene_method Character specifying the method to
@@ -98,7 +214,7 @@ setMethod(
         attribute = "genes"
       )
 
-      celltype_genes <- targets %s% celltype_genes
+      celltype_genes <- targets %ss% celltype_genes
 
       if (length(celltype_genes) == 0) {
         log_message(

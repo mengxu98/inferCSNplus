@@ -9,11 +9,10 @@
 setMethod(
   f = "GetNetwork",
   signature = "CSNObject",
-  definition = function(
-      object,
-      network = DefaultNetwork(object),
-      celltypes = NULL,
-      ...) {
+  definition = function(object,
+                        network = DefaultNetwork(object),
+                        celltypes = NULL,
+                        ...) {
     if (!is.null(celltypes)) {
       return(
         lapply(
@@ -100,11 +99,10 @@ setMethod(
 setMethod(
   f = "NetworkParams",
   signature = "CSNObject",
-  definition = function(
-      object,
-      network = DefaultNetwork(object),
-      celltypes = NULL,
-      ...) {
+  definition = function(object,
+                        network = DefaultNetwork(object),
+                        celltypes = NULL,
+                        ...) {
     networks <- GetNetwork(
       object,
       network = network,
@@ -145,12 +143,11 @@ setMethod(
 setMethod(
   f = "NetworkGraph",
   signature = "CSNObject",
-  definition = function(
-      object,
-      network = DefaultNetwork(object),
-      graph = "module_graph",
-      celltypes = NULL,
-      ...) {
+  definition = function(object,
+                        network = DefaultNetwork(object),
+                        graph = "module_graph",
+                        celltypes = NULL,
+                        ...) {
     networks <- GetNetwork(
       object,
       network = network,
@@ -178,10 +175,9 @@ setMethod(
 setMethod(
   f = "NetworkGraph",
   signature = "Network",
-  definition = function(
-      object,
-      graph = "module_graph",
-      ...) {
+  definition = function(object,
+                        graph = "module_graph",
+                        ...) {
     if (!graph %in% names(object@graphs)) {
       stop(
         paste0(
@@ -228,11 +224,11 @@ setMethod(
   f = "GetAssaySummary",
   signature = "Seurat",
   definition = function(
-    object,
-    group_name,
-    assay = NULL,
-    verbose = TRUE,
-    ...) {
+      object,
+      group_name,
+      assay = NULL,
+      verbose = TRUE,
+      ...) {
     if (is.null(assay)) {
       assay <- object@active.assay
     }
@@ -277,11 +273,11 @@ setMethod(
   f = "GetAssaySummary",
   signature = "CSNObject",
   definition = function(
-    object,
-    group_name,
-    assay = NULL,
-    verbose = TRUE,
-    ...) {
+      object,
+      group_name,
+      assay = NULL,
+      verbose = TRUE,
+      ...) {
     return(
       GetAssaySummary(
         object@data,
@@ -303,10 +299,9 @@ setMethod(
 setMethod(
   f = "GetAssay",
   signature = "CSNObject",
-  definition = function(
-      object,
-      assay = NULL,
-      ...) {
+  definition = function(object,
+                        assay = NULL,
+                        ...) {
     return(
       Seurat::GetAssay(
         object@data,
@@ -350,10 +345,10 @@ setMethod(
   f = "coef",
   signature = "CSNObject",
   definition = function(
-    object,
-    network = DefaultNetwork(object),
-    celltypes = NULL,
-    ...) {
+      object,
+      network = DefaultNetwork(object),
+      celltypes = NULL,
+      ...) {
     networks <- GetNetwork(object, network = network, celltypes = celltypes)
     if (is.null(celltypes)) {
       return(lapply(networks, function(net) net@coefficients))
@@ -384,15 +379,15 @@ setMethod(
   f = "metrics",
   signature = "CSNObject",
   definition = function(
-    object,
-    network = DefaultNetwork(object),
-    celltypes = NULL,
-    ...) {
+      object,
+      network = DefaultNetwork(object),
+      celltypes = NULL,
+      ...) {
     networks <- GetNetwork(object, network = network, celltypes = celltypes)
     if (is.null(celltypes)) {
-      return(lapply(networks, function(net) net@fit))
+      return(lapply(networks, function(net) net@metrics))
     }
-    return(lapply(networks, function(net) net@fit))
+    return(lapply(networks, function(net) net@metrics))
   }
 )
 
@@ -402,7 +397,7 @@ setMethod(
   f = "metrics",
   signature = "Network",
   definition = function(object, celltypes = NULL, ...) {
-    return(object@fit)
+    return(object@metrics)
   }
 )
 
@@ -612,6 +607,55 @@ setMethod(
   }
 )
 
+.process_Network <- function(object) {
+  coefficients <- methods::slot(object, "coefficients")
+
+  if (is.null(coefficients) || nrow(coefficients) == 0) {
+    methods::slot(object, "network") <- data.frame(
+      regulator = character(),
+      target = character(),
+      weight = numeric(),
+      mean_weight = numeric(),
+      mean_corr = numeric(),
+      n_regions = integer()
+    )
+    return(object)
+  }
+
+  coefficients_renamed <- dplyr::rename(coefficients, regulator = tf)
+  aggregated_edges <- dplyr::group_by(coefficients_renamed, regulator, target)
+  aggregated_edges <- dplyr::summarise(
+    aggregated_edges,
+    sum_weight = sum(coefficient),
+    mean_weight = mean(coefficient),
+    mean_corr = mean(corr),
+    n_regions = n(),
+    .groups = "drop"
+  )
+
+  aggregated_edges <- dplyr::group_by(aggregated_edges, target)
+  aggregated_edges <- dplyr::mutate(
+    aggregated_edges,
+    weight = normalization(sum_weight, method = "unit_vector")
+  )
+  aggregated_edges <- dplyr::ungroup(aggregated_edges)
+  aggregated_edges <- as.data.frame(aggregated_edges)
+
+  aggregated_edges <- dplyr::select(
+    aggregated_edges,
+    regulator,
+    target,
+    weight,
+    sum_weight,
+    mean_weight,
+    mean_corr,
+    n_regions
+  )
+
+  methods::slot(object, "network") <- aggregated_edges
+  return(object)
+}
+
 .process_csn <- function(object) {
   active_network <- DefaultNetwork(object)
   networks <- object@networks[[active_network]]
@@ -623,57 +667,7 @@ setMethod(
   for (celltype in names(networks)) {
     network <- networks[[celltype]]
     if (!is.null(network) && methods::is(network, "Network")) {
-      coefficients <- methods::slot(network, "coefficients")
-
-      if (is.null(coefficients) || nrow(coefficients) == 0) {
-        methods::slot(network, "network") <- data.frame(
-          regulator = character(),
-          target = character(),
-          weight = numeric(),
-          mean_weight = numeric(),
-          mean_corr = numeric(),
-          n_regions = integer()
-        )
-        object@networks[[active_network]][[celltype]] <- network
-        next
-      }
-
-      # First calculate aggregated edges with sum_weight
-      aggregated_edges <- coefficients |>
-        dplyr::rename(regulator = tf) |>
-        dplyr::group_by(regulator, target) |>
-        dplyr::summarise(
-          sum_weight = sum(coefficient),
-          mean_weight = mean(coefficient),
-          mean_corr = mean(corr),
-          n_regions = n()
-        ) |>
-        dplyr::ungroup()
-
-      # Then normalize sum_weight for each target and save as weight
-      aggregated_edges <- aggregated_edges |>
-        dplyr::group_by(target) |>
-        dplyr::mutate(
-          weight = normalization(
-            sum_weight,
-            method = "unit_vector"
-          )
-        ) |>
-        dplyr::ungroup() |>
-        as.data.frame()
-
-      aggregated_edges <- aggregated_edges |>
-        dplyr::select(
-          regulator,
-          target,
-          weight,
-          sum_weight,
-          mean_weight,
-          mean_corr,
-          n_regions
-        )
-
-      methods::slot(network, "network") <- aggregated_edges
+      network <- .process_Network(network)
       object@networks[[active_network]][[celltype]] <- network
     }
   }
@@ -696,27 +690,16 @@ setMethod(
            celltypes = NULL,
            weight_cutoff = NULL,
            ...) {
-    active_network <- active_network %s% DefaultNetwork(object)
+    active_network <- active_network %ss% DefaultNetwork(object)
     net_all <- object@networks[[active_network]]
 
     celltypes_all <- names(net_all)
-    celltypes <- intersect(celltypes %s% celltypes_all, celltypes_all)
+    celltypes <- intersect(celltypes %ss% celltypes_all, celltypes_all)
 
     res <- lapply(
       net_all[celltypes],
       function(x) {
-        network <- methods::slot(x, "network") |>
-          network_format(abs_weight = FALSE)
-
-        if (is.null(network)) {
-          return(NULL)
-        }
-
-        if (!is.null(weight_cutoff)) {
-          network <- network[abs(network$weight) >= weight_cutoff, ]
-        }
-
-        return(network)
+        export_csn(x, weight_cutoff = weight_cutoff)
       }
     ) |>
       purrr::set_names(celltypes)
@@ -726,5 +709,30 @@ setMethod(
     }
 
     return(res)
+  }
+)
+
+#' @rdname export_csn
+#' @method export_csn Network
+#' @export
+setMethod(
+  "export_csn",
+  signature = "Network",
+  function(object,
+           weight_cutoff = NULL,
+           ...) {
+    network <- methods::slot(object, "network")
+
+    if (is.null(network)) {
+      return(NULL)
+    }
+
+    network <- network_format(network, abs_weight = FALSE)
+
+    if (!is.null(weight_cutoff)) {
+      network <- network[abs(network$weight) >= weight_cutoff, ]
+    }
+
+    return(network)
   }
 )

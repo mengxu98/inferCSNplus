@@ -188,7 +188,7 @@ reference:
 
 - subtitle: "Utils functions"
 - contents:
-  - '%s%'
+  - '%ss%'
   - as_matrix
   - check_sparsity
   - coef.srm

@@ -87,7 +87,7 @@ utils::globalVariables(
     "region",
     "region_",
     "regulator",
-    "rsq",
+    "r_squared",
     "seqnames",
     "start_node",
     "strand tf_",

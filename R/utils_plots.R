@@ -39,7 +39,7 @@ find_modules.Network <- function(
   }
 
   models_use <- metrics(object) %>%
-    dplyr::filter(rsq > rsq_thresh & nvariables > nvar_thresh) %>%
+    dplyr::filter(r_squared > rsq_thresh & nvariables > nvar_thresh) %>%
     dplyr::pull(target) %>%
     unique()
 
@@ -269,12 +269,12 @@ plot_gof.CSNObject <- function(
   }
 
   metrics <- metrics(object, network = network) %>%
-    dplyr::filter(rsq <= 1, rsq >= 0) %>%
+    dplyr::filter(r_squared <= 1, r_squared >= 0) %>%
     dplyr::mutate(
-      nice = rsq > module_params$rsq_thresh & nvariables > module_params$nvar_thresh
+      nice = r_squared > module_params$rsq_thresh & nvariables > module_params$nvar_thresh
     )
 
-  p1 <- ggplot(metrics, aes(rsq, nvariables, alpha = nice)) +
+  p1 <- ggplot(metrics, aes(r_squared, nvariables, alpha = nice)) +
     ggpointdensity::geom_pointdensity(size = point_size, shape = 16) +
     geom_hline(
       yintercept = module_params$nvar_thresh,
@@ -303,7 +303,7 @@ plot_gof.CSNObject <- function(
       strip.text = element_blank()
     )
 
-  p2 <- ggplot(metrics, aes(rsq)) +
+  p2 <- ggplot(metrics, aes(r_squared)) +
     geom_histogram(
       fill = "darkgray",
       bins = 20,

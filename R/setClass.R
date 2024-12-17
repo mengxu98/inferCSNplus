@@ -23,10 +23,11 @@ setClass(
 #'  The Network object stores the inferred network itself,
 #'  information about the fitting process as well as graph representations of the network.
 #'
+#' @slot data A matrix.
 #' @slot modules A list TF modules.
 #' @slot regulators A named list containing the transcription factors included in the network.
 #' @slot targets A named list containing the target genes included in the network.
-#' @slot fit A dataframe with goodness of fit measures.
+#' @slot metrics A dataframe with goodness of fit measures.
 #' @slot coefficients A dataframe with the fitted coefficients.
 #' @slot graphs Graphical representations of the inferred network.
 #' @slot network A dataframe containing the network edges and their properties.
@@ -38,14 +39,15 @@ setClass(
 setClass(
   Class = "Network",
   slots = list(
-    modules = "Modules",
+    data = "ANY",
+    params = "list",
     regulators = "character",
     targets = "character",
-    fit = "data.frame",
+    metrics = "data.frame",
     coefficients = "data.frame",
-    graphs = "list",
     network = "data.frame",
-    params = "list"
+    modules = "Modules",
+    graphs = "list"
   )
 )
 

@@ -264,7 +264,7 @@ setMethod(
         verbose = verbose
       )
       regulators <- intersect(
-        regulators %s% colnames(motif2tf),
+        regulators %ss% colnames(motif2tf),
         colnames(motif2tf)
       )
       motif2tf <- motif2tf[, regulators, drop = FALSE]
@@ -530,7 +530,7 @@ setMethod(
       regulators = regulators,
       targets = targets,
       coefficients = coefficients,
-      fit = metrics,
+      metrics = metrics,
       params = params
     )
     object@networks[[network_name]][[celltype]] <- network_obj
@@ -548,7 +548,7 @@ setMethod(
   definition = function(object,
                         regulators = NULL,
                         targets = NULL,
-                        gene_cor_threshold = 0.1,
+                        gene_cor_threshold = 0,
                         method = c(
                           "srm",
                           "glm",
@@ -562,22 +562,20 @@ setMethod(
                         cores = 1,
                         ...) {
     method <- match.arg(method)
-    gene_data <- object
 
-    names(targets) <- targets
     log_message(
       sprintf(
-        "Fitting models for %d regulators and %d target genes",
+        "Fitting models with %d regulators and %d targets",
         length(regulators), length(targets)
       ),
       verbose = verbose
     )
-
     model_fits <- parallelize_fun(
-      targets, function(g) {
+      targets,
+      function(g) {
         regulators_use <- setdiff(regulators, g)
-        g_x <- gene_data[, g, drop = FALSE]
-        tf_x <- gene_data[, regulators_use, drop = FALSE]
+        g_x <- object[, g, drop = FALSE]
+        tf_x <- object[, regulators_use, drop = FALSE]
 
         tf_g_cor <- as(sparse_cor(tf_x, g_x), "generalMatrix")
         tf_g_cor[is.na(tf_g_cor)] <- 0

@@ -7,7 +7,7 @@
 fit_model(
   formula,
   data,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb"),
+  method = c("srm", "cvsrm", "glm", "glmnet", "cv.glmnet", "brms", "xgb"),
   family = gaussian,
   alpha = 1,
   ...

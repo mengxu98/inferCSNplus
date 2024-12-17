@@ -6,6 +6,7 @@
 \alias{inferCSN,matrix-method}
 \alias{inferCSN,sparseMatrix-method}
 \alias{inferCSN,data.frame-method}
+\alias{inferCSN,Network-method}
 \alias{inferCSN,CSNObject-method}
 \alias{inferCSN,Seurat-method}
 \title{\strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork}
@@ -75,6 +76,25 @@ inferCSN(
   targets = NULL,
   cores = 1,
   verbose = TRUE,
+  ...
+)
+
+\S4method{inferCSN}{Network}(
+  object,
+  penalty = "L0",
+  algorithm = "CD",
+  cross_validation = FALSE,
+  seed = 1,
+  n_folds = 10,
+  subsampling_method = "sample",
+  subsampling_ratio = 1,
+  r_threshold = 0,
+  regulators = NULL,
+  targets = NULL,
+  cores = 1,
+  verbose = TRUE,
+  method = "srm",
+  gene_cor_threshold = 0,
   ...
 )
 
@@ -164,6 +184,15 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 
 \item{...}{Parameters for other methods.}
 
+\item{method}{A character string indicating the method to fit the model.
+* \code{'srm'} - Sparse Regression Model.
+* \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
+* \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
+* \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
+* \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.}
+
+\item{gene_cor_threshold}{Threshold for TF - target gene correlation.}
+
 \item{celltypes}{Character vector of cell types to infer networks for.}
 
 \item{network_name}{network_name.}
@@ -182,20 +211,11 @@ Only used of `peak_to_gene_method = 'GREAT'`.}
 
 \item{peak_to_gene_domains}{\code{GenomicRanges} object with regulatory regions for each gene.}
 
-\item{gene_cor_threshold}{Threshold for TF - target gene correlation.}
-
 \item{peak_cor_threshold}{Threshold for binding peak - target gene correlation.}
 
 \item{aggregate_rna_col}{aggregate_rna_col}
 
 \item{aggregate_peaks_col}{aggregate_peaks_col}
-
-\item{method}{A character string indicating the method to fit the model.
-* \code{'srm'} - Sparse Regression Model.
-* \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
-* \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-* \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
-* \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.}
 
 \item{alpha}{The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.}
 

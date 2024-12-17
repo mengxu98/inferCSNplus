@@ -3,6 +3,7 @@
 \name{export_csn}
 \alias{export_csn}
 \alias{export_csn,CSNObject-method}
+\alias{export_csn,Network-method}
 \title{Export network from CSN object}
 \usage{
 export_csn(object, ...)
@@ -14,6 +15,8 @@ export_csn(object, ...)
   weight_cutoff = NULL,
   ...
 )
+
+\S4method{export_csn}{Network}(object, weight_cutoff = NULL, ...)
 }
 \arguments{
 \item{object}{A CSNObject object}
