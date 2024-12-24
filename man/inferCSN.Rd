@@ -167,7 +167,7 @@ The \emph{\code{CDPSI}} algorithm may yield better results, but it also increase
 
 \item{n_folds}{The number of folds for cross-validation, default is \emph{\code{10}}.}
 
-\item{subsampling_method}{The method to use for subsampling. Options are "sample" or "meta_cells".}
+\item{subsampling_method}{The method to use for subsampling. Options are "sample", "pseudobulk" or "meta_cells".}
 
 \item{subsampling_ratio}{The percent of all samples used for \code{\link{sparse_regression}}, default is \emph{\code{1}}.}
 
@@ -324,4 +324,8 @@ plot_weight_distribution(
   network_table_sparse_1
 )
 }
+data("example_matrix")
+data("example_ground_truth")
+object <- initiate_object(example_matrix)
+object <- inferCSN(object)
 }

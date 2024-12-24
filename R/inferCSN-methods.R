@@ -5,6 +5,11 @@
 #' @rdname inferCSN
 #' @method inferCSN Network
 #' @export
+#'
+#' @examples
+#' data("example_matrix")
+#' object <- initiate_object(example_matrix)
+#' object <- inferCSN(object)
 setMethod(
   f = "inferCSN",
   signature = signature(object = "Network"),

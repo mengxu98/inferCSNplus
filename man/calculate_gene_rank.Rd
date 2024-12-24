@@ -2,34 +2,43 @@
 % Please edit documentation in R/calculate_gene_rank.R
 \name{calculate_gene_rank}
 \alias{calculate_gene_rank}
-\title{Rank TFs and genes in network}
+\alias{calculate_gene_rank,Network-method}
+\alias{calculate_gene_rank,data.frame-method}
+\title{Calculate gene ranks in network}
 \usage{
 calculate_gene_rank(
-  network_table,
+  object,
+  regulators = NULL,
+  targets = NULL,
+  directed = FALSE
+)
+
+\S4method{calculate_gene_rank}{Network}(
+  object,
+  regulators = NULL,
+  targets = NULL,
+  directed = FALSE
+)
+
+\S4method{calculate_gene_rank}{data.frame}(
+  object,
   regulators = NULL,
   targets = NULL,
   directed = FALSE
 )
 }
 \arguments{
-\item{network_table}{The weight data table of network.}
+\item{object}{A Network object or data frame containing network information}
 
-\item{regulators}{Regulators list.}
+\item{regulators}{Optional character vector of regulator genes}
 
-\item{targets}{Targets list.}
+\item{targets}{Optional character vector of target genes}
 
-\item{directed}{Whether the network is directed.}
+\item{directed}{Logical, whether the network is directed}
 }
 \value{
-A table of gene rank.
+A data frame of gene ranks
 }
 \description{
-Rank TFs and genes in network
-}
-\examples{
-data("example_matrix")
-network_table <- inferCSN(example_matrix)
-head(calculate_gene_rank(network_table))
-head(calculate_gene_rank(network_table, regulators = "g1"))
-head(calculate_gene_rank(network_table, targets = "g1"))
+Calculate gene importance using PageRank algorithm
 }

@@ -106,13 +106,13 @@ RoxygenNote: 7.3.2
 Language: en-US
 Collate: 
     'RcppExports.R'
+    'setGenerics.R'
+    'setClass.R'
     'calculate_gene_rank.R'
     'data.R'
     'density_intersection.R'
     'dynamic_network.R'
     'extract_genes.R'
-    'setGenerics.R'
-    'setClass.R'
     'find_motifs.R'
     'fit_models.R'
     'import.R'
