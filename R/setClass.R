@@ -1,3 +1,31 @@
+#' @title The Perturbation class
+#' @description
+#'  The Perturbation object stores the original expression matrix,
+#'  perturbed expression matrix, TF states, prediction results,
+#'  and embedding results.
+#'
+#' @slot original A matrix.
+#' @slot perturbed A matrix.
+#' @slot tf_states A dataframe.
+#' @slot prediction A list.
+#' @slot embedding A matrix.
+#' @slot params A list.
+#'
+#' @name Perturbation-class
+#' @rdname Perturbation-class
+#' @exportClass Perturbation
+setClass(
+  Class = "Perturbation",
+  slots = list(
+    original = "matrix",
+    perturbed = "matrix",
+    tf_states = "data.frame",
+    prediction = "list",
+    embedding = "matrix",
+    params = "list"
+  )
+)
+
 #' @title The Modules class
 #' @description
 #'  The Modules object stores the TF modules extracted from the inferred network.
@@ -32,6 +60,7 @@ setClass(
 #' @slot graphs Graphical representations of the inferred network.
 #' @slot network A dataframe containing the network edges and their properties.
 #' @slot params A named list with GRN inference parameters.
+#' @slot perturbation A \code{Perturbation} object containing perturbation analysis results.
 #'
 #' @name Network-class
 #' @rdname Network-class
@@ -47,7 +76,8 @@ setClass(
     coefficients = "data.frame",
     network = "data.frame",
     modules = "Modules",
-    graphs = "list"
+    graphs = "list",
+    perturbation = "Perturbation"
   )
 )
 

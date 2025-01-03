@@ -586,7 +586,6 @@ plot_dynamic_networks <- function(
     layout = layout
   )
 
-  # Get out-degree for each regulator node per celltype
   nodes_data <- purrr::map_dfr(
     celltypes_list,
     .f = function(x) {
@@ -656,7 +655,7 @@ plot_dynamic_networks <- function(
       alpha = 0.9
     ) +
     geom_nodetext(
-      aes(label = label_genes), # , size = targets_num - 1
+      aes(label = label_genes),
       color = "black"
     ) +
     theme(aspect.ratio = 2, legend.position = "bottom") +

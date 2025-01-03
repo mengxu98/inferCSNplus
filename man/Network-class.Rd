@@ -28,5 +28,7 @@ The Network object stores the inferred network itself,
 \item{\code{network}}{A dataframe containing the network edges and their properties.}
 
 \item{\code{params}}{A named list with GRN inference parameters.}
+
+\item{\code{perturbation}}{A \code{Perturbation} object containing perturbation analysis results.}
 }}
 

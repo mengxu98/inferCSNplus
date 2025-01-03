@@ -245,13 +245,15 @@ sparse_regression <- function(
     coefficients <- rep(0, ncol(x))
   }
 
-  return(list(
-    metrics = list(r_squared = r),
-    coefficients = list(
-      variable = colnames(x),
-      coefficient = coefficients
+  return(
+    list(
+      metrics = list(r_squared = r),
+      coefficients = list(
+        variable = colnames(x),
+        coefficient = coefficients
+      )
     )
-  ))
+  )
 }
 
 #' @title Fit a sparse regression model

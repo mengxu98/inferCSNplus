@@ -325,7 +325,6 @@ plot_weight_distribution(
 )
 }
 data("example_matrix")
-data("example_ground_truth")
 object <- initiate_object(example_matrix)
 object <- inferCSN(object)
 }

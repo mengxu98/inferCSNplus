@@ -127,6 +127,7 @@ Collate:
     'network_comparison.R'
     'network_evaluation.R'
     'network_heatmap.R'
+    'network_perturbation.R'
     'network_sift.R'
     'network_visualization.R'
     'plot_motifs.R'

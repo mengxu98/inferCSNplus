@@ -4,41 +4,75 @@
 \alias{calculate_gene_rank}
 \alias{calculate_gene_rank,Network-method}
 \alias{calculate_gene_rank,data.frame-method}
-\title{Calculate gene ranks in network}
+\alias{calculate_degree_distribution}
+\alias{calculate_degree_distribution,Network-method}
+\alias{calculate_degree_distribution,data.frame-method}
+\title{Calculate gene rank}
 \usage{
 calculate_gene_rank(
   object,
   regulators = NULL,
   targets = NULL,
-  directed = FALSE
+  directed = FALSE,
+  method = c("page_rank", "degree_distribution"),
+  ...
 )
 
 \S4method{calculate_gene_rank}{Network}(
   object,
   regulators = NULL,
   targets = NULL,
-  directed = FALSE
+  directed = FALSE,
+  method = c("page_rank", "degree_distribution"),
+  ...
 )
 
 \S4method{calculate_gene_rank}{data.frame}(
   object,
   regulators = NULL,
   targets = NULL,
-  directed = FALSE
+  directed = FALSE,
+  method = c("page_rank", "degree_distribution"),
+  ...
+)
+
+calculate_degree_distribution(
+  object,
+  regulators = NULL,
+  targets = NULL,
+  directed = TRUE
+)
+
+\S4method{calculate_degree_distribution}{Network}(
+  object,
+  regulators = NULL,
+  targets = NULL,
+  directed = TRUE
+)
+
+\S4method{calculate_degree_distribution}{data.frame}(
+  object,
+  regulators = NULL,
+  targets = NULL,
+  directed = TRUE
 )
 }
 \arguments{
-\item{object}{A Network object or data frame containing network information}
+\item{object}{Network object}
 
-\item{regulators}{Optional character vector of regulator genes}
+\item{regulators}{Character vector, regulators to include}
 
-\item{targets}{Optional character vector of target genes}
+\item{targets}{Character vector, targets to include}
 
 \item{directed}{Logical, whether the network is directed}
+
+\item{method}{Character, ranking method: "page_rank" or "degree_distribution"}
+
+\item{...}{Additional arguments}
 }
 \value{
-A data frame of gene ranks
+Data frame with gene ranks
 }
 \description{
-Calculate gene importance using PageRank algorithm
+Calculate gene rank
 }
