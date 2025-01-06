@@ -35,7 +35,6 @@ single_network <- function(
     cross_validation = FALSE,
     seed = 1,
     penalty = "L0",
-    algorithm = "CD",
     regulators_num = (ncol(matrix) - 1),
     n_folds = 10,
     subsampling_ratio = 1,
@@ -59,7 +58,6 @@ single_network <- function(
     cross_validation = cross_validation,
     seed = seed,
     penalty = penalty,
-    algorithm = algorithm,
     regulators_num = regulators_num,
     n_folds = n_folds,
     subsampling_ratio = subsampling_ratio,
@@ -90,6 +88,9 @@ single_network <- function(
 #' @inheritParams single_network
 #' @param x The matrix of regulators.
 #' @param y The vector of target.
+#' @param algorithm The type of algorithm used to minimize the objective function, default is *`CD`*.
+#' Currently *`CD`* and *`CDPSI`* are supported.
+#' The *`CDPSI`* algorithm may yield better results, but it also increases running time.
 #' @param computation_method The method used to compute `r` value.
 #'
 #' @md
@@ -107,7 +108,7 @@ sparse_regression <- function(
     cross_validation = FALSE,
     seed = 1,
     penalty = "L0",
-    algorithm = "CD",
+    algorithm = c("CD", "CDPSI"),
     regulators_num = ncol(x),
     n_folds = 10,
     subsampling_ratio = 1,
@@ -115,6 +116,7 @@ sparse_regression <- function(
     computation_method = "cor",
     verbose = TRUE,
     ...) {
+  algorithm <- match.arg(algorithm)
   # TODO:
   # how to handle computation_method in CSNObject and other objects compatible?
   if (cross_validation) {

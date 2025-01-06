@@ -15,7 +15,6 @@ setMethod(
   signature = signature(object = "Network"),
   definition = function(object,
                         penalty = "L0",
-                        algorithm = "CD",
                         cross_validation = FALSE,
                         seed = 1,
                         n_folds = 10,
@@ -105,7 +104,6 @@ setMethod(
     object@params <- list(
       method = method,
       penalty = penalty,
-      algorithm = algorithm,
       cross_validation = cross_validation,
       seed = seed,
       n_folds = n_folds,
@@ -164,7 +162,6 @@ setMethod(
   signature = signature(object = "CSNObject"),
   definition = function(object,
                         penalty = "L0",
-                        algorithm = "CD",
                         cross_validation = FALSE,
                         seed = 1,
                         n_folds = 10,
