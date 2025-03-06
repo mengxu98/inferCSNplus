@@ -56,7 +56,7 @@ format_coefs <- function(
   return(coefs_use)
 }
 
-#' Find peaks or regions near gene body or TSS
+#' @title Find peaks or regions near gene body or TSS
 #'
 #' @param peaks A \code{GRanges} object with peak regions.
 #' @param genes A \code{GRanges} object with gene coordinates.

@@ -16,10 +16,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
+  n_folds = 5,
+  subsampling_method = c("sample", "meta_cells", "pseudobulk"),
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -32,10 +32,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
+  n_folds = 5,
+  subsampling_method = c("sample", "meta_cells", "pseudobulk"),
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -48,10 +48,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
+  n_folds = 5,
+  subsampling_method = c("sample", "meta_cells", "pseudobulk"),
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -64,10 +64,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
+  n_folds = 5,
+  subsampling_method = c("sample", "meta_cells", "pseudobulk"),
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -80,15 +80,15 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
+  n_folds = 5,
   subsampling_method = "sample",
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
   verbose = TRUE,
-  method = "srm",
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "susie"),
   gene_cor_threshold = 0,
   ...
 )
@@ -98,10 +98,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
+  n_folds = 5,
   subsampling_method = "sample",
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -118,7 +118,7 @@ inferCSN(
   peak_cor_threshold = 0,
   aggregate_rna_col = NULL,
   aggregate_peaks_col = NULL,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb"),
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "susie"),
   alpha = 0.5,
   family = "gaussian",
   interaction_term = ":",
@@ -132,10 +132,10 @@ inferCSN(
   penalty = "L0",
   cross_validation = FALSE,
   seed = 1,
-  n_folds = 10,
-  subsampling_method = "sample",
+  n_folds = 5,
+  subsampling_method = c("sample", "meta_cells", "pseudobulk"),
   subsampling_ratio = 1,
-  r_threshold = 0,
+  r_squared_threshold = 0,
   regulators = NULL,
   targets = NULL,
   cores = 1,
@@ -154,13 +154,13 @@ For high-dimensional and sparse data, \emph{\code{L0L2}} is more effective.}
 
 \item{seed}{The random seed for cross-validation, default is \emph{\code{1}}.}
 
-\item{n_folds}{The number of folds for cross-validation, default is \emph{\code{10}}.}
+\item{n_folds}{The number of folds for cross-validation, default is \emph{\code{5}}.}
 
 \item{subsampling_method}{The method to use for subsampling. Options are "sample", "pseudobulk" or "meta_cells".}
 
-\item{subsampling_ratio}{The percent of all samples used for \code{\link{sparse_regression}}, default is \emph{\code{1}}.}
+\item{subsampling_ratio}{The percent of all samples used for \code{\link{fit_srm}}, default is \emph{\code{1}}.}
 
-\item{r_threshold}{Threshold of \eqn{R^2} or correlation coefficient, default is \emph{\code{0}}.}
+\item{r_squared_threshold}{Threshold of \eqn{R^2} coefficient, default is \emph{\code{0}}.}
 
 \item{regulators}{The regulator genes for which to infer the regulatory network.}
 
@@ -262,7 +262,7 @@ inferCSN(
 data("example_ground_truth")
 network_table_07 <- inferCSN(
   example_matrix,
-  r_threshold = 0.7
+  r_squared_threshold = 0.7
 )
 calculate_metrics(
   network_table_1,

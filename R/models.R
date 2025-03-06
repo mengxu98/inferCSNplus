@@ -23,6 +23,8 @@
 #'
 #' * *`xgb`* - Gradient Boosting using *`xgboost`*
 #'
+#' * *`susie`* - SuSiE regression using *`susieR`* package
+#'
 #' @param family A description of the error distribution and link function.
 #' See *`stats::family`* for details.
 #'
@@ -36,6 +38,16 @@
 #' * *`coefficients`* - Fitted coefficients
 #'
 #' @export
+#' @examples
+#' data("example_matrix")
+#' df <- as.data.frame(example_matrix)
+#' fit_model(g1 ~ ., data = df, method = "srm")
+#' fit_model(g1 ~ ., data = df, method = "glm")
+#' fit_model(g1 ~ ., data = df, method = "glmnet")
+#' fit_model(g1 ~ ., data = df, method = "cv.glmnet")
+#' fit_model(g1 ~ ., data = df, method = "brms")
+#' fit_model(g1 ~ ., data = df, method = "xgb")
+#' fit_model(g1 ~ ., data = df, method = "susie")
 fit_model <- function(
     formula,
     data,
@@ -46,7 +58,8 @@ fit_model <- function(
       "glmnet",
       "cv.glmnet",
       "brms",
-      "xgb"
+      "xgb",
+      "susie"
     ),
     family = gaussian,
     alpha = 1,
@@ -54,7 +67,7 @@ fit_model <- function(
   method <- match.arg(method)
   result <- switch(
     EXPR = method,
-    "srm" = fit_srm(
+    "srm" = fit_srm2(
       formula, data, ...
     ),
     "cvsrm" = fit_cvsrm(
@@ -78,6 +91,9 @@ fit_model <- function(
     ),
     "xgb" = fit_xgb(
       formula, data, ...
+    ),
+    "susie" = fit_susie(
+      formula, data, ...
     )
   )
 
@@ -92,7 +108,11 @@ fit_model <- function(
 #' @md
 #' @param formula An object of class *`formula`* with a symbolic description
 #' of the model to be fitted.
+#'
 #' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param verbose If `TRUE`, show warning messages.
+#'
 #' @param ... Additional parameters passed to the underlying sparse regression function.
 #'
 #' @return A list containing two data frames:
@@ -103,10 +123,11 @@ fit_model <- function(
 #' @examples
 #' data("example_matrix")
 #' df <- as.data.frame(example_matrix)
-#' fit_srm(g1 ~ ., data = df)
-fit_srm <- function(
+#' fit_srm2(g1 ~ ., data = df)
+fit_srm2 <- function(
     formula,
     data,
+    verbose = TRUE,
     ...) {
   model_mat <- stats::model.matrix(
     formula,
@@ -114,10 +135,20 @@ fit_srm <- function(
   )[, -1]
   response <- data[[formula[[2]]]]
 
-  result <- sparse_regression(
+  result <- fit_srm(
     x = model_mat,
     y = response,
+    verbose = verbose,
     ...
+  )
+
+  result$metrics <- tibble::tibble(
+    r_squared = result$metrics$r_squared
+  )
+
+  result$coefficients <- tibble::tibble(
+    variable = result$coefficients$variable,
+    coefficient = result$coefficients$coefficient
   )
 
   return(result)
@@ -128,8 +159,8 @@ fit_srm <- function(
 #' @description
 #' Fits a sparse regression model with cross-validation.
 #'
-#' @inheritParams fit_srm
-#' @param verbose If `TRUE`, show warning messages.
+#' @md
+#' @inheritParams fit_srm2
 #'
 #' @return A list containing two data frames:
 #' * `metrics` - Goodness of fit measures
@@ -143,7 +174,6 @@ fit_srm <- function(
 fit_cvsrm <- function(
     formula,
     data,
-    verbose = TRUE,
     ...) {
   model_mat <- stats::model.matrix(
     formula,
@@ -151,12 +181,18 @@ fit_cvsrm <- function(
   )[, -1]
   response <- data[[formula[[2]]]]
 
-  result <- sparse_regression(
+  result <- fit_srm(
     x = model_mat,
     y = response,
     cross_validation = TRUE,
-    verbose = verbose,
     ...
+  )
+  result$metrics <- tibble::tibble(
+    r_squared = result$metrics$r_squared
+  )
+  result$coefficients <- tibble::tibble(
+    variable = result$coefficients$variable,
+    coefficient = result$coefficients$coefficient
   )
 
   return(result)
@@ -209,6 +245,7 @@ fit_glm <- function(
   )
   return(
     list(
+      model = fit,
       metrics = metrics,
       coefficients = coefficients
     )
@@ -268,7 +305,13 @@ fit_glmnet <- function(
   )
   colnames(coefficients) <- c("variable", "coefficient")
 
-  return(list(metrics = metrics, coefficients = coefficients))
+  return(
+    list(
+      model = fit,
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
 }
 
 #' @title Cross-validation for regularized generalized linear models
@@ -320,7 +363,13 @@ fit_cvglmnet <- function(
     rownames = "variable"
   )
   colnames(coefficients) <- c("variable", "coefficient")
-  return(list(metrics = metrics, coefficients = coefficients))
+  return(
+    list(
+      model = fit,
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
 }
 
 #' @title Fit a Bayesian regression model with brms and Stan
@@ -377,9 +426,17 @@ fit_brms <- function(
     ),
     rownames = "variable"
   )
-  colnames(coefficients) <- c("variable", "coefficient", "est_error", "q5", "q95")
+  colnames(coefficients) <- c(
+    "variable", "coefficient", "est_error", "q5", "q95"
+  )
   coefficients$pval <- bayestestR::p_map(fit)$p_MAP
-  return(list(metrics = metrics, coefficients = coefficients))
+  return(
+    list(
+      model = fit,
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
 }
 
 #' @title Fit a gradient boosting regression model with XGBoost
@@ -445,7 +502,71 @@ fit_xgb <- function(
       )
     )
   )
-  colnames(coefficients) <- c("variable", "gain", "cover", "frequency")
+  colnames(coefficients) <- c(
+    "variable", "gain", "cover", "frequency"
+  )
 
-  return(list(metrics = metrics, coefficients = coefficients))
+  return(
+    list(
+      model = fit,
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
+}
+
+#' @title Fit a SuSiE regression model
+#'
+#' @description
+#' Fits a Sum of Single Effects (SuSiE) regression model using the susieR package.
+#'
+#' @md
+#' @param formula An object of class *`formula`* with a symbolic description
+#' of the model to be fitted.
+#'
+#' @param data A *`data.frame`* containing the variables in the model.
+#'
+#' @param ... Additional parameters passed to *`susieR::susie`*.
+#'
+#' @return A list containing two data frames:
+#' * *`metrics`* - Goodness of fit measures
+#' * *`coefficients`* - Fitted coefficients
+#'
+#' @export
+fit_susie <- function(
+    formula,
+    data,
+    ...) {
+  model_mat <- stats::model.matrix(
+    formula,
+    data = data
+  )[, -1]
+  response <- data[[formula[[2]]]]
+
+  fit <- susieR::susie(
+    X = model_mat,
+    y = response,
+    ...
+  )
+
+  y_pred <- predict(fit)
+  r2 <- 1 - sum((response - y_pred)^2) / sum((response - mean(response))^2)
+
+  metrics <- tibble::tibble(
+    r_squared = r2
+  )
+
+  coefs <- coef(fit)[-1]
+  coefficients <- tibble::tibble(
+    variable = colnames(model_mat),
+    coefficient = coefs
+  )
+
+  return(
+    list(
+      model = fit,
+      metrics = metrics,
+      coefficients = coefficients
+    )
+  )
 }

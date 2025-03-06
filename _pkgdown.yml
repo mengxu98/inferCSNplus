@@ -81,8 +81,8 @@ reference:
 - subtitle: "Sparse regression model"
 - contents:
   - single_network
+  - fit_srm
   - sparse_regression
-  - fit_sparse_regression
   - fit_brms
   - fit_cvglmnet
   - fit_cvsrm

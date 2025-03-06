@@ -57,7 +57,8 @@ setGeneric(
                    "glmnet",
                    "cv.glmnet",
                    "brms",
-                   "xgb"
+                   "xgb",
+                   "susie"
                  ),
                  interaction_term = ":",
                  adjust_method = "fdr",
@@ -98,7 +99,8 @@ setMethod(
                           "glmnet",
                           "cv.glmnet",
                           "brms",
-                          "xgb"
+                          "xgb",
+                          "susie"
                         ),
                         interaction_term = ":",
                         adjust_method = "fdr",
@@ -555,7 +557,8 @@ setMethod(
                           "glmnet",
                           "cv.glmnet",
                           "brms",
-                          "xgb"
+                          "xgb",
+                          "susie"
                         ),
                         scale = FALSE,
                         verbose = TRUE,
@@ -631,7 +634,7 @@ setMethod(
 
         if (inherits(result, "try-error")) {
           log_message(
-            sprintf("fitting model failed for %s", g),
+            "fitting model failed for: ", g,
             verbose = verbose == 2,
             message_type = "warning"
           )

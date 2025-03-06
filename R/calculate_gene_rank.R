@@ -245,9 +245,9 @@ setGeneric(
   name = "plot_gene_rank",
   signature = c("object"),
   def = function(object,
-                method = c("page_rank", "degree_distribution"),
-                weight_cutoff = 0.1,
-                compare_random = TRUE) {
+                 method = c("page_rank", "degree_distribution"),
+                 weight_cutoff = 0.1,
+                 compare_random = TRUE) {
     standardGeneric("plot_gene_rank")
   }
 )
@@ -288,9 +288,20 @@ setMethod(
 
     p1 <- ggplot(df_orig, aes(x = log(k), y = log(P_k))) +
       geom_point(size = 1) +
-      geom_smooth(method = "lm", se = FALSE, color = "grey50", size = 0.3, formula = y ~ x) +
+      geom_smooth(
+        method = "lm",
+        se = FALSE,
+        color = "grey50",
+        size = 0.3,
+        formula = y ~ x
+      ) +
       dist_theme +
-      labs(x = "log k", y = "log P(k)", title = "Degree distribution", tag = "a")
+      labs(
+        x = "log k",
+        y = "log P(k)",
+        title = "Degree distribution",
+        tag = "a"
+      )
 
     if (nrow(df_orig) > 1) {
       model <- lm(log(P_k) ~ log(k), data = df_orig)
@@ -314,9 +325,9 @@ setMethod(
     }
 
     centrality_df <- ranks %>%
-      arrange(desc(.data[[rank_col]])) %>%
+      dplyr::arrange(dplyr::desc(.data[[rank_col]])) %>%
       head(30) %>%
-      mutate(centrality = .data[[rank_col]] / max(.data[[rank_col]]))
+      dplyr::mutate(centrality = .data[[rank_col]] / max(.data[[rank_col]]))
 
     cent_theme <- theme_minimal() +
       theme(
@@ -344,7 +355,6 @@ setMethod(
     if (compare_random) {
       n_edges <- igraph::ecount(g_orig)
       all_nodes <- unique(c(network_table$regulator, network_table$target))
-      n_nodes <- length(all_nodes)
 
       random_edges <- data.frame(
         regulator = sample(all_nodes, n_edges, replace = TRUE),
@@ -363,7 +373,13 @@ setMethod(
 
       p2 <- ggplot(df_random, aes(x = log(k), y = log(P_k))) +
         geom_point(size = 1) +
-        geom_smooth(method = "lm", se = FALSE, color = "grey50", size = 0.3, formula = y ~ x) +
+        geom_smooth(
+          method = "lm",
+          se = FALSE,
+          color = "grey50",
+          size = 0.3,
+          formula = y ~ x
+        ) +
         dist_theme +
         labs(
           x = "log k", y = "log P(k)",

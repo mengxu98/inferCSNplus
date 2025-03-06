@@ -105,18 +105,27 @@ calculate_metrics <- function(
   pre <- as.vector(
     table(
       predictor_binary,
-      reverse_label
+      reverse_label,
+      dnn = c("Predicted", "Actual")
     )
   )
   acc <- as.numeric(
     sprintf("%0.3f", (pre[1] + pre[4]) / sum(pre))
   )
 
+  conf_matrix <- matrix(pre, nrow=2, byrow=TRUE)
+  colnames(conf_matrix) <- c("Negative", "Positive")
+  rownames(conf_matrix) <- c("Negative", "Positive")
+  
+  TP <- conf_matrix[2,2]
+  FP <- conf_matrix[2,1]
+  FN <- conf_matrix[1,2]
+  
   precision <- as.numeric(
-    sprintf("%0.3f", pre[4] / (pre[4] + pre[3]))
+    sprintf("%0.3f", TP / (TP + FP))
   )
   recall <- as.numeric(
-    sprintf("%0.3f", pre[4] / (pre[4] + pre[2]))
+    sprintf("%0.3f", TP / (TP + FN))
   )
   f1_score <- as.numeric(
     sprintf(
@@ -143,18 +152,22 @@ calculate_metrics <- function(
     pred_edge_ids,
     true_edge_ids
   )
-  intersection_size <- length(overlap_edges)
-  union_size <- length(union(pred_edge_ids, true_edge_ids))
 
-  si_score <- as.numeric(
-    sprintf("%0.3f", intersection_size)
-  )
-  ji_score <- as.numeric(
-    sprintf(
-      "%0.3f",
-      ifelse(union_size > 0, intersection_size / union_size, 0)
+  if(length(pred_edge_ids) == 0 || length(true_edge_ids) == 0) {
+    si_score <- 0
+    ji_score <- 0
+  } else {
+    intersection_size <- length(overlap_edges)
+    union_size <- length(union(pred_edge_ids, true_edge_ids))
+    
+    si_score <- as.numeric(sprintf("%0.3f", intersection_size))
+    ji_score <- as.numeric(
+      sprintf(
+        "%0.3f",
+        intersection_size / union_size
+      )
     )
-  )
+  }
 
   if (plot) {
     all_genes <- sort(
@@ -346,9 +359,9 @@ calculate_metrics <- function(
         vjust = -0.3
       ) +
       scale_fill_manual(values = c(
-        "Overlap" = "#FFB347",
-        "Prediction" = "#FF6B6B",
-        "Ground Truth" = "#4ECDC4",
+        "Overlap" = "#e88c0b",
+        "Prediction" = "#da3030",
+        "Ground Truth" = "#0d8880",
         "Total" = "#6C757D"
       )) +
       theme_minimal() +

@@ -607,8 +607,15 @@ setMethod(
   }
 )
 
-.process_Network <- function(object) {
+.process_Network <- function(
+  object,
+  r_squared_threshold = 0
+) {
+  metrics <- methods::slot(object, "metrics")
+  metrics <- metrics[metrics$r_squared >= r_squared_threshold, ]
+  targets <- unique(metrics$target)
   coefficients <- methods::slot(object, "coefficients")
+  coefficients <- coefficients[coefficients$target %in% targets, ]
 
   if (is.null(coefficients) || nrow(coefficients) == 0) {
     methods::slot(object, "network") <- data.frame(
@@ -622,8 +629,15 @@ setMethod(
     return(object)
   }
 
-  coefficients_renamed <- dplyr::rename(coefficients, regulator = tf)
-  aggregated_edges <- dplyr::group_by(coefficients_renamed, regulator, target)
+  coefficients_renamed <- dplyr::rename(
+    coefficients,
+    regulator = tf
+  )
+  aggregated_edges <- dplyr::group_by(
+    coefficients_renamed,
+    regulator,
+    target
+  )
   aggregated_edges <- dplyr::summarise(
     aggregated_edges,
     sum_weight = sum(coefficient),
@@ -656,7 +670,10 @@ setMethod(
   return(object)
 }
 
-.process_csn <- function(object) {
+.process_csn <- function(
+  object,
+  r_squared_threshold = 0
+) {
   active_network <- DefaultNetwork(object)
   networks <- object@networks[[active_network]]
 
@@ -667,7 +684,10 @@ setMethod(
   for (celltype in names(networks)) {
     network <- networks[[celltype]]
     if (!is.null(network) && methods::is(network, "Network")) {
-      network <- .process_Network(network)
+      network <- .process_Network(
+        network,
+        r_squared_threshold = r_squared_threshold
+      )
       object@networks[[active_network]][[celltype]] <- network
     }
   }

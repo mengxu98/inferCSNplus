@@ -32,6 +32,7 @@ Imports:
     SeuratObject,
     tidygraph,
     stats,
+    susieR,
     utils,
     patchwork
 Suggests:
@@ -138,7 +139,8 @@ Collate:
     'setMethod-infer_vector.R'
     'setMethod.R'
     'simulate_data.R'
-    'sparse_regression.R'
+    'single_network.R'
+    'sparse_regression_model.R'
     'subsampling.R'
     'theme.R'
     'utils.R'

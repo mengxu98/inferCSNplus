@@ -13,10 +13,10 @@
 #' @param rect_color Default is *`NA`*. Color of heatmap rect.
 #' @param anno_width Width of annotation.
 #' @param anno_height Height of annotation.
-#' @param row_anno_type Default is *`NULL`*,
+#' @param row_anno_type Default is *`boxplot`*,
 #' could add a annotation plot to row,
 #' choose one of *`boxplot`*, *`barplot`*, *`histogram`*, *`density`*, *`lines`*, *`points`*, and *`horizon`*.
-#' @param column_anno_type Default is *`NULL`*,
+#' @param column_anno_type Default is *`boxplot`*,
 #' could add a annotation plot to column,
 #' choose one of *`boxplot`*, *`barplot`*, *`histogram`*, *`density`*, *`lines`*, and *`points`*.
 #' @param legend_name The name of legend.
@@ -45,13 +45,11 @@
 #'
 #' p3 <- plot_network_heatmap(
 #'   network_table,
-#'   heatmap_title = "inferCSN",
 #'   legend_name = "Weight1",
 #'   heatmap_color = c("#20a485", "#410054", "#fee81f")
 #' )
 #' p4 <- plot_network_heatmap(
 #'   network_table,
-#'   heatmap_title = "inferCSN",
 #'   legend_name = "Weight2",
 #'   heatmap_color = c("#20a485", "white", "#fee81f")
 #' )
@@ -96,13 +94,32 @@ plot_network_heatmap <- function(
     heatmap_height = NULL,
     heatmap_width = NULL,
     heatmap_title = NULL,
-    heatmap_color = c("#1966ad", "white", "#bb141a"),
+    heatmap_color = c(
+      "#1966ad",
+      "white",
+      "#bb141a"
+    ),
     border_color = "gray",
     rect_color = NA,
     anno_width = 1,
     anno_height = 1,
-    row_anno_type = NULL,
-    column_anno_type = NULL,
+    row_anno_type = c(
+      "boxplot",
+      "barplot",
+      "histogram",
+      "density",
+      "lines",
+      "points",
+      "horizon"
+    ),
+    column_anno_type = c(
+      "boxplot",
+      "barplot",
+      "histogram",
+      "density",
+      "lines",
+      "points"
+    ),
     legend_name = "Weight",
     row_title = "Regulators") {
   if (switch_matrix) {
@@ -155,10 +172,7 @@ plot_network_heatmap <- function(
   }
 
   if (!is.null(row_anno_type)) {
-    row_anno_type <- match.arg(
-      row_anno_type,
-      c("boxplot", "barplot", "histogram", "density", "lines", "points", "horizon")
-    )
+    row_anno_type <- match.arg(row_anno_type)
     row_anno <- switch(row_anno_type,
       "boxplot" = ComplexHeatmap::rowAnnotation(
         Anno = ComplexHeatmap::anno_boxplot(
@@ -215,10 +229,7 @@ plot_network_heatmap <- function(
   }
 
   if (!is.null(column_anno_type)) {
-    column_anno_type <- match.arg(
-      column_anno_type,
-      c("boxplot", "barplot", "histogram", "density", "lines", "points")
-    )
+    column_anno_type <- match.arg(column_anno_type)
     column_anno <- switch(column_anno_type,
       "boxplot" = ComplexHeatmap::columnAnnotation(
         Anno = ComplexHeatmap::anno_boxplot(

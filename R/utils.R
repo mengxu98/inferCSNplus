@@ -136,12 +136,9 @@ parallelize_fun <- function(
     cross_validation,
     seed,
     n_folds,
-    subsampling_method,
-    subsampling_ratio,
-    r_threshold,
+    r_squared_threshold,
     regulators,
     targets,
-    regulators_num,
     verbose,
     cores,
     ...) {
@@ -175,14 +172,9 @@ parallelize_fun <- function(
     )
   }
 
-  match.arg(
-    subsampling_method,
-    c("sample", "meta_cells", "pseudobulk")
-  )
-
-  if (!(is.numeric(subsampling_ratio) && subsampling_ratio > 0 && subsampling_ratio <= 1)) {
+  if (r_squared_threshold < 0 || r_squared_threshold > 1) {
     log_message(
-      "Please set 'subsampling_ratio' value between: (0, 1].",
+      "Please set 'r_squared_threshold' value between: [0, 1].",
       message_type = "error"
     )
   }
@@ -591,8 +583,8 @@ check_sparsity <- function(x) {
 
 #' @title Extracts a specific solution in the regularization path
 #'
-#' @inheritParams single_network
-#' @param object The output of \code{\link{fit_sparse_regression}}.
+#' @inheritParams fit_srm
+#' @param object The output of \code{\link{sparse_regression}}.
 #' @param lambda The value of lambda at which to extract the solution.
 #' @param gamma The value of gamma at which to extract the solution.
 #' @param ... Other parameters
@@ -612,7 +604,6 @@ coef.srm <- function(
   }
 
   if (is.null(lambda) && is.null(gamma) && is.null(regulators_num)) {
-    # If all three are null, return all solutions
     t <- do.call(cbind, object$beta)
     if (object$settings$intercept) {
       intercepts <- unlist(object$a0)
@@ -675,15 +666,15 @@ coef.srm_cv <- function(
   )
 }
 
-#' @title Prints a summary of `fit_sparse_regression`
+#' @title Prints a summary of `sparse_regression`
 #'
-#' @param x The output of \code{\link{fit_sparse_regression}}.
+#' @param x The output of \code{\link{sparse_regression}}.
 #' @param ... Other parameters
 #'
 #' @method print srm
 #'
 #' @md
-#' @return Return information of `fit_sparse_regression`
+#' @return Return information of `sparse_regression`
 #' @export
 print.srm <- function(x, ...) {
   gammas <- rep(x$gamma, times = lapply(x$lambda, length))
@@ -708,7 +699,7 @@ print.srm_cv <- function(x, ...) {
 
 #' @title Predicts response for a given sample
 #'
-#' @param object The output of fit_sparse_regression.
+#' @param object The output of sparse_regression.
 #' @param newx A matrix on which predictions are made. The matrix should have p columns
 #' @param lambda The value of lambda to use for prediction.
 #' A summary of the lambdas in the regularization path can be obtained using \code{\link{print.srm}}.

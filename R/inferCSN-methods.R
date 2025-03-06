@@ -17,15 +17,23 @@ setMethod(
                         penalty = "L0",
                         cross_validation = FALSE,
                         seed = 1,
-                        n_folds = 10,
+                        n_folds = 5,
                         subsampling_method = "sample",
                         subsampling_ratio = 1,
-                        r_threshold = 0,
+                        r_squared_threshold = 0,
                         regulators = NULL,
                         targets = NULL,
                         cores = 1,
                         verbose = TRUE,
-                        method = "srm",
+                        method = c(
+                          "srm",
+                          "glm",
+                          "glmnet",
+                          "cv.glmnet",
+                          "brms",
+                          "xgb",
+                          "susie"
+                        ),
                         gene_cor_threshold = 0,
                         ...) {
     matrix <- as_matrix(object@data)
@@ -67,7 +75,7 @@ setMethod(
     if (length(model_fits) == 0) {
       log_message(
         "fitting model failed for all genes.",
-        verbose = verbose == 2,
+        verbose = verbose,
         message_type = "warning"
       )
     }
@@ -110,11 +118,14 @@ setMethod(
       subsampling_method = subsampling_method,
       subsampling_ratio = subsampling_ratio,
       gene_cor_threshold = gene_cor_threshold,
-      r_threshold = r_threshold,
+      r_squared_threshold = r_squared_threshold,
       cores = cores,
       verbose = verbose
     )
-    object <- .process_Network(object)
+    object <- .process_Network(
+      object,
+      r_squared_threshold = r_squared_threshold
+    )
     object@network <- export_csn(object)
 
     return(object)
@@ -164,10 +175,10 @@ setMethod(
                         penalty = "L0",
                         cross_validation = FALSE,
                         seed = 1,
-                        n_folds = 10,
+                        n_folds = 5,
                         subsampling_method = "sample",
                         subsampling_ratio = 1,
-                        r_threshold = 0,
+                        r_squared_threshold = 0,
                         regulators = NULL,
                         targets = NULL,
                         cores = 1,
@@ -190,7 +201,8 @@ setMethod(
                           "glmnet",
                           "cv.glmnet",
                           "brms",
-                          "xgb"
+                          "xgb",
+                          "susie"
                         ),
                         alpha = 0.5,
                         family = "gaussian",
@@ -260,7 +272,10 @@ setMethod(
       verbose = verbose
     )
 
-    object <- .process_csn(object)
+    object <- .process_csn(
+      object,
+      r_squared_threshold = r_squared_threshold
+    )
     for (celltype in celltypes) {
       network <- export_csn(
         object,
@@ -280,7 +295,7 @@ setMethod(
         )
       } else {
         log_message(
-          sprintf("   %s: no edges inferred", celltype),
+          celltype, ": no edges inferred",
           verbose = verbose,
           message_type = "warning"
         )
@@ -299,8 +314,8 @@ setMethod(
   signature = signature(object = "Seurat"),
   definition = function(object, ...) {
     stop(
-      "inferCSN is not supported for Seurat objects",
-      "\n  Please run `initiate_object()` first"
+      "inferCSN is not supported for Seurat object",
+      "\n  Please run `initiate_object()` for Seurat object first"
     )
   }
 )
