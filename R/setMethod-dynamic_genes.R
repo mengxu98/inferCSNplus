@@ -21,8 +21,12 @@ gam_fit <- function(
     cores = 1,
     verbose = TRUE,
     adjust_method = "BH") {
-  adjust_method <- match.arg(adjust_method, stats::p.adjust.methods)
+  adjust_method <- match.arg(
+    adjust_method,
+    stats::p.adjust.methods
+  )
 
+  matrix <- t(matrix)
   res <- parallelize_fun(
     colnames(matrix),
     function(x) {
@@ -81,13 +85,12 @@ gam_fit <- function(
 setMethod(
   "dynamic_genes",
   signature = "matrix",
-  function(
-      object,
-      pseudotime = NULL,
-      cores = 1,
-      verbose = TRUE,
-      adjust_method = "BH",
-      ...) {
+  function(object,
+           pseudotime = NULL,
+           cores = 1,
+           verbose = TRUE,
+           adjust_method = "BH",
+           ...) {
     if (is.null(pseudotime)) {
       log_message(
         "No pseudotime provided, using all genes.",
