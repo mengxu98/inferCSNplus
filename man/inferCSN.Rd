@@ -267,12 +267,12 @@ network_table_07 <- inferCSN(
 calculate_metrics(
   network_table_1,
   example_ground_truth,
-  plot = TRUE
+  return_plot = TRUE
 )
 calculate_metrics(
   network_table_07,
   example_ground_truth,
-  plot = TRUE
+  return_plot = TRUE
 )
 }
 \dontrun{

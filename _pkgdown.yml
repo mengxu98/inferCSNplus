@@ -62,6 +62,7 @@ reference:
 - contents:
   - plot_coefficient
   - plot_coefficients
+  - plot_edges_comparison
   - plot_embedding
   - plot_histogram
   - plot_scatter
@@ -76,6 +77,15 @@ reference:
 - subtitle: "Network evaluation"
 - contents:
   - calculate_metrics
+  - calculate_accuracy
+  - calculate_auc
+  - calculate_auroc
+  - calculate_auprc
+  - calculate_precision
+  - calculate_recall
+  - calculate_f1
+  - calculate_si
+  - calculate_ji
   - JI_across_topregs
 
 - subtitle: "Sparse regression model"
@@ -228,6 +238,7 @@ reference:
   - sample_and_epoch_reconstruct
   - score_targets
   - sparse_cor
+  - sparse_cov_cor
   - split_indices
   - log_message
   - r_square

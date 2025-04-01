@@ -28,7 +28,8 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 NumericMatrix table_to_matrix(DataFrame network_table,
                               Nullable<CharacterVector> regulators = R_NilValue,
-                              Nullable<CharacterVector> targets = R_NilValue) {
+                              Nullable<CharacterVector> targets = R_NilValue)
+{
   CharacterVector table_regulators = network_table["regulator"];
   CharacterVector table_targets = network_table["target"];
   NumericVector weight = network_table["weight"];
@@ -37,17 +38,23 @@ NumericMatrix table_to_matrix(DataFrame network_table,
   CharacterVector filter_regulators;
   CharacterVector filter_targets;
 
-  if (regulators.isNotNull()) {
+  if (regulators.isNotNull())
+  {
     CharacterVector reg(regulators);
     filter_regulators = intersect(unique(table_regulators), reg);
-  } else {
+  }
+  else
+  {
     filter_regulators = unique(table_regulators);
   }
 
-  if (targets.isNotNull()) {
+  if (targets.isNotNull())
+  {
     CharacterVector tar(targets);
     filter_targets = intersect(unique(table_targets), tar);
-  } else {
+  }
+  else
+  {
     filter_targets = unique(table_targets);
   }
 
@@ -55,22 +62,27 @@ NumericMatrix table_to_matrix(DataFrame network_table,
   std::vector<std::string> reg_strings;
   std::vector<std::string> tar_strings;
 
-  for (int i = 0; i < filter_regulators.length(); i++) {
+  for (int i = 0; i < filter_regulators.length(); i++)
+  {
     reg_strings.push_back(Rcpp::as<std::string>(filter_regulators[i]));
   }
-  for (int i = 0; i < filter_targets.length(); i++) {
+  for (int i = 0; i < filter_targets.length(); i++)
+  {
     tar_strings.push_back(Rcpp::as<std::string>(filter_targets[i]));
   }
 
   // Custom comparison function for gene names (e.g., g1, g2, g10)
-  auto geneCompare = [](const std::string &a, const std::string &b) {
+  auto geneCompare = [](const std::string &a, const std::string &b)
+  {
     size_t na = a.find_first_of("0123456789");
     size_t nb = b.find_first_of("0123456789");
 
-    if (na != std::string::npos && nb != std::string::npos) {
+    if (na != std::string::npos && nb != std::string::npos)
+    {
       std::string prefix_a = a.substr(0, na);
       std::string prefix_b = b.substr(0, nb);
-      if (prefix_a == prefix_b) {
+      if (prefix_a == prefix_b)
+      {
         return std::stoi(a.substr(na)) < std::stoi(b.substr(nb));
       }
     }
@@ -85,10 +97,12 @@ NumericMatrix table_to_matrix(DataFrame network_table,
   std::unordered_map<std::string, int> regulator_indices;
   std::unordered_map<std::string, int> target_indices;
 
-  for (int i = 0; i < reg_strings.size(); ++i) {
+  for (int i = 0; i < reg_strings.size(); ++i)
+  {
     regulator_indices[reg_strings[i]] = i;
   }
-  for (int i = 0; i < tar_strings.size(); ++i) {
+  for (int i = 0; i < tar_strings.size(); ++i)
+  {
     target_indices[tar_strings[i]] = i;
   }
 
@@ -99,10 +113,12 @@ NumericMatrix table_to_matrix(DataFrame network_table,
   // Convert back to CharacterVector for rownames/colnames
   CharacterVector sorted_regulators(reg_strings.size());
   CharacterVector sorted_targets(tar_strings.size());
-  for (int i = 0; i < reg_strings.size(); i++) {
+  for (int i = 0; i < reg_strings.size(); i++)
+  {
     sorted_regulators[i] = reg_strings[i];
   }
-  for (int i = 0; i < tar_strings.size(); i++) {
+  for (int i = 0; i < tar_strings.size(); i++)
+  {
     sorted_targets[i] = tar_strings[i];
   }
 
@@ -110,7 +126,8 @@ NumericMatrix table_to_matrix(DataFrame network_table,
   colnames(weight_matrix) = sorted_targets;
 
   // Fill matrix only with filtered and valid entries
-  for (int i = 0; i < network_table.nrows(); ++i) {
+  for (int i = 0; i < network_table.nrows(); ++i)
+  {
     std::string reg = Rcpp::as<std::string>(table_regulators[i]);
     std::string tar = Rcpp::as<std::string>(table_targets[i]);
 
@@ -118,7 +135,8 @@ NumericMatrix table_to_matrix(DataFrame network_table,
     auto tar_it = target_indices.find(tar);
 
     // Skip if regulator or target is not in filtered set
-    if (reg_it != regulator_indices.end() && tar_it != target_indices.end()) {
+    if (reg_it != regulator_indices.end() && tar_it != target_indices.end())
+    {
       weight_matrix(reg_it->second, tar_it->second) = weight[i];
     }
   }
@@ -230,4 +248,10 @@ bench::mark(
   table_to_matrix_v1(network_table),
   table_to_matrix_v2(network_table)
 )
+# # A tibble: 3 × 13
+#   expression               min   median `itr/sec` mem_alloc `gc/sec` n_itr  n_gc
+#   <bch:expr>          <bch:tm> <bch:tm>     <dbl> <bch:byt>    <dbl> <int> <dbl>
+# 1 table_to_matrix(ne… 222.04ms 349.54ms     2.86    763.1MB    1.43      2     1
+# 2 table_to_matrix_v1…     1.3s     1.3s     0.767    2.25GB    0.767     1     1
+# 3 table_to_matrix_v2…    2.09s    2.09s     0.479    4.12GB    0.959     1     2
  */
