@@ -2974,6 +2974,21 @@
       ],
       "Hash": "aba060ef3c097b26a4d304ea39d87f32"
     },
+    "mixsqp": {
+      "Package": "mixsqp",
+      "Version": "0.3-54",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "RcppArmadillo",
+        "irlba",
+        "stats",
+        "utils"
+      ],
+      "Hash": "62896dd832ccbf1091e7f13324c24160"
+    },
     "modelr": {
       "Package": "modelr",
       "Version": "0.1.11",
@@ -3651,6 +3666,17 @@
         "utils"
       ],
       "Hash": "397b7b2a265bc5a7a06852524dabae20"
+    },
+    "reshape": {
+      "Package": "reshape",
+      "Version": "0.8.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "plyr"
+      ],
+      "Hash": "603d56041d7d4fa3ceb1864b3f6ee6b1"
     },
     "reshape2": {
       "Package": "reshape2",
@@ -4352,6 +4378,26 @@
         "utils"
       ],
       "Hash": "184d7799bca4ba8c3be72ea396f4b9a3"
+    },
+    "susieR": {
+      "Package": "susieR",
+      "Version": "0.12.35",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Matrix",
+        "R",
+        "crayon",
+        "ggplot2",
+        "grDevices",
+        "graphics",
+        "matrixStats",
+        "methods",
+        "mixsqp",
+        "reshape",
+        "stats"
+      ],
+      "Hash": "e1fbc50605703cb61f2cc1c9f9dd9a58"
     },
     "sys": {
       "Package": "sys",
