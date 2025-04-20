@@ -272,6 +272,7 @@ setGeneric(
     standardGeneric("DefaultNetwork")
   }
 )
+
 #' @title Get metrics
 #'
 #' @param object The input data, a csn object.
@@ -284,21 +285,6 @@ setGeneric(
   signature = "object",
   function(object, ...) {
     standardGeneric("metrics")
-  }
-)
-
-#' @title Find TF modules in regulatory network
-#'
-#' @param object The input data, a csn object.
-#' @param ... Arguments for other methods
-#'
-#' @rdname find_modules
-#' @export find_modules
-setGeneric(
-  "find_modules",
-  signature = "object",
-  function(object, ...) {
-    standardGeneric("find_modules")
   }
 )
 

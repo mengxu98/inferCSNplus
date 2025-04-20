@@ -2,14 +2,15 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{get_network_graph}
 \alias{get_network_graph}
-\alias{get_network_graph.CSNObject}
+\alias{get_network_graph,CSNObject-method}
 \title{Compute network graph embedding using UMAP.}
 \usage{
 get_network_graph(object, ...)
 
-\method{get_network_graph}{CSNObject}(
+\S4method{get_network_graph}{CSNObject}(
   object,
   network = DefaultNetwork(object),
+  celltypes = NULL,
   graph_name = "module_graph",
   rna_assay = "RNA",
   rna_layer = "data",
@@ -26,6 +27,8 @@ get_network_graph(object, ...)
 \item{...}{Additional arguments for \code{\link[uwot]{umap}}.}
 
 \item{network}{Name of the network to use.}
+
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
 
 \item{graph_name}{Name of the graph.}
 

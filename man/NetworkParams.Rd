@@ -2,15 +2,15 @@
 % Please edit documentation in R/setGenerics.R, R/setMethod.R
 \name{NetworkParams}
 \alias{NetworkParams}
-\alias{NetworkParams,CSNObject-method}
 \alias{NetworkParams,Network-method}
+\alias{NetworkParams,CSNObject-method}
 \title{Get network parameters}
 \usage{
 NetworkParams(object, ...)
 
-\S4method{NetworkParams}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
-
 \S4method{NetworkParams}{Network}(object, ...)
+
+\S4method{NetworkParams}{CSNObject}(object, network = DefaultNetwork(object), celltypes = NULL, ...)
 }
 \arguments{
 \item{object}{The input data, a csn object.}

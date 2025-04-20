@@ -2,17 +2,18 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{get_tf_network}
 \alias{get_tf_network}
-\alias{get_tf_network.CSNObject}
+\alias{get_tf_network,CSNObject-method}
 \title{Get sub-network centered around one TF.}
 \usage{
 get_tf_network(object, ...)
 
-\method{get_tf_network}{CSNObject}(
+\S4method{get_tf_network}{CSNObject}(
   object,
-  tf,
+  celltypes = NULL,
+  tfs = NULL,
+  features = NULL,
   network = DefaultNetwork(object),
   graph = "module_graph",
-  features = NULL,
   order = 3,
   keep_all_edges = FALSE,
   verbose = TRUE,
@@ -25,13 +26,15 @@ get_tf_network(object, ...)
 
 \item{...}{Arguments for other methods}
 
-\item{tf}{The transcription factor to center around.}
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
+
+\item{tfs}{The transcription factors to center around.}
+
+\item{features}{Features to use. If \code{NULL} uses all features in the graph.}
 
 \item{network}{Name of the network to use.}
 
 \item{graph}{Name of the graph.}
-
-\item{features}{Features to use. If \code{NULL} uses all features in the graph.}
 
 \item{order}{Integer indicating the maximal order of the graph.}
 

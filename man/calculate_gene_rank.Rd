@@ -4,19 +4,9 @@
 \alias{calculate_gene_rank}
 \alias{calculate_gene_rank,Network-method}
 \alias{calculate_gene_rank,data.frame-method}
-\alias{calculate_degree_distribution}
-\alias{calculate_degree_distribution,Network-method}
-\alias{calculate_degree_distribution,data.frame-method}
 \title{Calculate gene rank}
 \usage{
-calculate_gene_rank(
-  object,
-  regulators = NULL,
-  targets = NULL,
-  directed = FALSE,
-  method = c("page_rank", "degree_distribution"),
-  ...
-)
+calculate_gene_rank(object, ...)
 
 \S4method{calculate_gene_rank}{Network}(
   object,
@@ -35,30 +25,11 @@ calculate_gene_rank(
   method = c("page_rank", "degree_distribution"),
   ...
 )
-
-calculate_degree_distribution(
-  object,
-  regulators = NULL,
-  targets = NULL,
-  directed = TRUE
-)
-
-\S4method{calculate_degree_distribution}{Network}(
-  object,
-  regulators = NULL,
-  targets = NULL,
-  directed = TRUE
-)
-
-\S4method{calculate_degree_distribution}{data.frame}(
-  object,
-  regulators = NULL,
-  targets = NULL,
-  directed = TRUE
-)
 }
 \arguments{
 \item{object}{Network object}
+
+\item{...}{Additional arguments}
 
 \item{regulators}{Character vector, regulators to include}
 
@@ -67,8 +38,6 @@ calculate_degree_distribution(
 \item{directed}{Logical, whether the network is directed}
 
 \item{method}{Character, ranking method: "page_rank" or "degree_distribution"}
-
-\item{...}{Additional arguments}
 }
 \value{
 Data frame with gene ranks

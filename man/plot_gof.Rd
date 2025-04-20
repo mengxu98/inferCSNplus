@@ -2,19 +2,27 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{plot_gof}
 \alias{plot_gof}
-\alias{plot_gof.CSNObject}
+\alias{plot_gof,CSNObject-method}
 \title{Plot goodness-of-fit metrics.}
 \usage{
 plot_gof(object, ...)
 
-\method{plot_gof}{CSNObject}(object, network = DefaultNetwork(object), point_size = 0.5, ...)
+\S4method{plot_gof}{CSNObject}(
+  object,
+  network = DefaultNetwork(object),
+  celltypes = NULL,
+  point_size = 0.5,
+  ...
+)
 }
 \arguments{
 \item{object}{An object.}
 
-\item{...}{Arguments for other methods}
+\item{...}{Additional arguments.}
 
 \item{network}{Name of the network to use.}
+
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
 
 \item{point_size}{Float indicating the point size.}
 }

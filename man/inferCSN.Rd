@@ -88,7 +88,7 @@ inferCSN(
   targets = NULL,
   cores = 1,
   verbose = TRUE,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "susie"),
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "xgb", "susie"),
   gene_cor_threshold = 0,
   ...
 )
@@ -118,7 +118,7 @@ inferCSN(
   peak_cor_threshold = 0,
   aggregate_rna_col = NULL,
   aggregate_peaks_col = NULL,
-  method = c("srm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "susie"),
+  method = c("srm", "glm", "glmnet", "cv.glmnet", "xgb", "susie"),
   alpha = 0.5,
   family = "gaussian",
   interaction_term = ":",
@@ -177,7 +177,6 @@ Recommend setting this to a small fraction of min(n,p) (e.g. 0.05 * min(n,p)) as
 * \code{'srm'} - Sparse Regression Model.
 * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
 * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-* \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
 * \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.}
 
 \item{gene_cor_threshold}{Threshold for TF - target gene correlation.}
@@ -313,7 +312,9 @@ plot_weight_distribution(
   network_table_sparse_1
 )
 }
+\dontrun{
 data("example_matrix")
 object <- initiate_object(example_matrix)
 object <- inferCSN(object)
+}
 }

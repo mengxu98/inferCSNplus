@@ -1,3 +1,14 @@
+#' @title Get GRN inference parameters
+#' @rdname Params
+#' @export
+setMethod(
+  f = "Params",
+  signature = "CSNObject",
+  definition = function(object, ...) {
+    return(object@params)
+  }
+)
+
 #' @include setClass.R
 #' @include setGenerics.R
 
@@ -91,6 +102,16 @@ setMethod(
   }
 )
 
+#' @rdname NetworkParams
+#' @export
+setMethod(
+  f = "NetworkParams",
+  signature = "Network",
+  definition = function(object, ...) {
+    return(object@params)
+  }
+)
+
 #' @param network network
 #' @param celltypes cell types to analyze, NULL for all cell types
 #'
@@ -121,16 +142,6 @@ setMethod(
         networks, function(net) NetworkParams(net)
       )
     )
-  }
-)
-
-#' @rdname NetworkParams
-#' @export
-setMethod(
-  f = "NetworkParams",
-  signature = "Network",
-  definition = function(object, ...) {
-    return(object@params)
   }
 )
 
@@ -203,17 +214,6 @@ setMethod(
   }
 )
 
-#' @title Get GRN inference parameters
-#' @rdname Params
-#' @export
-setMethod(
-  f = "Params",
-  signature = "CSNObject",
-  definition = function(object, ...) {
-    return(object@params)
-  }
-)
-
 #' @param group_name group_name
 #' @param assay assay
 #' @param verbose verbose
@@ -223,12 +223,11 @@ setMethod(
 setMethod(
   f = "GetAssaySummary",
   signature = "Seurat",
-  definition = function(
-      object,
-      group_name,
-      assay = NULL,
-      verbose = TRUE,
-      ...) {
+  definition = function(object,
+                        group_name,
+                        assay = NULL,
+                        verbose = TRUE,
+                        ...) {
     if (is.null(assay)) {
       assay <- object@active.assay
     }
@@ -272,12 +271,11 @@ setMethod(
 setMethod(
   f = "GetAssaySummary",
   signature = "CSNObject",
-  definition = function(
-      object,
-      group_name,
-      assay = NULL,
-      verbose = TRUE,
-      ...) {
+  definition = function(object,
+                        group_name,
+                        assay = NULL,
+                        verbose = TRUE,
+                        ...) {
     return(
       GetAssaySummary(
         object@data,
@@ -331,41 +329,51 @@ setMethod(
   }
 )
 
+#' @title Get fitted coefficients
+#'
+#' @param object Network object
+#' @param ... Other parameters
+#'
+#' @method coef Network
+#'
+#' @return Return the fitted coefficients
+#' @export
+coef.Network <- function(object, ...) {
+  return(object@coefficients)
+}
 
 #' @title Get fitted coefficients
 #'
-#' @param object The csn object
-#' @param network network
-#' @param celltypes cell types to analyze, NULL for all cell types
-#' @param ... other parameters
+#' @param object CSNObject object
+#' @param network Name of the network to use.
+#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param ... Other parameters
 #'
-#' @rdname coef
+#' @method coef CSNObject
+#'
+#' @return Return the fitted coefficients
 #' @export
-setMethod(
-  f = "coef",
-  signature = "CSNObject",
-  definition = function(
-      object,
-      network = DefaultNetwork(object),
-      celltypes = NULL,
-      ...) {
-    networks <- GetNetwork(object, network = network, celltypes = celltypes)
-    if (is.null(celltypes)) {
-      return(lapply(networks, function(net) net@coefficients))
-    }
-    return(lapply(networks, function(net) net@coefficients))
+coef.CSNObject <- function(
+    object,
+    network = DefaultNetwork(object),
+    celltypes = NULL,
+    ...) {
+  networks <- GetNetwork(
+    object,
+    network = network,
+    celltypes = celltypes
+  )
+  if (is.null(celltypes)) {
+    return(
+      lapply(
+        networks, function(net) {
+          net@coefficients
+        }
+      )
+    )
   }
-)
-
-#' @rdname coef
-#' @export
-setMethod(
-  f = "coef",
-  signature = "Network",
-  definition = function(object, ...) {
-    return(object@coefficients)
-  }
-)
+  return(networks@coefficients)
+}
 
 #' @title Get goodness-of-fit info
 #'
@@ -378,16 +386,43 @@ setMethod(
 setMethod(
   f = "metrics",
   signature = "CSNObject",
-  definition = function(
-      object,
-      network = DefaultNetwork(object),
-      celltypes = NULL,
-      ...) {
-    networks <- GetNetwork(object, network = network, celltypes = celltypes)
-    if (is.null(celltypes)) {
-      return(lapply(networks, function(net) net@metrics))
+  definition = function(object,
+                        network = DefaultNetwork(object),
+                        celltypes = NULL,
+                        ...) {
+    # Get network object(s)
+    networks_data <- GetNetwork(object, network = network, celltypes = celltypes)
+
+    # If networks_data is a single Network object
+    if (is(networks_data, "Network")) {
+      return(metrics(networks_data)) # Call metrics,Network-method
     }
-    return(lapply(networks, function(net) net@metrics))
+    # If networks_data is a list of Network objects
+    else if (is.list(networks_data)) {
+      metrics_list <- lapply(
+        networks_data,
+        function(net) {
+          idx <- vapply(networks_data, function(x) identical(x, net), logical(1))
+          net_name <- if (any(idx)) names(networks_data)[which(idx)[1]] else "Unknown"
+
+          if (is(net, "Network")) {
+            metrics(net)
+          } else {
+            warning("Item in list is not a Network object for celltype: ", net_name)
+            NULL
+          }
+        }
+      )
+      valid_indices <- !sapply(metrics_list, is.null)
+      if (length(names(networks_data)) == length(metrics_list)) {
+        names(metrics_list)[valid_indices] <- names(networks_data)[valid_indices]
+      } else {
+        warning("Could not reliably assign names to the result list.")
+      }
+      return(metrics_list)
+    } else {
+      stop("GetNetwork returned an unexpected data type.")
+    }
   }
 )
 
@@ -410,12 +445,16 @@ setMethod(
 #' @export
 #' @method print Network
 print.Network <- function(x, ...) {
-  if (nrow(NetworkModules(x)@meta) == 0) {
-    n_genes <- length(unique(coef(x)$target))
-    n_tfs <- length(unique(coef(x)$tf))
+  coeffs <- methods::slot(x, "coefficients")
+  modules_obj <- methods::slot(x, "modules")
+  modules_meta <- methods::slot(modules_obj, "meta")
+
+  if (nrow(modules_meta) == 0) {
+    n_genes <- length(unique(coeffs$target))
+    n_tfs <- length(unique(coeffs$tf))
   } else {
-    n_genes <- length(unique(NetworkModules(x)@meta$target))
-    n_tfs <- length(unique(NetworkModules(x)@meta$tf))
+    n_genes <- length(unique(modules_meta$target))
+    n_tfs <- length(unique(modules_meta$tf))
   }
   cat(paste0(
     "A Network object\n", "with ", n_tfs, " TFs and ",
@@ -473,144 +512,9 @@ setMethod(
   }
 )
 
-#' @title Get regulatory genes
-#'
-#' @param object A CSNObject object
-#'
-#' @rdname get_attribute
-#' @export
-setGeneric(
-  "get_attribute",
-  function(object, ...) {
-    standardGeneric("get_attribute")
-  }
-)
-
-#' @md
-#' @param celltypes A character vector specifying the celltypes to get attributes for.
-#' If \code{NULL}, all celltypes are returned.
-#' @param active_network A character string specifying the active network to get attributes for.
-#' @param attribute A character string specifying the attribute to get.
-#' This can take any of the following choices:
-#'
-#' * *`genes`* - Gene names
-#'
-#' * *`tfs`* - Transcription factors
-#'
-#' * *`peaks`* - Peaks
-#'
-#' * *`regulators`* - Regulators
-#'
-#' * *`targets`* - Targets
-#'
-#' * *`cells`* - Cells
-#'
-#' * *`modules`* - Modules
-#'
-#' * *`coefficients`* - Coefficients
-#'
-#' @param ... Additional arguments
-#'
-#' @return A character vector of regulatory genes
-#'
-#' @rdname get_attribute
-#' @method get_attribute CSNObject
-#'
-#' @export
-setMethod(
-  "get_attribute",
-  "CSNObject",
-  function(object,
-           celltypes = NULL,
-           active_network = NULL,
-           attribute = c(
-             "genes",
-             "tfs",
-             "peaks",
-             "regulators",
-             "targets",
-             "celltypes",
-             "cells",
-             "modules",
-             "coefficients"
-           ),
-           ...) {
-    if (is.null(celltypes)) {
-      celltypes <- object@metadata$celltypes
-    }
-    if (is.null(active_network)) {
-      active_network <- DefaultNetwork(object)
-    }
-    attribute <- match.arg(attribute)
-    attributes <- switch(
-      EXPR = attribute,
-      "genes" = lapply(
-        celltypes,
-        function(c) {
-          object@metadata$attributes[[c]]$genes$gene
-        }
-      ),
-      "peaks" = lapply(
-        celltypes,
-        function(c) {
-          object@metadata$attributes[[c]]$peaks$peak
-        }
-      ),
-      "regulators" = lapply(
-        celltypes,
-        function(c) {
-          object@networks[[active_network]][[c]]$regulators |>
-            unique()
-        }
-      ),
-      "targets" = lapply(
-        celltypes,
-        function(c) {
-          object@networks[[active_network]][[c]]$targets |>
-            unique()
-        }
-      ),
-      "cells" = lapply(
-        celltypes,
-        function(c) {
-          object@metadata$attributes[[c]]$cells
-        }
-      ),
-      "modules" = lapply( # TODO: check if this is correct
-        celltypes,
-        function(c) {
-          object@networks[[active_network]][[c]]$modules
-        }
-      ),
-      "coefficients" = lapply( # TODO: check if this is correct
-        celltypes,
-        function(c) {
-          object@networks[[active_network]][[c]]$coefficients
-        }
-      )
-    )
-    if (attribute == "tfs") {
-      attributes <- object@metadata$tfs
-      return(attributes)
-    }
-    if (attribute == "celltypes") {
-      attributes <- object@metadata$celltypes
-      return(attributes)
-    }
-
-    attributes <- purrr::set_names(attributes, celltypes)
-    if (length(attributes) == 1) {
-      return(attributes[[1]])
-    }
-
-    return(attributes)
-  }
-)
-
 .process_Network <- function(
-  object,
-  r_squared_threshold = 0
-) {
+    object,
+    r_squared_threshold = 0) {
   metrics <- methods::slot(object, "metrics")
   metrics <- metrics[metrics$r_squared >= r_squared_threshold, ]
   targets <- unique(metrics$target)
@@ -671,9 +575,8 @@ setMethod(
 }
 
 .process_csn <- function(
-  object,
-  r_squared_threshold = 0
-) {
+    object,
+    r_squared_threshold = 0) {
   active_network <- DefaultNetwork(object)
   networks <- object@networks[[active_network]]
 

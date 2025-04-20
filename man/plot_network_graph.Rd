@@ -2,14 +2,15 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{plot_network_graph}
 \alias{plot_network_graph}
-\alias{plot_network_graph.CSNObject}
+\alias{plot_network_graph,CSNObject-method}
 \title{Plot network graph.}
 \usage{
 plot_network_graph(object, ...)
 
-\method{plot_network_graph}{CSNObject}(
+\S4method{plot_network_graph}{CSNObject}(
   object,
   network = DefaultNetwork(object),
+  celltypes = NULL,
   graph = "module_graph",
   layout = "umap",
   edge_width = 0.2,
@@ -29,6 +30,8 @@ plot_network_graph(object, ...)
 \item{...}{Arguments for other methods}
 
 \item{network}{Name of the network to use.}
+
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
 
 \item{graph}{Name of the graph.}
 

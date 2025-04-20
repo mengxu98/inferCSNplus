@@ -6,12 +6,7 @@
 \alias{calculate_page_rank,data.frame-method}
 \title{Calculate PageRank}
 \usage{
-calculate_page_rank(
-  object,
-  regulators = NULL,
-  targets = NULL,
-  directed = FALSE
-)
+calculate_page_rank(object, ...)
 
 \S4method{calculate_page_rank}{Network}(
   object,
@@ -29,6 +24,8 @@ calculate_page_rank(
 }
 \arguments{
 \item{object}{Network object}
+
+\item{...}{Additional arguments}
 
 \item{regulators}{Character vector, regulators to include}
 

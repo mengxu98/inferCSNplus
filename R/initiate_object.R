@@ -52,13 +52,16 @@ setMethod(
 #' @param rna_test_method Statistical test to use for gene markers identification.
 #' @param n_variable_genes Number of variable features to select when not comparing between groups.
 #' @param peak_assay A character vector indicating the name of the chromatin
-#' accessibility assay in the \code{Seurat} object. If NULL, only RNA-seq data will be processed.
+#' accessibility assay in the \code{Seurat} object.
+#' If NULL, only RNA-seq data will be processed.
 #' @param peak_min_pct Minimum percentage of cells expressing the peak in either population.
 #' @param peak_logfc_threshold Minimum log fold-change threshold for peak data.
 #' @param peak_test_method Statistical test to use for peak markers identification.
 #' @param n_variable_peaks Number of variable peaks to select ("q5" by default).
 #' @param regions Candidate regions to consider for binding site inference.
 #' If \code{NULL}, all peaks regions are considered.
+#' \code{regions} could be a \code{GRanges} object,
+#' or a data frame with three columns: chrom, start, end.
 #' @param exclude_exons Logical. Whether to consider exons for binding site inference.
 #' @param only_pos Only return positive markers.
 #' @param verbose Print progress messages.
@@ -523,9 +526,23 @@ process_regions <- function(
     rownames(Seurat::GetAssay(object, assay = peak_assay))
   )
 
-  # Find candidate ranges by intersecting the supplied regions with peaks
-  # Per default take all peaks as candidate regions
   if (!is.null(regions)) {
+    if (is.data.frame(regions)) {
+      regions <- GenomicRanges::GRanges(
+        seqnames = regions[, 1],
+        ranges = IRanges::IRanges(
+          start = regions[, 2],
+          end = regions[, 3]
+        )
+      )
+    }
+    if (!inherits(regions, "GRanges")) {
+      log_message(
+        "Regions must be a GRanges object or a data frame with three columns: chrom, start, end.",
+        message_type = "error"
+      )
+    }
+
     cand_olaps <- IRanges::findOverlaps(regions, peak_ranges)
     cand_ranges <- IRanges::pintersect(
       peak_ranges[S4Vectors::subjectHits(cand_olaps)],
@@ -587,7 +604,8 @@ print_summary <- function(
           as.character(ct), attr$n_cells, attr$n_genes, attr$n_peaks
         ),
         verbose = verbose,
-        cli_model = FALSE
+        cli_model = FALSE,
+        timestamp = FALSE
       )
     } else {
       log_message(
@@ -596,7 +614,8 @@ print_summary <- function(
           as.character(ct), attr$n_cells, attr$n_genes
         ),
         verbose = verbose,
-        cli_model = FALSE
+        cli_model = FALSE,
+        timestamp = FALSE
       )
     }
   }

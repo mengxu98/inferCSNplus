@@ -7,7 +7,7 @@
 fit_model(
   formula,
   data,
-  method = c("srm", "cvsrm", "glm", "glmnet", "cv.glmnet", "brms", "xgb", "susie"),
+  method = c("srm", "cvsrm", "glm", "glmnet", "cv.glmnet", "xgb", "susie"),
   family = gaussian,
   alpha = 1,
   ...
@@ -25,7 +25,6 @@ This can take any of the following choices:
 \item \emph{\code{srm}} - Sparse Regression Model
 \item \emph{\code{glm}} - Generalized Linear Model using \emph{\code{stats::glm}}
 \item \emph{\code{glmnet}}, \emph{\code{cv.glmnet}} - Regularized GLM using \emph{\code{glmnet::glmnet}}
-\item \emph{\code{brms}} - Bayesian Regression using \emph{\code{brms}} package
 \item \emph{\code{xgb}} - Gradient Boosting using \emph{\code{xgboost}}
 \item \emph{\code{susie}} - SuSiE regression using \emph{\code{susieR}} package
 }}
@@ -56,7 +55,6 @@ fit_model(g1 ~ ., data = df, method = "srm")
 fit_model(g1 ~ ., data = df, method = "glm")
 fit_model(g1 ~ ., data = df, method = "glmnet")
 fit_model(g1 ~ ., data = df, method = "cv.glmnet")
-fit_model(g1 ~ ., data = df, method = "brms")
 fit_model(g1 ~ ., data = df, method = "xgb")
 fit_model(g1 ~ ., data = df, method = "susie")
 }

@@ -19,8 +19,6 @@
 #'
 #' * *`glmnet`*, *`cv.glmnet`* - Regularized GLM using *`glmnet::glmnet`*
 #'
-#' * *`brms`* - Bayesian Regression using *`brms`* package
-#'
 #' * *`xgb`* - Gradient Boosting using *`xgboost`*
 #'
 #' * *`susie`* - SuSiE regression using *`susieR`* package
@@ -45,7 +43,6 @@
 #' fit_model(g1 ~ ., data = df, method = "glm")
 #' fit_model(g1 ~ ., data = df, method = "glmnet")
 #' fit_model(g1 ~ ., data = df, method = "cv.glmnet")
-#' fit_model(g1 ~ ., data = df, method = "brms")
 #' fit_model(g1 ~ ., data = df, method = "xgb")
 #' fit_model(g1 ~ ., data = df, method = "susie")
 fit_model <- function(
@@ -57,7 +54,6 @@ fit_model <- function(
       "glm",
       "glmnet",
       "cv.glmnet",
-      "brms",
       "xgb",
       "susie"
     ),
@@ -84,10 +80,6 @@ fit_model <- function(
     "cv.glmnet" = fit_cvglmnet(
       formula, data,
       family = family, alpha = alpha, ...
-    ),
-    "brms" = fit_brms(
-      formula, data,
-      family = family, ...
     ),
     "xgb" = fit_xgb(
       formula, data, ...
@@ -363,73 +355,6 @@ fit_cvglmnet <- function(
     rownames = "variable"
   )
   colnames(coefficients) <- c("variable", "coefficient")
-  return(
-    list(
-      model = fit,
-      metrics = metrics,
-      coefficients = coefficients
-    )
-  )
-}
-
-#' @title Fit a Bayesian regression model with brms and Stan
-#'
-#' @description
-#' Fits a Bayesian regression model using the brms interface to Stan.
-#'
-#' @md
-#' @param formula An object of class *`formula`* with a symbolic description
-#' of the model to be fitted.
-#'
-#' @param data A *`data.frame`* containing the variables in the model.
-#'
-#' @param family A description of the error distribution and link function.
-#' See *`stats::family`* for details.
-#'
-#' @param prior The prior distribution specification for coefficients.
-#' Default *`normal(0,1)`* provides ridge-like regularization.
-#' See *`brms::set_prior`* for details.
-#'
-#' @param ... Additional parameters passed to *`brms::brm`*.
-#'
-#' @return A list containing two data frames:
-#' * *`metrics`* - Bayesian R-squared and model fit metrics
-#' * *`coefficients`* - Posterior estimates with uncertainty intervals
-#'
-#' @export
-fit_brms <- function(
-    formula,
-    data,
-    family = gaussian,
-    prior = brms::prior(normal(0, 1)),
-    ...) {
-  if (!requireNamespace("brms", quietly = TRUE)) {
-    stop("The brms package is required to use brms bayesian regression models.")
-  }
-  fit <- suppressMessages(
-    brms::brm(
-      formula,
-      data = data,
-      family = family,
-      prior = prior,
-      silent = TRUE,
-      refresh = 0,
-      ...
-    )
-  )
-  metrics <- tibble::tibble(
-    r_squared = as.matrix(brms::bayes_R2(fit))[, "Estimate"]
-  )
-  coefficients <- tibble::as_tibble(
-    as.matrix(
-      brms::fixef(fit, probs = c(0.05, 0.95))
-    ),
-    rownames = "variable"
-  )
-  colnames(coefficients) <- c(
-    "variable", "coefficient", "est_error", "q5", "q95"
-  )
-  coefficients$pval <- bayestestR::p_map(fit)$p_MAP
   return(
     list(
       model = fit,

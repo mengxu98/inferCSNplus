@@ -7,9 +7,11 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' data("example_matrix")
 #' object <- initiate_object(example_matrix)
 #' object <- inferCSN(object)
+#' }
 setMethod(
   f = "inferCSN",
   signature = signature(object = "Network"),
@@ -30,7 +32,6 @@ setMethod(
                           "glm",
                           "glmnet",
                           "cv.glmnet",
-                          "brms",
                           "xgb",
                           "susie"
                         ),
@@ -150,7 +151,6 @@ setMethod(
 #' * \code{'srm'} - Sparse Regression Model.
 #' * \code{'glm'} - Generalized Liner Model with \code{\link[stats]{glm}}.
 #' * \code{'glmnet'}, \code{'cv.glmnet'} - Regularized Generalized Liner Model with \code{\link[glmnet]{glmnet}}.
-#' * \code{'brms'} - Bayesian Regression Models using \code{\link[brms]{brms-package}}.
 #' * \code{'xgb'} - Gradient Boosting Regression using \code{\link[xgboost]{xgboost}}.
 #' @param alpha The elasticnet mixing parameter. See \code{\link[glmnet]{glmnet}} for details.
 #' @param family A description of the error distribution and link function to be used in the model.
@@ -200,7 +200,6 @@ setMethod(
                           "glm",
                           "glmnet",
                           "cv.glmnet",
-                          "brms",
                           "xgb",
                           "susie"
                         ),

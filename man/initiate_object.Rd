@@ -69,7 +69,8 @@ assay in the \code{Seurat} object.}
 \item{n_variable_genes}{Number of variable features to select when not comparing between groups.}
 
 \item{peak_assay}{A character vector indicating the name of the chromatin
-accessibility assay in the \code{Seurat} object. If NULL, only RNA-seq data will be processed.}
+accessibility assay in the \code{Seurat} object.
+If NULL, only RNA-seq data will be processed.}
 
 \item{peak_min_pct}{Minimum percentage of cells expressing the peak in either population.}
 
@@ -80,7 +81,9 @@ accessibility assay in the \code{Seurat} object. If NULL, only RNA-seq data will
 \item{n_variable_peaks}{Number of variable peaks to select ("q5" by default).}
 
 \item{regions}{Candidate regions to consider for binding site inference.
-If \code{NULL}, all peaks regions are considered.}
+If \code{NULL}, all peaks regions are considered.
+\code{regions} could be a \code{GRanges} object,
+or a data frame with three columns: chrom, start, end.}
 
 \item{exclude_exons}{Logical. Whether to consider exons for binding site inference.}
 

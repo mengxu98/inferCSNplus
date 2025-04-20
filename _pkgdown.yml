@@ -92,6 +92,7 @@ reference:
 - contents:
   - single_network
   - fit_srm
+  - fit_srm2
   - sparse_regression
   - fit_brms
   - fit_cvglmnet
@@ -102,6 +103,7 @@ reference:
   - fit_xgb
   - fit_model
   - fit_models
+  - fit_susie
   - format_coefs
 
 - subtitle: "vector functions"
@@ -195,6 +197,18 @@ reference:
 - contents:
   - calculate_gene_rank
   - compute_pagerank
+  - calculate_page_rank
+  - plot_gene_rank
+
+- subtitle: "Network perturbation"
+- contents:
+  - Perturbation-class
+  - SetNetwork
+  - calculate_trajectory
+  - embedPerturbation
+  - plotPerturbation
+  - plotPerturbationTrajectory
+  - predictPerturbation
 
 - subtitle: "Utils functions"
 - contents:
@@ -203,6 +217,7 @@ reference:
   - check_sparsity
   - coef.srm
   - coef.srm_cv
+  - coef.Network
   - coef.CSNObject
   - dMcast
   - edge_rank
@@ -237,6 +252,7 @@ reference:
   - rough_hierarchy
   - sample_and_epoch_reconstruct
   - score_targets
+  - SetNetwork
   - sparse_cor
   - sparse_cov_cor
   - split_indices

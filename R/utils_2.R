@@ -127,7 +127,8 @@ find_peaks_near_genes <- function(
     )
 
     # Create GRanges object storing the TSS information
-    tss <- GenomicRanges::GRanges(gene_annot_use)
+    # tss <- GenomicRanges::GRanges(gene_annot_use)
+    tss <- GenomicRanges::GRanges(gene_annot_tss)
 
     # Define basal regulatory region (promoter region)
     # as 5 kb upstream + 1 kb downstream of the TSS
@@ -267,7 +268,6 @@ dMcast <- function(
   characters <- unlist(lapply(data, is.character))
   data[, characters] <- lapply(data[, characters, drop = FALSE], as.factor)
   factors <- unlist(lapply(data, is.factor))
-  # Prevents errors with 1 or fewer distinct levels
   data[, factors] <- lapply(
     data[, factors, drop = FALSE], function(x) {
       if (factor.nas) {
@@ -286,7 +286,6 @@ dMcast <- function(
       return(x)
     }
   )
-  # Allows NAs to pass
   attr(data, "na.action") <- na.pass
   result <- Matrix::sparse.model.matrix(
     newformula,

@@ -2,12 +2,17 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{plot_module_metrics}
 \alias{plot_module_metrics}
-\alias{plot_module_metrics.CSNObject}
+\alias{plot_module_metrics,CSNObject-method}
 \title{Plot module metrics number of genes, number of peaks and number of TFs per gene.}
 \usage{
 plot_module_metrics(object, ...)
 
-\method{plot_module_metrics}{CSNObject}(object, network = DefaultNetwork(object), ...)
+\S4method{plot_module_metrics}{CSNObject}(
+  object,
+  network = DefaultNetwork(object),
+  celltypes = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{The input data, a csn object.}
@@ -15,6 +20,8 @@ plot_module_metrics(object, ...)
 \item{...}{Arguments for other methods}
 
 \item{network}{Name of the network to use.}
+
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
 }
 \value{
 A ggplot2 object.

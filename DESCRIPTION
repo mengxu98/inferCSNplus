@@ -59,7 +59,6 @@ Suggests:
     scales,
     slingshot,
     bayestestR,
-    brms,
     cowplot,
     glmnetUtils,
     gmodels,
@@ -107,19 +106,25 @@ RoxygenNote: 7.3.2
 Language: en-US
 Collate: 
     'RcppExports.R'
-    'setGenerics.R'
     'setClass.R'
     'calculate_gene_rank.R'
     'data.R'
     'density_intersection.R'
+    'dynamic_genes.R'
     'dynamic_network.R'
     'extract_genes.R'
+    'find_modules.R'
+    'setGenerics.R'
     'find_motifs.R'
     'fit_models.R'
+    'get_attribute.R'
+    'get_embedding.R'
+    'get_pseudotime.R'
     'import.R'
     'inferCSN.R'
     'inferCSN-methods.R'
     'inferCSN-package.R'
+    'infer_vector.R'
     'initiate_object.R'
     'lda.R'
     'meta_cells.R'
@@ -133,10 +138,6 @@ Collate:
     'network_visualization.R'
     'plot_motifs.R'
     'plotting_functions.R'
-    'setMethod-dynamic_genes.R'
-    'setMethod-get_embedding.R'
-    'setMethod-get_pseudotime.R'
-    'setMethod-infer_vector.R'
     'setMethod.R'
     'simulate_data.R'
     'single_network.R'

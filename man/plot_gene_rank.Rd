@@ -6,18 +6,14 @@
 \alias{plot_gene_rank,data.frame-method}
 \title{Plot gene ranks and network properties}
 \usage{
-plot_gene_rank(
-  object,
-  method = c("page_rank", "degree_distribution"),
-  weight_cutoff = 0.1,
-  compare_random = TRUE
-)
+plot_gene_rank(object, ...)
 
 \S4method{plot_gene_rank}{Network}(
   object,
   method = c("page_rank", "degree_distribution"),
   weight_cutoff = 0.1,
-  compare_random = TRUE
+  compare_random = TRUE,
+  ...
 )
 
 \S4method{plot_gene_rank}{data.frame}(
@@ -29,6 +25,8 @@ plot_gene_rank(
 }
 \arguments{
 \item{object}{Network object}
+
+\item{...}{Other params}
 
 \item{method}{Character, ranking method: "page_rank" or "degree_distribution"}
 

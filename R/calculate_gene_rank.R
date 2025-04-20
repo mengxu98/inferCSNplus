@@ -1,29 +1,26 @@
 #' @include setClass.R
-#' @include setGenerics.R
 
 #' @title Calculate gene rank
+#'
 #' @param object Network object
-#' @param regulators Character vector, regulators to include
-#' @param targets Character vector, targets to include
-#' @param directed Logical, whether the network is directed
-#' @param method Character, ranking method: "page_rank" or "degree_distribution"
 #' @param ... Additional arguments
+#'
 #' @return Data frame with gene ranks
-#' @export
+#'
 #' @rdname calculate_gene_rank
+#' @export
 setGeneric(
   name = "calculate_gene_rank",
   signature = c("object"),
-  def = function(object,
-                 regulators = NULL,
-                 targets = NULL,
-                 directed = FALSE,
-                 method = c("page_rank", "degree_distribution"),
-                 ...) {
+  def = function(object, ...) {
     standardGeneric("calculate_gene_rank")
   }
 )
 
+#' @param regulators Character vector, regulators to include
+#' @param targets Character vector, targets to include
+#' @param directed Logical, whether the network is directed
+#' @param method Character, ranking method: "page_rank" or "degree_distribution"
 #' @rdname calculate_gene_rank
 setMethod(
   "calculate_gene_rank",
@@ -36,14 +33,34 @@ setMethod(
            ...) {
     method <- match.arg(method)
     if (method == "page_rank") {
-      return(calculate_page_rank(object, regulators, targets, directed, ...))
+      return(
+        calculate_page_rank(
+          object,
+          regulators,
+          targets,
+          directed,
+          ...
+        )
+      )
     } else {
-      return(calculate_degree_distribution(object, regulators, targets, directed, ...))
+      return(
+        calculate_degree_distribution(
+          object,
+          regulators,
+          targets,
+          directed, ...
+        )
+      )
     }
   }
 )
 
+#' @param regulators Character vector, regulators to include
+#' @param targets Character vector, targets to include
+#' @param directed Logical, whether the network is directed
+#' @param method Character, ranking method: "page_rank" or "degree_distribution"
 #' @rdname calculate_gene_rank
+#' @export
 setMethod(
   "calculate_gene_rank",
   signature(object = "data.frame"),
@@ -55,33 +72,49 @@ setMethod(
            ...) {
     method <- match.arg(method)
     if (method == "page_rank") {
-      return(calculate_page_rank(object, regulators, targets, directed, ...))
+      return(
+        calculate_page_rank(
+          object,
+          regulators,
+          targets,
+          directed,
+          ...
+        )
+      )
     } else {
-      return(calculate_degree_distribution(object, regulators, targets, directed, ...))
+      return(
+        calculate_degree_distribution(
+          object,
+          regulators,
+          targets,
+          directed,
+          ...
+        )
+      )
     }
   }
 )
 
 #' @title Calculate PageRank
+#'
 #' @param object Network object
-#' @param regulators Character vector, regulators to include
-#' @param targets Character vector, targets to include
-#' @param directed Logical, whether the network is directed
+#' @param ... Additional arguments
 #' @return Data frame with PageRank scores
 #' @export
 #' @rdname calculate_page_rank
 setGeneric(
   name = "calculate_page_rank",
   signature = c("object"),
-  def = function(object,
-                 regulators = NULL,
-                 targets = NULL,
-                 directed = FALSE) {
+  def = function(object, ...) {
     standardGeneric("calculate_page_rank")
   }
 )
 
+#' @param regulators Character vector, regulators to include
+#' @param targets Character vector, targets to include
+#' @param directed Logical, whether the network is directed
 #' @rdname calculate_page_rank
+#' @export
 setMethod(
   "calculate_page_rank",
   signature(object = "Network"),
@@ -94,7 +127,11 @@ setMethod(
   }
 )
 
+#' @param regulators Character vector, regulators to include
+#' @param targets Character vector, targets to include
+#' @param directed Logical, whether the network is directed
 #' @rdname calculate_page_rank
+#' @export
 setMethod(
   "calculate_page_rank",
   signature(object = "data.frame"),
@@ -136,61 +173,70 @@ setMethod(
   return(page_rank_res)
 }
 
-#' @rdname calculate_gene_rank
+#' @title calculate_degree_distribution
+#'
+#' @param object The input object.
+#' @param ... Parameters for other methods.
+#'
+#' @rdname calculate_degree_distribution
+#'
+#' @export
+#' @export
 setGeneric(
   name = "calculate_degree_distribution",
   signature = c("object"),
-  def = function(object,
-                 regulators = NULL,
-                 targets = NULL,
-                 directed = TRUE) {
+  def = function(object, ...) {
     standardGeneric("calculate_degree_distribution")
   }
 )
 
-#' @rdname calculate_gene_rank
+#' @param regulators regulators
+#' @param targets targets
+#' @param directed directed
+#' @rdname calculate_degree_distribution
+#' @export
 setMethod(
   "calculate_degree_distribution",
   signature(object = "Network"),
-  function(object, regulators = NULL, targets = NULL, directed = TRUE) {
+  function(object, regulators = NULL, targets = NULL, directed = TRUE, ...) {
     network_table <- as.data.frame(object@network)
-    if (!all(c("regulator", "target", "weight") %in% colnames(network_table))) {
-      stop("Network slot must contain 'regulator', 'target', and 'weight' columns")
-    }
-    .calculate_degree_distribution_internal(network_table, directed)
+
+    .degree_distribution(network_table, directed)
   }
 )
 
-#' @rdname calculate_gene_rank
+#' @param regulators regulators
+#' @param targets targets
+#' @param directed directed
+#' @rdname calculate_degree_distribution
+#' @export
 setMethod(
   "calculate_degree_distribution",
   signature(object = "data.frame"),
-  function(object, regulators = NULL, targets = NULL, directed = TRUE) {
+  function(object, regulators = NULL, targets = NULL, directed = TRUE, ...) {
     network_table <- network_format(
       object,
       regulators,
       targets,
       abs_weight = FALSE
     )
-    .calculate_degree_distribution_internal(network_table, directed)
+    .degree_distribution(network_table, directed)
   }
 )
 
-.calculate_power_law_fit <- function(deg) {
+.calculate_power_fit <- function(deg) {
   degree_freq <- table(deg)
   k <- as.numeric(names(degree_freq))
   pk <- as.numeric(degree_freq) / sum(degree_freq)
 
   if (length(unique(k)) > 1) {
-    log_k <- log(k)
-    log_pk <- log(pk)
-    fit <- lm(log_pk ~ log_k)
+    fit <- stats::lm(log(pk) ~ log(k))
     return(summary(fit)$r.squared)
   }
   return(0)
 }
 
-.calculate_degree_distribution_internal <- function(
+.degree_distribution <- function(
     network_table, directed) {
   network <- igraph::graph_from_data_frame(
     network_table,
@@ -211,8 +257,8 @@ setMethod(
     in_degrees <- igraph::degree(network, mode = "in")
     out_degrees <- igraph::degree(network, mode = "out")
 
-    in_power_law_score <- .calculate_power_law_fit(in_degrees)
-    out_power_law_score <- .calculate_power_law_fit(out_degrees)
+    in_power_law_score <- .calculate_power_fit(in_degrees)
+    out_power_law_score <- .calculate_power_fit(out_degrees)
 
     result$in_degree <- in_degrees[result$gene]
     result$out_degree <- out_degrees[result$gene]
@@ -221,7 +267,7 @@ setMethod(
     result$rank_value <- (result$in_degree * in_power_law_score +
       result$out_degree * out_power_law_score) / 2
   } else {
-    power_law_score <- .calculate_power_law_fit(total_degrees)
+    power_law_score <- .calculate_power_fit(total_degrees)
     result$power_law_fit <- power_law_score
     result$rank_value <- result$degree * power_law_score
   }
@@ -234,24 +280,23 @@ setMethod(
 }
 
 #' @title Plot gene ranks and network properties
+#'
 #' @param object Network object
-#' @param method Character, ranking method: "page_rank" or "degree_distribution"
-#' @param weight_cutoff Numeric, threshold for edge weight filtering
-#' @param compare_random Logical, whether to compare with randomized network
+#' @param ... Other params
 #' @return Combined ggplot object
 #' @export
 #' @rdname plot_gene_rank
 setGeneric(
   name = "plot_gene_rank",
   signature = c("object"),
-  def = function(object,
-                 method = c("page_rank", "degree_distribution"),
-                 weight_cutoff = 0.1,
-                 compare_random = TRUE) {
+  def = function(object, ...) {
     standardGeneric("plot_gene_rank")
   }
 )
 
+#' @param method Character, ranking method: "page_rank" or "degree_distribution"
+#' @param weight_cutoff Numeric, threshold for edge weight filtering
+#' @param compare_random Logical, whether to compare with randomized network
 #' @rdname plot_gene_rank
 #' @export
 setMethod(
@@ -260,7 +305,8 @@ setMethod(
   function(object,
            method = c("page_rank", "degree_distribution"),
            weight_cutoff = 0.1,
-           compare_random = TRUE) {
+           compare_random = TRUE,
+           ...) {
     method <- match.arg(method)
     network_table <- as.data.frame(object@network)
     network_table <- network_table[abs(network_table$weight) >= weight_cutoff, ]
@@ -304,7 +350,7 @@ setMethod(
       )
 
     if (nrow(df_orig) > 1) {
-      model <- lm(log(P_k) ~ log(k), data = df_orig)
+      model <- stats::lm(log(P_k) ~ log(k), data = df_orig)
       r2 <- summary(model)$r.squared
       p1 <- p1 + annotate("text",
         x = max(log(df_orig$k)) - 0.1,
@@ -342,7 +388,7 @@ setMethod(
 
     p_cent <- ggplot(
       centrality_df,
-      aes(x = centrality, y = reorder(gene, centrality))
+      aes(x = centrality, y = stats::reorder(gene, centrality))
     ) +
       geom_point(color = "steelblue", size = 2) +
       cent_theme +
@@ -388,7 +434,7 @@ setMethod(
         )
 
       if (nrow(df_random) > 1) {
-        model_random <- lm(log(P_k) ~ log(k), data = df_random)
+        model_random <- stats::lm(log(P_k) ~ log(k), data = df_random)
         r2_random <- summary(model_random)$r.squared
         p2 <- p2 + annotate("text",
           x = max(log(df_random$k)) - 0.1,
@@ -401,13 +447,11 @@ setMethod(
       }
     }
 
-    if (requireNamespace("patchwork", quietly = TRUE)) {
-      if (compare_random) {
-        dist_plots <- p1 / p2 + patchwork::plot_layout(heights = c(1, 1))
-        return(dist_plots | p_cent + patchwork::plot_layout(widths = c(1, 1.5)))
-      }
-      return(p1 | p_cent + patchwork::plot_layout(widths = c(1, 1.5)))
+    if (compare_random) {
+      dist_plots <- p1 / p2 + patchwork::plot_layout(heights = c(1, 1))
+      return(dist_plots | p_cent + patchwork::plot_layout(widths = c(1, 1.5)))
     }
+    return(p1 | p_cent + patchwork::plot_layout(widths = c(1, 1.5)))
 
     return(
       list(

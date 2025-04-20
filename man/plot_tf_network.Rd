@@ -2,15 +2,16 @@
 % Please edit documentation in R/setGenerics.R, R/utils_plots.R
 \name{plot_tf_network}
 \alias{plot_tf_network}
-\alias{plot_tf_network.CSNObject}
+\alias{plot_tf_network,CSNObject-method}
 \title{Plot sub-network centered around one TF.}
 \usage{
 plot_tf_network(object, ...)
 
-\method{plot_tf_network}{CSNObject}(
+\S4method{plot_tf_network}{CSNObject}(
   object,
-  tf,
+  tfs = NULL,
   network = DefaultNetwork(object),
+  celltypes = NULL,
   graph = "module_graph",
   circular = TRUE,
   edge_width = 0.2,
@@ -27,9 +28,11 @@ plot_tf_network(object, ...)
 
 \item{...}{Arguments for other methods}
 
-\item{tf}{The transcription factor to center around.}
+\item{tfs}{The transcription factor to center around.}
 
 \item{network}{Name of the network to use.}
+
+\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
 
 \item{graph}{Name of the graph.}
 

@@ -56,7 +56,6 @@ setGeneric(
                    "glm",
                    "glmnet",
                    "cv.glmnet",
-                   "brms",
                    "xgb",
                    "susie"
                  ),
@@ -98,7 +97,6 @@ setMethod(
                           "glm",
                           "glmnet",
                           "cv.glmnet",
-                          "brms",
                           "xgb",
                           "susie"
                         ),
@@ -556,7 +554,6 @@ setMethod(
                           "glm",
                           "glmnet",
                           "cv.glmnet",
-                          "brms",
                           "xgb",
                           "susie"
                         ),

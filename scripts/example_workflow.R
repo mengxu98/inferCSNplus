@@ -1,3 +1,5 @@
+
+
 object <- initiate_object(example_matrix)
 object <- inferCSN(object)
 

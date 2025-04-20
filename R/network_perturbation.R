@@ -228,13 +228,13 @@ setMethod(
 preprocess_data <- function(data, scale) {
   if (any(is.na(data))) data[is.na(data)] <- 0
 
-  var_cols <- apply(data, 2, var) > 1e-10
+  var_cols <- apply(data, 2, stats::var) > 1e-10
   if (!any(var_cols)) stop("No variable columns found in the data")
   data <- data[, var_cols]
 
   if (scale) {
     col_means <- colMeans(data)
-    col_sds <- apply(data, 2, sd)
+    col_sds <- apply(data, 2, stats::sd)
     col_sds[col_sds < 1e-10] <- 1
     data <- scale(data, center = col_means, scale = col_sds)
   }
@@ -324,9 +324,9 @@ setMethod(
     n_pert <- nrow(pert@perturbed)
 
     plot_df <- data.frame(
-      DR1 = pert@embedding[, 1],
-      DR2 = pert@embedding[, 2],
-      Type = factor(
+      "DR1" = pert@embedding[, 1],
+      "DR2" = pert@embedding[, 2],
+      "Type" = factor(
         c(rep("Original", n_orig), rep("Perturbed", n_pert)),
         levels = c("Original", "Perturbed")
       )
@@ -421,35 +421,39 @@ setGeneric("plotPerturbationTrajectory", function(object,
 setMethod(
   "plotPerturbationTrajectory",
   signature(object = "Network"),
-  function(object, genes = NULL, show_heatmap = FALSE, n_top_genes = 50, 
+  function(object, genes = NULL, show_heatmap = FALSE, n_top_genes = 50,
            heatmap_style = "combined", ...) {
     pert <- object@perturbation
-    
+
     if (is.null(genes)) {
       genes <- pert@tf_states$tf
     }
-    
+
     orig_expr <- pert@original
     pert_expr <- pert@perturbed
-    
+
     delta_expr <- pert_expr - orig_expr
-    
-    cv <- apply(delta_expr, 2, function(x) sd(x) / mean(abs(x)))
-    
+
+    cv <- apply(
+      delta_expr, 2, function(x) {
+        stats::sd(x) / mean(abs(x))
+      }
+    )
+
     top_genes <- names(sort(cv, decreasing = TRUE))[1:n_top_genes]
-    
+
     if (heatmap_style == "separate") {
       heatmap_data <- cbind(
         orig_expr[, top_genes],
         pert_expr[, top_genes]
       )
-      
+
       col_names <- c(
         paste0("orig_", top_genes),
         paste0("pert_", top_genes)
       )
       colnames(heatmap_data) <- col_names
-      
+
       column_anno <- data.frame(
         State = c(
           rep("Original", length(top_genes)),
@@ -461,7 +465,7 @@ setMethod(
         ),
         row.names = col_names
       )
-      
+
       h <- pheatmap::pheatmap(
         heatmap_data,
         scale = "row",
@@ -483,12 +487,12 @@ setMethod(
         orig_expr[, top_genes],
         pert_expr[, top_genes]
       )
-      
+
       column_anno <- data.frame(
         State = rep(c("Original", "Perturbed"), each = length(top_genes)),
         Gene = rep(top_genes, 2)
       )
-      
+
       col_names <- paste(
         rep(c("orig", "pert"), each = length(top_genes)),
         rep(top_genes, 2),
@@ -496,7 +500,7 @@ setMethod(
       )
       colnames(heatmap_data) <- col_names
       rownames(column_anno) <- col_names
-      
+
       h <- pheatmap::pheatmap(
         heatmap_data,
         scale = "row",
@@ -513,32 +517,40 @@ setMethod(
         )
       )
     }
-    
+
     traj_data <- data.frame(
-      Iteration = rep(c(1, 2), each = nrow(orig_expr) * length(genes)),
-      Gene = rep(rep(genes, each = nrow(orig_expr)), 2),
-      Expression = c(
+      "Iteration" = rep(c(1, 2), each = nrow(orig_expr) * length(genes)),
+      "Gene" = rep(rep(genes, each = nrow(orig_expr)), 2),
+      "Expression" = c(
         as.vector(orig_expr[, genes]),
         as.vector(pert_expr[, genes])
       ),
-      Type = rep(c("Original", "Perturbed"), each = nrow(orig_expr) * length(genes))
+      "Type" = rep(
+        c("Original", "Perturbed"),
+        each = nrow(orig_expr) * length(genes)
+      )
     )
-    
-    p <- ggplot(traj_data, aes(x = Iteration, y = Expression, color = Type)) +
+
+    p <- ggplot(
+      traj_data,
+      aes(x = Iteration, y = Expression, color = Type)
+    ) +
       geom_boxplot(alpha = 0.6) +
       facet_wrap(~Gene, scales = "free_y") +
-      scale_color_manual(values = c("Original" = "#66CC33", "Perturbed" = "#9933CC")) +
+      scale_color_manual(
+        values = c("Original" = "#66CC33", "Perturbed" = "#9933CC")
+      ) +
       theme_minimal() +
       labs(
-        title = "Gene Expression Trajectories",
+        title = "Gene expression trajectories",
         x = "State",
-        y = "Expression Level"
+        y = "Expression level"
       )
-    
+
     if (show_heatmap) {
       return(list(trajectory = p, heatmap = h))
     }
-    
+
     return(p)
   }
 )

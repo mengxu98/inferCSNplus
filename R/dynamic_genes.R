@@ -8,10 +8,13 @@
 #'
 #' @rdname dynamic_genes
 setGeneric(
-  "dynamic_genes",
-  signature = "object",
-  function(object, ...) {
-    standardGeneric("dynamic_genes")
+  name = "dynamic_genes",
+  signature = c("object"),
+  def = function(object, ...) {
+    UseMethod(
+      generic = "dynamic_genes",
+      object = object
+    )
   }
 )
 
@@ -26,7 +29,6 @@ gam_fit <- function(
     stats::p.adjust.methods
   )
 
-  matrix <- t(matrix)
   res <- parallelize_fun(
     colnames(matrix),
     function(x) {
@@ -93,7 +95,7 @@ setMethod(
            ...) {
     if (is.null(pseudotime)) {
       log_message(
-        "No pseudotime provided, using all genes.",
+        "No pseudotime provided, return all genes as dynamic genes",
         verbose = verbose
       )
       return(colnames(object))
@@ -128,12 +130,14 @@ setMethod(
            layer = "data",
            ...) {
     if (!pseudotime_column %in% colnames(object@meta.data)) {
-      stop("pseudotime_column not existed in the provides Seurat object.")
+      stop("pseudotime_column not existed in the provides Seurat object")
     }
 
     Seurat::Misc(object, "dynamic_genes") <- dynamic_genes(
-      Matrix::as.matrix(
-        Seurat::GetAssayData(object, layer = layer)
+      Matrix::t(
+        Matrix::as.matrix(
+          Seurat::GetAssayData(object, layer = layer)
+        )
       ),
       pseudotime = object@meta.data[[pseudotime_column]],
       cores = cores,
