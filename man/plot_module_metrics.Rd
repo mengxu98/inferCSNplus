@@ -21,7 +21,8 @@ plot_module_metrics(object, ...)
 
 \item{network}{Name of the network to use.}
 
-\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
+\item{celltypes}{Celltypes to plot.
+If \code{NULL}, all celltypes are plotted.}
 }
 \value{
 A ggplot2 object.

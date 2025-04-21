@@ -2,7 +2,8 @@
 #'
 #' @param object An object.
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param point_size Float indicating the point size.
 #' @param ... Additional arguments.
 #'
@@ -116,7 +117,8 @@ setMethod(
 #' Plot module metrics number of genes, number of peaks and number of TFs per gene.
 #'
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #'
 #' @return A ggplot2 object.
 #'
@@ -257,7 +259,8 @@ get_umap <- function(
 #' Compute network graph embedding using UMAP.
 #'
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param graph_name Name of the graph.
 #' @param rna_assay Name of the RNA assay.
 #' @param rna_layer Name of the RNA slot to use.
@@ -481,7 +484,8 @@ setMethod(
 #' Plot network graph.
 #'
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param graph Name of the graph.
 #' @param layout Layout for the graph. Can be 'umap' or any force-directed layout
 #' implemented in \code{\link[ggraph]{ggraph}}
@@ -595,7 +599,8 @@ setMethod(
 #'
 #' @param tfs The transcription factors to center around.
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param graph Name of the graph.
 #' @param features Features to use. If \code{NULL} uses all features in the graph.
 #' @param order Integer indicating the maximal order of the graph.
@@ -810,7 +815,8 @@ setMethod(
 #'
 #' @param tfs The transcription factor to center around.
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param graph Name of the graph.
 #' @param circular Logical. Layout tree in circular layout.
 #' @param edge_width Edge width.

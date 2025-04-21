@@ -26,7 +26,8 @@ get_tf_network(object, ...)
 
 \item{...}{Arguments for other methods}
 
-\item{celltypes}{Celltypes to plot. If code{NULL}, all celltypes are plotted.}
+\item{celltypes}{Celltypes to plot.
+If \code{NULL}, all celltypes are plotted.}
 
 \item{tfs}{The transcription factors to center around.}
 

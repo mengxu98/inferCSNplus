@@ -37,15 +37,15 @@ find_modules(object, ...)
 
 \item{p_thresh}{Float indicating the significance threshold on the adjusted p-value.}
 
-\item{rsq_thresh}{Float indicating the eqn{R^2} threshold on the adjusted p-value.}
+\item{rsq_thresh}{Float indicating the \eqn{R^2} threshold on the adjusted p-value.}
 
 \item{nvar_thresh}{Integer indicating the minimum number of variables in the model.}
 
 \item{min_genes_per_module}{Integer indicating the minimum number of genes in a module.}
 
 \item{xgb_method}{Method to get modules from xgb models
-* code{'tf'} - Choose top targets for each TF.
-* code{'target'} - Choose top TFs for each target gene.}
+\code{tf} - Choose top targets for each TF.
+\code{target} - Choose top TFs for each target gene.}
 
 \item{xgb_top}{Interger indicating how many top targets/TFs to return.}
 

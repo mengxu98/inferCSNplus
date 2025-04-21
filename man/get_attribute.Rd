@@ -28,15 +28,15 @@ If \code{NULL}, all celltypes are returned.}
 
 \item{attribute}{A character string specifying the attribute to get.
 This can take any of the following choices:
-\itemize{
-\item{genes} {Gene names.}
-\item{tfs} {Transcription factors.}
-\item{peaks} {Peaks.}
-\item{regulators} {Regulators.}
-\item{targets} {Targets.}
-\item{cells} {Cells.}
-\item{modules} {Modules.}
-\item{coefficients} {Coefficients.}
+\describe{
+\item{genes}{The original gene without any filtering.}
+\item{tfs}{The original transcription factors without any filtering.}
+\item{peaks}{The original peaks without any filtering.}
+\item{regulators}{The regulators of the network after inference CSN.}
+\item{targets}{The targets of the network after inference CSN.}
+\item{cells}{The cells of the network.}
+\item{modules}{The modules of the network.}
+\item{coefficients}{The coefficients of the network.}
 }}
 }
 \value{

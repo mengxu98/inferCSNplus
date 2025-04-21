@@ -355,7 +355,7 @@ setMethod(
       p1 <- p1 + annotate("text",
         x = max(log(df_orig$k)) - 0.1,
         y = max(log(df_orig$P_k)) - 0.1,
-        label = sprintf("R² = %.3f", r2),
+        label = sprintf("R\u00b2 = %.2f", r2),
         size = 3,
         color = "steelblue",
         hjust = 1
@@ -439,7 +439,7 @@ setMethod(
         p2 <- p2 + annotate("text",
           x = max(log(df_random$k)) - 0.1,
           y = max(log(df_random$P_k)) - 0.1,
-          label = sprintf("R² = %.3f", r2_random),
+          label = sprintf("R\u00b2 = %.2f", r2_random),
           size = 3,
           color = "steelblue",
           hjust = 1

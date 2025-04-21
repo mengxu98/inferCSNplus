@@ -14,12 +14,12 @@ setGeneric(
 )
 
 #' @param p_thresh Float indicating the significance threshold on the adjusted p-value.
-#' @param rsq_thresh Float indicating the eqn{R^2} threshold on the adjusted p-value.
+#' @param rsq_thresh Float indicating the \eqn{R^2} threshold on the adjusted p-value.
 #' @param nvar_thresh Integer indicating the minimum number of variables in the model.
 #' @param min_genes_per_module Integer indicating the minimum number of genes in a module.
 #' @param xgb_method Method to get modules from xgb models
-#' * code{'tf'} - Choose top targets for each TF.
-#' * code{'target'} - Choose top TFs for each target gene.
+#' \code{tf} - Choose top targets for each TF.
+#' \code{target} - Choose top TFs for each target gene.
 #' @param xgb_top Interger indicating how many top targets/TFs to return.
 #' @param verbose Print messages.
 #'

@@ -346,7 +346,8 @@ coef.Network <- function(object, ...) {
 #'
 #' @param object CSNObject object
 #' @param network Name of the network to use.
-#' @param celltypes Celltypes to plot. If code{NULL}, all celltypes are plotted.
+#' @param celltypes Celltypes to plot.
+#' If \code{NULL}, all celltypes are plotted.
 #' @param ... Other parameters
 #'
 #' @method coef CSNObject
@@ -390,39 +391,29 @@ setMethod(
                         network = DefaultNetwork(object),
                         celltypes = NULL,
                         ...) {
-    # Get network object(s)
-    networks_data <- GetNetwork(object, network = network, celltypes = celltypes)
+    celltypes_all <- get_attribute(
+      object,
+      attribute = "celltypes"
+    )
+    celltypes <- intersect(
+      celltypes %ss% celltypes_all,
+      celltypes_all
+    )
+    networks <- GetNetwork(
+      object,
+      network = network,
+      celltypes = celltypes
+    )
 
-    # If networks_data is a single Network object
-    if (is(networks_data, "Network")) {
-      return(metrics(networks_data)) # Call metrics,Network-method
-    }
-    # If networks_data is a list of Network objects
-    else if (is.list(networks_data)) {
-      metrics_list <- lapply(
-        networks_data,
-        function(net) {
-          idx <- vapply(networks_data, function(x) identical(x, net), logical(1))
-          net_name <- if (any(idx)) names(networks_data)[which(idx)[1]] else "Unknown"
-
-          if (is(net, "Network")) {
-            metrics(net)
-          } else {
-            warning("Item in list is not a Network object for celltype: ", net_name)
-            NULL
-          }
-        }
-      )
-      valid_indices <- !sapply(metrics_list, is.null)
-      if (length(names(networks_data)) == length(metrics_list)) {
-        names(metrics_list)[valid_indices] <- names(networks_data)[valid_indices]
-      } else {
-        warning("Could not reliably assign names to the result list.")
+    res <- lapply(
+      networks,
+      function(net) {
+        net@metrics
       }
-      return(metrics_list)
-    } else {
-      stop("GetNetwork returned an unexpected data type.")
-    }
+    )
+    names(res) <- celltypes
+
+    return(res)
   }
 )
 

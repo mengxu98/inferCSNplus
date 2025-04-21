@@ -13,7 +13,6 @@ BugReports: https://github.com/mengxu98/inferCSNplus/issues
 Depends:
     R (>= 4.1.0)
 Imports:
-    DelayedArray,
     doParallel,
     foreach,
     GenomicRanges,
@@ -27,6 +26,7 @@ Imports:
     Rcpp,
     RcppArmadillo,
     RcppParallel,
+    S4Arrays,
     Signac,
     Seurat,
     SeuratObject,
@@ -37,7 +37,6 @@ Imports:
     patchwork
 Suggests:
     ComplexHeatmap,
-    BSgenome.Hsapiens.UCSC.hg38,
     cli,
     circlize,
     chromVAR,
