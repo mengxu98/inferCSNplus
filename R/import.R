@@ -7,16 +7,12 @@
 #' @importFrom utils methods
 #' @importFrom stats family gaussian na.pass
 #' @importFrom methods as is new
-# # ' @importFrom DelayedArray makeNindexFromArrayViewport
 #' @importClassesFrom Signac Motif
 #' @importClassesFrom GenomicRanges GRanges
 #' @importClassesFrom SeuratObject Seurat
 NULL
 
-# summary_fun <- list(
-#   "makeNindexFromArrayViewport" = DelayedArray::makeNindexFromArrayViewport
-# )
-.make_nindex <- function(
+makeNindexFromArrayViewport <- function(
     viewport,
     expand.RangeNSBS = FALSE) {
   viewport_ranges <- IRanges::ranges(viewport)
@@ -37,7 +33,7 @@ NULL
       range_start <- viewport_starts[[i]]
       range_end <- viewport_ends[[i]]
       upper_bound <- viewport_refdim[[i]]
-      S4Vectors::new2("RangeNSBS",
+      new2("RangeNSBS",
         subscript = c(range_start, range_end),
         upper_bound = upper_bound, check = FALSE
       )
@@ -53,7 +49,7 @@ NULL
 }
 
 summary_fun <- list(
-  "makeNindexFromArrayViewport" = .make_nindex
+  "makeNindexFromArrayViewport" = makeNindexFromArrayViewport
 )
 
 utils::globalVariables(
@@ -114,6 +110,7 @@ utils::globalVariables(
     "n_regions",
     "n_tfs",
     "name",
+    "new2",
     "nice",
     "nodes",
     "normal",

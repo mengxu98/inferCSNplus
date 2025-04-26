@@ -26,7 +26,6 @@ Imports:
     Rcpp,
     RcppArmadillo,
     RcppParallel,
-    S4Arrays,
     Signac,
     Seurat,
     SeuratObject,
@@ -75,6 +74,7 @@ Suggests:
     RColorBrewer,
     Rtsne,
     IRanges,
+    S4Arrays,
     S4Vectors,
     ggpointdensity,
     pals,
@@ -89,9 +89,7 @@ Suggests:
     topicmodels,
     RTransferEntropy,
     proxy,
-    RANN,
-    knitr,
-    rmarkdown
+    RANN
 LinkingTo: 
     Rcpp,
     RcppArmadillo,
@@ -148,4 +146,3 @@ Collate:
     'utils_network.R'
     'utils_plots.R'
     'utils_vector.R'
-VignetteBuilder: knitr

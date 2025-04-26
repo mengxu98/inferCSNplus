@@ -44,7 +44,7 @@ filter_sort_matrix(NumericMatrix network_matrix,
                    Nullable<CharacterVector> regulators = R_NilValue,
                    Nullable<CharacterVector> targets = R_NilValue) {
   // Replace NA with 0
-  for (int i = 0; i < network_matrix.length(); i++) {
+  for (size_t i = 0; i < network_matrix.length(); i++) {
     if (R_IsNA(network_matrix[i])) {
       network_matrix[i] = 0;
     }
@@ -59,9 +59,9 @@ filter_sort_matrix(NumericMatrix network_matrix,
   if (regulators.isNotNull()) {
     CharacterVector reg(regulators);
     // Get intersection
-    for (int i = 0; i < curr_regulators.length(); i++) {
+    for (size_t i = 0; i < curr_regulators.length(); i++) {
       std::string curr_reg = as<std::string>(curr_regulators[i]);
-      for (int j = 0; j < reg.length(); j++) {
+      for (size_t j = 0; j < reg.length(); j++) {
         if (curr_reg == as<std::string>(reg[j])) {
           filtered_regulators.push_back(curr_reg);
           break;
@@ -69,7 +69,7 @@ filter_sort_matrix(NumericMatrix network_matrix,
       }
     }
   } else {
-    for (int i = 0; i < curr_regulators.length(); i++) {
+    for (size_t i = 0; i < curr_regulators.length(); i++) {
       filtered_regulators.push_back(as<std::string>(curr_regulators[i]));
     }
   }
@@ -79,9 +79,9 @@ filter_sort_matrix(NumericMatrix network_matrix,
   if (targets.isNotNull()) {
     CharacterVector tar(targets);
     // Get intersection
-    for (int i = 0; i < curr_targets.length(); i++) {
+    for (size_t i = 0; i < curr_targets.length(); i++) {
       std::string curr_tar = as<std::string>(curr_targets[i]);
-      for (int j = 0; j < tar.length(); j++) {
+      for (size_t j = 0; j < tar.length(); j++) {
         if (curr_tar == as<std::string>(tar[j])) {
           filtered_targets.push_back(curr_tar);
           break;
@@ -89,7 +89,7 @@ filter_sort_matrix(NumericMatrix network_matrix,
       }
     }
   } else {
-    for (int i = 0; i < curr_targets.length(); i++) {
+    for (size_t i = 0; i < curr_targets.length(); i++) {
       filtered_targets.push_back(as<std::string>(curr_targets[i]));
     }
   }
@@ -106,16 +106,16 @@ filter_sort_matrix(NumericMatrix network_matrix,
   std::unordered_map<std::string, int> old_reg_indices;
   std::unordered_map<std::string, int> old_tar_indices;
 
-  for (int i = 0; i < curr_regulators.length(); i++) {
+  for (size_t i = 0; i < curr_regulators.length(); i++) {
     old_reg_indices[as<std::string>(curr_regulators[i])] = i;
   }
-  for (int i = 0; i < curr_targets.length(); i++) {
+  for (size_t i = 0; i < curr_targets.length(); i++) {
     old_tar_indices[as<std::string>(curr_targets[i])] = i;
   }
 
   // Fill new matrix
-  for (int i = 0; i < filtered_regulators.size(); i++) {
-    for (int j = 0; j < filtered_targets.size(); j++) {
+  for (size_t i = 0; i < filtered_regulators.size(); i++) {
+    for (size_t j = 0; j < filtered_targets.size(); j++) {
       int old_row = old_reg_indices[filtered_regulators[i]];
       int old_col = old_tar_indices[filtered_targets[j]];
       result(i, j) = network_matrix(old_row, old_col);
@@ -126,10 +126,10 @@ filter_sort_matrix(NumericMatrix network_matrix,
   CharacterVector new_regulators(filtered_regulators.size());
   CharacterVector new_targets(filtered_targets.size());
 
-  for (int i = 0; i < filtered_regulators.size(); i++) {
+  for (size_t i = 0; i < filtered_regulators.size(); i++) {
     new_regulators[i] = filtered_regulators[i];
   }
-  for (int i = 0; i < filtered_targets.size(); i++) {
+  for (size_t i = 0; i < filtered_targets.size(); i++) {
     new_targets[i] = filtered_targets[i];
   }
 
