@@ -3,12 +3,12 @@
 \docType{package}
 \name{inferCSN-package}
 \alias{inferCSN-package}
-\title{\emph{\strong{inferCSN}}: \strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork}
+\title{inferCSN: infer cell-type-specific gene regulatory network}
 \source{
 \url{https://github.com/mengxu98/inferCSNplus}
 }
 \description{
-An R package for \strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork from single-cell omics data
+An R package for infer cell-type-specific gene regulatory network from single-cell omics data
 }
 \seealso{
 Useful links:

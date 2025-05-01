@@ -9,7 +9,7 @@
 \alias{inferCSN,Network-method}
 \alias{inferCSN,CSNObject-method}
 \alias{inferCSN,Seurat-method}
-\title{\strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork}
+\title{inferring cell-type specific gene regulatory network}
 \usage{
 inferCSN(
   object,
@@ -226,7 +226,7 @@ A data table of regulator-target regulatory relationships
 A CSNObject.
 }
 \description{
-\strong{infer}ring \strong{C}ell-\strong{S}pecific gene regulatory \strong{N}etwork
+inferring cell-type specific gene regulatory network
 }
 \examples{
 data("example_matrix")

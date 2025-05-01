@@ -1,4 +1,4 @@
-# ***inferCSN+*** <img src="man/figures/logo.svg" align="right" width="120"/>
+# ***inferCSN+*** <img src="man/figures/logo.svg" alt="inferCSN+ logo" align="right" width="120"/>
 
 <!-- badges: start -->
 
@@ -10,7 +10,7 @@
 
 [*`inferCSN+`*](https://mengxu98.github.io/inferCSNplus/) is an R package for ***infer***ring ***C***ell-***S***pecific gene regulatory ***N***etwork from single-cell omics data.
 
-<img src="man/figures/inferCSNplus.svg" width="90%"/>
+<img src="man/figures/inferCSNplus.svg" alt="inferCSN+ workflow diagram" width="90%"/>
 
 ## **Installation**
 
