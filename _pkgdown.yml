@@ -86,6 +86,7 @@ reference:
   - calculate_f1
   - calculate_si
   - calculate_ji
+  - calculate_degree_distribution
   - JI_across_topregs
 
 - subtitle: "Sparse regression model"
@@ -94,7 +95,6 @@ reference:
   - fit_srm
   - fit_srm2
   - sparse_regression
-  - fit_brms
   - fit_cvglmnet
   - fit_cvsrm
   - fit_glm
