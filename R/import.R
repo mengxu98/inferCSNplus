@@ -12,44 +12,42 @@
 #' @importClassesFrom SeuratObject Seurat
 NULL
 
-makeNindexFromArrayViewport <- function(
-    viewport,
-    expand.RangeNSBS = FALSE) {
-  viewport_ranges <- IRanges::ranges(viewport)
-  viewport_dim <- dim(viewport)
-  viewport_refdim <- S4Arrays::refdim(viewport)
-  ndim <- length(viewport_dim)
-  Nindex <- vector("list", length = ndim)
-  is_not_missing <- viewport_dim < viewport_refdim
-  if (expand.RangeNSBS) {
-    expand_idx <- which(is_not_missing)
-  } else {
-    viewport_starts <- stats::start(viewport_ranges)
-    viewport_ends <- stats::end(viewport_ranges)
-    is_width1 <- viewport_dim == 1L
-    expand_idx <- which(is_not_missing & is_width1)
-    RangeNSBS_idx <- which(is_not_missing & !is_width1)
-    Nindex[RangeNSBS_idx] <- lapply(RangeNSBS_idx, function(i) {
-      range_start <- viewport_starts[[i]]
-      range_end <- viewport_ends[[i]]
-      upper_bound <- viewport_refdim[[i]]
-      new2("RangeNSBS",
-        subscript = c(range_start, range_end),
-        upper_bound = upper_bound, check = FALSE
-      )
-    })
-  }
-  if (length(expand_idx) != 0L) {
-    Nindex[expand_idx] <- as.list(as(
-      viewport_ranges[expand_idx],
-      "CompressedIntegerList"
-    ))
-  }
-  Nindex
-}
-
 summary_fun <- list(
-  "makeNindexFromArrayViewport" = makeNindexFromArrayViewport
+  "fun" = function(
+      viewport,
+      expand.RangeNSBS = FALSE) {
+    viewport_ranges <- IRanges::ranges(viewport)
+    viewport_dim <- dim(viewport)
+    viewport_refdim <- S4Arrays::refdim(viewport)
+    ndim <- length(viewport_dim)
+    Nindex <- vector("list", length = ndim)
+    is_not_missing <- viewport_dim < viewport_refdim
+    if (expand.RangeNSBS) {
+      expand_idx <- which(is_not_missing)
+    } else {
+      viewport_starts <- stats::start(viewport_ranges)
+      viewport_ends <- stats::end(viewport_ranges)
+      is_width1 <- viewport_dim == 1L
+      expand_idx <- which(is_not_missing & is_width1)
+      RangeNSBS_idx <- which(is_not_missing & !is_width1)
+      Nindex[RangeNSBS_idx] <- lapply(RangeNSBS_idx, function(i) {
+        range_start <- viewport_starts[[i]]
+        range_end <- viewport_ends[[i]]
+        upper_bound <- viewport_refdim[[i]]
+        new2("RangeNSBS",
+          subscript = c(range_start, range_end),
+          upper_bound = upper_bound, check = FALSE
+        )
+      })
+    }
+    if (length(expand_idx) != 0L) {
+      Nindex[expand_idx] <- as.list(as(
+        viewport_ranges[expand_idx],
+        "CompressedIntegerList"
+      ))
+    }
+    Nindex
+  }
 )
 
 utils::globalVariables(
