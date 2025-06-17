@@ -35,6 +35,14 @@ reference:
   - inferCSN_logo
   - inferCSN
 
+- subtitle: "Object of cell type-specific gene regulatory network"
+- contents:
+  - initiate_object
+  - CSNObject-class
+  - Modules-class
+  - Network-class
+  - Regions-class
+
 - subtitle: "Network visualization"
 - contents:
   - plot_dynamic_networks
@@ -66,13 +74,6 @@ reference:
   - plot_embedding
   - plot_histogram
   - plot_scatter
-
-- subtitle: "Plotting theme"
-- contents:
-  - no_legend
-  - no_margin
-  - no_x_text
-  - no_y_text
 
 - subtitle: "Network evaluation"
 - contents:
@@ -212,9 +213,6 @@ reference:
 
 - subtitle: "Utils functions"
 - contents:
-  - '%ss%'
-  - as_matrix
-  - check_sparsity
   - coef.srm
   - coef.srm_cv
   - coef.Network
@@ -238,11 +236,8 @@ reference:
   - mean_subnetwork_expression
   - meta_cells
   - network_format
-  - normalization
   - table_to_matrix
   - order_genes
-  - parallelize_fun
-  - pearson_correlation
   - pre_pseudotime_matrix
   - print.logo
   - print.srm
@@ -253,19 +248,13 @@ reference:
   - sample_and_epoch_reconstruct
   - score_targets
   - SetNetwork
-  - sparse_cor
-  - sparse_cov_cor
-  - split_indices
-  - log_message
-  - r_square
 
-- subtitle: "Class"
+- subtitle: "Plotting theme"
 - contents:
-  - initiate_object
-  - CSNObject-class
-  - Modules-class
-  - Network-class
-  - Regions-class
+  - no_legend
+  - no_margin
+  - no_x_text
+  - no_y_text
 
 - subtitle: "Example data and datasets"
 - contents:

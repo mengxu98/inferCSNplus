@@ -47,7 +47,7 @@ fit_srm <- function(
     )
 
     if (any(class(fit) == "try-error")) {
-      log_message(
+      thisutils::log_message(
         "cross validation error, setting `cross_validation` to `FALSE` and re-train model.",
         message_type = "warning",
         verbose = verbose
@@ -138,7 +138,7 @@ fit_srm <- function(
     list(
       model = fit,
       metrics = list(
-        r_squared = r_square(y, pred_y)
+        r_squared = thisutils::r_square(y, pred_y)
       ),
       coefficients = list(
         variable = colnames(x),
@@ -278,7 +278,7 @@ sparse_regression <- function(
   # Handle Lambda Grids
   if (length(lambdaGrid) != 0) {
     if (!is.null(autoLambda) && !autoLambda) {
-      log_message(
+      thisutils::log_message(
         "'autoLambda' is ignored and inferred if 'lambdaGrid' is supplied.",
         message_type = "warning",
         verbose = verbose
@@ -316,7 +316,7 @@ sparse_regression <- function(
   if (penalty != "L0" && !autoLambda) {
     bad_lambda_grid <- FALSE
     if (length(lambdaGrid) != nGamma) {
-      log_message(
+      thisutils::log_message(
         "'nGamma' is ignored and replaced with length(lambdaGrid).",
         message_type = "warning",
         verbose = verbose
@@ -425,7 +425,7 @@ sparse_regression <- function(
     last <- length(m$SuppSize[[i]])
     if (m$SuppSize[[i]][last] > regulators_num) {
       if (last == 1) {
-        log_message(
+        thisutils::log_message(
           "only 1 element in path with support size > regulators_num.
               Try increasing 'regulators_num' to resolve the issue.",
           message_type = "warning",

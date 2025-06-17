@@ -418,7 +418,7 @@ fit_xgb <- function(
   )
   y_pred <- predict(fit, newdata = model_mat)
   metrics <- tibble::tibble(
-    r_squared = r_square(response, y_pred)
+    r_squared = thisutils::r_square(response, y_pred)
   )
   coefficients <- tibble::as_tibble(
     as.data.frame(

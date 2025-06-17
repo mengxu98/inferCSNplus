@@ -29,7 +29,7 @@ gam_fit <- function(
     stats::p.adjust.methods
   )
 
-  res <- parallelize_fun(
+  res <- thisutils::parallelize_fun(
     colnames(matrix),
     function(x) {
       gam_model <- suppressWarnings(
@@ -94,7 +94,7 @@ setMethod(
            adjust_method = "BH",
            ...) {
     if (is.null(pseudotime)) {
-      log_message(
+      thisutils::log_message(
         "No pseudotime provided, return all genes as dynamic genes",
         verbose = verbose
       )
@@ -259,13 +259,13 @@ dynamic_genes_new <- function(
       cluster <- x
       x <- meta_data_list[[x]]
       if (is.null(x)) {
-        log_message(cluster, " not existed.", verbose = verbose)
+        thisutils::log_message(cluster, " not existed.", verbose = verbose)
         return(NULL)
       }
 
       object <- object[, x$cells]
 
-      log_message("\rStarting gammma for cluster: ", cluster, verbose = verbose)
+      thisutils::log_message("\rStarting gammma for cluster: ", cluster, verbose = verbose)
       res <- gam_fit(
         object,
         x$pseudotime,

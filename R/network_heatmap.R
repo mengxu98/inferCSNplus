@@ -331,7 +331,7 @@ plot_top_features <- function(
   for (i in seq_len(length(network_list))) {
     epoch <- names(network_list)[i]
     network_table <- network_list[[i]]
-    log_message(
+    thisutils::log_message(
       paste0("Plotting for ", i, "/", length(network_list), " network: ", epoch)
     )
 

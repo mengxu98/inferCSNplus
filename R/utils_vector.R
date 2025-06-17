@@ -301,11 +301,11 @@ vector_grid_value <- function(out, plot = TRUE) {
   }
   # center_vector <- out$center_vector
 
-  value_norm <- normalization(value)
+  value_norm <- thisutils::normalization(value)
   VALUE.COL <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
   value <- center_value
-  value_norm <- normalization(value)
+  value_norm <- thisutils::normalization(value)
   colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
   if (plot == TRUE) {
@@ -428,7 +428,7 @@ vector_auto_center <- function(
 
   value <- score
   # plot(out$vector, col='grey70',pch=16)
-  value_norm <- normalization(value)
+  value_norm <- thisutils::normalization(value)
   colors <- vector_vcol(
     value_norm,
     c(0, 0.5, 1),
@@ -595,7 +595,7 @@ vector_draw_arrow <- function(
       )
     }
   }
-  N.SCORE <- normalization(score)
+  N.SCORE <- thisutils::normalization(score)
   SCORE.COL <- vector_vcol(
     N.SCORE,
     c(0, 0.5, 1),
@@ -761,7 +761,7 @@ vector_vcol <- function(value, CV, CN) {
 vector.showValue <- function(out) {
   vector <- out$vector
   value <- out$value
-  value_norm <- normalization(value)
+  value_norm <- thisutils::normalization(value)
   colors <- vector_vcol(
     value_norm,
     c(0, 0.5, 1),
@@ -790,7 +790,7 @@ vector.showValue <- function(out) {
 
 vector.calValue <- function(umap) {
   out <- list()
-  PCA.RC <- apply(apply(umap, 2, rank), 2, normalization)
+  PCA.RC <- apply(apply(umap, 2, rank), 2, thisutils::normalization)
   PCA.RC <- abs(PCA.RC - 0.5)
   value <- apply(PCA.RC, 1, mean)
   out$value <- value
@@ -847,7 +847,7 @@ vector.selectCenter <- function(out, plot = TRUE) {
   score <- max(score) - score
 
   value <- score
-  value_norm <- normalization(value)
+  value_norm <- thisutils::normalization(value)
   colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
   out$colors <- rep("grey70", nrow(out$vector))
@@ -1175,7 +1175,7 @@ vector.selectRegion <- function(out) {
 #   score <- max(score) - score
 
 #   value <- score
-#   value_norm <- normalization(value)
+#   value_norm <- thisutils::normalization(value)
 #   colors <- vector_vcol(value_norm, c(0, 0.5, 1), c("#009FFF", "#FFF200", "#ec2F4B"))
 
 #   out$colors <- rep("grey70", nrow(out$vector))

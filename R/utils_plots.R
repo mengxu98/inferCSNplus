@@ -329,9 +329,9 @@ setMethod(
           )
           features <- intersect(features, colnames(rna_expr))
 
-          log_message("Computing gene-gene correlation", verbose = verbose)
+          thisutils::log_message("Computing gene-gene correlation", verbose = verbose)
           rna_expr <- rna_expr[, features]
-          gene_cor <- sparse_cor(rna_expr)
+          gene_cor <- thisutils::sparse_cor(rna_expr)
           gene_cor_df <- gene_cor |>
             tibble::as_tibble(rownames = "source") |>
             tidyr::pivot_longer(
@@ -368,7 +368,7 @@ setMethod(
             tibble::column_to_rownames("target") %>%
             as.matrix()
 
-          log_message("Computing weighted regulatory factor", verbose = verbose)
+          thisutils::log_message("Computing weighted regulatory factor", verbose = verbose)
           reg_factor_mat <- abs(reg_mat) + 1
           coex_mat <- gene_cor[rownames(reg_factor_mat), colnames(reg_factor_mat)] * sqrt(reg_factor_mat)
         } else if (umap_method == "corr") {
@@ -389,9 +389,9 @@ setMethod(
             features <- net_features
           }
 
-          log_message("Computing gene-gene correlation", verbose = verbose)
+          thisutils::log_message("Computing gene-gene correlation", verbose = verbose)
           rna_expr <- rna_expr[, features]
-          coex_mat <- sparse_cor(rna_expr)
+          coex_mat <- thisutils::sparse_cor(rna_expr)
           gene_cor_df <- coex_mat %>%
             tibble::as_tibble(rownames = "source") %>%
             tidyr::pivot_longer(
@@ -437,7 +437,7 @@ setMethod(
             dplyr::select(tf, target, tidyselect::everything()) %>%
             dplyr::group_by(target)
 
-          log_message("Getting network graph", verbose = verbose)
+          thisutils::log_message("Getting network graph", verbose = verbose)
           gene_graph <- tidygraph::as_tbl_graph(gene_net) %>%
             tidygraph::activate(edges) %>%
             dplyr::mutate(
@@ -452,14 +452,14 @@ setMethod(
           return(object)
         }
 
-        log_message("Computing UMAP embedding", verbose = verbose)
+        thisutils::log_message("Computing UMAP embedding", verbose = verbose)
         set.seed(seed)
         coex_umap <- get_umap(
-          as_matrix(coex_mat),
+          thisutils::as_matrix(coex_mat),
           ...
         )
 
-        log_message("Getting network graph", verbose = verbose)
+        thisutils::log_message("Getting network graph", verbose = verbose)
         gene_graph <- tidygraph::as_tbl_graph(gene_net) |>
           tidygraph::activate(edges) |>
           dplyr::mutate(
@@ -666,7 +666,7 @@ setMethod(
 
             features <- intersect(features, gene_graph_nodes$name)
 
-            log_message("Getting shortest paths from TF", verbose = verbose)
+            thisutils::log_message("Getting shortest paths from TF", verbose = verbose)
             spaths <- igraph::all_shortest_paths(
               gene_graph,
               tf,
@@ -675,7 +675,7 @@ setMethod(
             )$res
 
             if (length(spaths) < 3) {
-              log_message(
+              thisutils::log_message(
                 "Selected TF has fewer than 3 targets.",
                 message_type = "warning",
                 verbose = verbose
@@ -683,7 +683,7 @@ setMethod(
               return(NULL)
             }
 
-            spath_list <- parallelize_fun(spaths, function(p) {
+            spath_list <- thisutils::parallelize_fun(spaths, function(p) {
               edg <- names(p)
               edg_graph <- gene_graph |>
                 dplyr::filter(name %in% edg) |>
@@ -737,7 +737,7 @@ setMethod(
               )
             }, cores = cores, verbose = verbose)
 
-            log_message("Pruning graph", verbose = verbose)
+            thisutils::log_message("Pruning graph", verbose = verbose)
             spath_dir <- purrr::map_dfr(spath_list, function(x) x$path) |>
               dplyr::mutate(
                 path_genes = stringr::str_split(path, ";"),
@@ -897,7 +897,7 @@ setMethod(
         plot_list <- purrr::map(tfs, function(tf) {
           gene_graph <- gene_graph_celltype[[tf]]
           if (is.null(gene_graph)) {
-            log_message(
+            thisutils::log_message(
               paste0("No graph found for TF ", tf, " in celltype ", celltype),
               message_type = "warning"
             )

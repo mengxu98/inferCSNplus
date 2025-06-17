@@ -153,7 +153,7 @@ setMethod(
       "regions_neg" = regions_neg
     )
 
-    log_message(
+    thisutils::log_message(
       "Found ", length(unique(modules$tf)), " TF modules",
       verbose = verbose,
       message_type = "success"

@@ -235,12 +235,12 @@ setMethod(
       object[[assay]]
     )$summary[[group_name]]
     if (is.null(smry)) {
-      log_message(
+      thisutils::log_message(
         "summary of '", group_name, "' does not yet exist",
         verbose = verbose,
         message_type = "warning"
       )
-      log_message(
+      thisutils::log_message(
         "Summarizing information for '", group_name, "'",
         verbose = verbose
       )
@@ -545,7 +545,7 @@ setMethod(
   aggregated_edges <- dplyr::group_by(aggregated_edges, target)
   aggregated_edges <- dplyr::mutate(
     aggregated_edges,
-    weight = normalization(sum_weight, method = "unit_vector")
+    weight = thisutils::normalization(sum_weight, method = "unit_vector")
   )
   aggregated_edges <- dplyr::ungroup(aggregated_edges)
   aggregated_edges <- as.data.frame(aggregated_edges)

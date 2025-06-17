@@ -340,7 +340,7 @@ static_shortest_path <- function(
     weight_column = "weight",
     compare_to_average = FALSE) {
   # compute relative edge lengths
-  network_table$normalized_score <- normalization(
+  network_table$normalized_score <- thisutils::normalization(
     network_table[, weight_column],
     method = "maximum"
   )
@@ -493,7 +493,7 @@ dynamic_shortest_path_multiple <- function(
   }
 
   network_table <- do.call("rbind", network_table)
-  network_table$normalized_score <- normalization(
+  network_table$normalized_score <- thisutils::normalization(
     network_table[, weight_column],
     method = "max"
   )
@@ -545,7 +545,7 @@ static_reachability <- function(
     tfs = NULL,
     tf_only = FALSE) {
   # compute relative edge lengths
-  network_table$normalized_score <- normalization(
+  network_table$normalized_score <- thisutils::normalization(
     network_table[, weight_column],
     method = "max"
   )

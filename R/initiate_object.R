@@ -140,7 +140,7 @@ setMethod(
     )
 
     if (is.null(peak_assay)) {
-      log_message(
+      thisutils::log_message(
         "No peak assay found.
         Please specify the peak assay with 'peak_assay' in 'initiate_object'.",
         verbose = verbose,
@@ -292,7 +292,7 @@ process_celltype_features <- function(
   }
 
   feature_type <- if (is_peak) "peaks" else "genes"
-  log_message(
+  thisutils::log_message(
     "Finding celltype-specific ", feature_type,
     verbose = verbose
   )
@@ -440,7 +440,7 @@ process_attributes <- function(
     p_value = 0.05) {
   res <- purrr::map(
     celltypes, function(x) {
-      log_message(
+      thisutils::log_message(
         "Processing results for ", x,
         verbose = verbose
       )
@@ -512,7 +512,7 @@ process_regions <- function(
     return(res)
   }
 
-  log_message(
+  thisutils::log_message(
     "Processing candidate regions",
     verbose = verbose
   )
@@ -537,7 +537,7 @@ process_regions <- function(
       )
     }
     if (!inherits(regions, "GRanges")) {
-      log_message(
+      thisutils::log_message(
         "Regions must be a GRanges object or a data frame with three columns: chrom, start, end.",
         message_type = "error"
       )
@@ -591,14 +591,14 @@ print_summary <- function(
     celltypes,
     peak_assay,
     verbose) {
-  log_message(
+  thisutils::log_message(
     "Summary of cell-type specific features:",
     verbose = verbose
   )
   for (ct in celltypes) {
     attr <- attributes[[ct]]
     if (!is.null(peak_assay)) {
-      log_message(
+      thisutils::log_message(
         sprintf(
           "   %s: %d cells, %d genes, %d peaks",
           as.character(ct), attr$n_cells, attr$n_genes, attr$n_peaks
@@ -608,7 +608,7 @@ print_summary <- function(
         timestamp = FALSE
       )
     } else {
-      log_message(
+      thisutils::log_message(
         sprintf(
           "   %s: %d cells, %d genes",
           as.character(ct), attr$n_cells, attr$n_genes

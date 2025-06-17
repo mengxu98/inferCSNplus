@@ -37,7 +37,7 @@ setMethod(
                         ),
                         gene_cor_threshold = 0,
                         ...) {
-    matrix <- as_matrix(object@data)
+    matrix <- thisutils::as_matrix(object@data)
     if (is.null(regulators)) {
       regulators <- object@regulators
       if (length(regulators) == 0) {
@@ -74,7 +74,7 @@ setMethod(
     )
     model_fits <- model_fits[!purrr::map_lgl(model_fits, is.null)]
     if (length(model_fits) == 0) {
-      log_message(
+      thisutils::log_message(
         "fitting model failed for all genes.",
         verbose = verbose,
         message_type = "warning"
@@ -217,7 +217,7 @@ setMethod(
     }
 
     for (celltype in celltypes) {
-      log_message(
+      thisutils::log_message(
         "Inferring network for celltype: '", celltype, "'",
         verbose = verbose
       )
@@ -230,7 +230,7 @@ setMethod(
       celltype_genes <- targets %ss% celltype_genes
 
       if (length(celltype_genes) == 0) {
-        log_message(
+        thisutils::log_message(
           "no target genes found for ", celltype, ", skipping",
           verbose = verbose,
           message_type = "warning"
@@ -266,7 +266,7 @@ setMethod(
       )
     }
 
-    log_message(
+    thisutils::log_message(
       "Network inference summary:",
       verbose = verbose
     )
@@ -281,7 +281,7 @@ setMethod(
         celltypes = celltype
       )
       if (!is.null(network)) {
-        log_message(
+        thisutils::log_message(
           sprintf(
             "   %s: %d edges (%d regulators -> %d targets)",
             celltype,
@@ -293,7 +293,7 @@ setMethod(
           cli_model = FALSE
         )
       } else {
-        log_message(
+        thisutils::log_message(
           celltype, ": no edges inferred",
           verbose = verbose,
           message_type = "warning"

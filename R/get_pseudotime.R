@@ -53,7 +53,7 @@ get_pseudotime.default <- function(
     )
   }
 
-  log_message("Running `slingshot`", verbose = verbose)
+  thisutils::log_message("Running `slingshot`", verbose = verbose)
   pseudotime_res <- slingshot::slingshot(
     embeddings,
     clusterLabels = meta_data$cluster,
@@ -62,7 +62,7 @@ get_pseudotime.default <- function(
   ) |> slingshot::slingPseudotime()
   pseudotime_res <- apply(
     pseudotime_res, 2, function(x) {
-      normalization(
+      thisutils::normalization(
         x
       )
     }

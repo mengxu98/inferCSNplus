@@ -127,7 +127,7 @@ setMethod(
         stop("Please provide a gene annotation for the ChromatinAssay.")
       }
     } else {
-      log_message(
+      thisutils::log_message(
         "No peak data found. Running RNA-only network inference.",
         verbose = verbose
       )
@@ -214,7 +214,7 @@ setMethod(
       }
 
       if (is.null(peak_to_gene_domains)) {
-        log_message(
+        thisutils::log_message(
           "Selecting candidate regulatory regions near genes",
           verbose = verbose
         )
@@ -227,7 +227,7 @@ setMethod(
           only_tss = only_tss
         )
       } else {
-        log_message(
+        thisutils::log_message(
           "Selecting candidate regulatory regions in provided domains",
           verbose = verbose
         )
@@ -259,7 +259,7 @@ setMethod(
       peaks2motif <- peaks2motif[peaks_use, , drop = FALSE]
       peak_data <- peak_data[, peaks_use, drop = FALSE]
 
-      log_message(
+      thisutils::log_message(
         "Preparing model input",
         verbose = verbose
       )
@@ -269,7 +269,7 @@ setMethod(
       )
       motif2tf <- motif2tf[, regulators, drop = FALSE]
 
-      log_message(
+      thisutils::log_message(
         sprintf(
           "Fitting models for %d regulators and %d target genes",
           length(regulators), length(features)
@@ -277,11 +277,11 @@ setMethod(
         verbose = verbose
       )
       names(features) <- features
-      model_fits <- parallelize_fun(
+      model_fits <- thisutils::parallelize_fun(
         features, function(g) {
           # Select peaks near gene
           if (!g %in% rownames(peaks2gene)) {
-            log_message(
+            thisutils::log_message(
               g, " not found in 'EnsDb'",
               verbose = verbose == 2,
               message_type = "warning"
@@ -290,7 +290,7 @@ setMethod(
           }
           gene_peaks <- as.logical(peaks2gene[g, ])
           if (sum(gene_peaks) == 0) {
-            log_message(
+            thisutils::log_message(
               "no peaks found near ", g,
               verbose = verbose == 2,
               message_type = "warning"
@@ -302,7 +302,7 @@ setMethod(
           peak_x <- peak_data[peak_groups, gene_peaks, drop = FALSE]
 
           if (sum(colSums(peak_x != 0) >= 3) == 0) {
-            log_message(
+            thisutils::log_message(
               sprintf("not enough non-zero values in peaks for %s", g),
               verbose = verbose == 2,
               message_type = "warning"
@@ -311,14 +311,14 @@ setMethod(
           }
 
           peak_g_cor <- as(
-            sparse_cor(peak_x, g_x),
+            thisutils::sparse_cor(peak_x, g_x),
             "generalMatrix"
           )
           peak_g_cor[is.na(peak_g_cor)] <- 0
           peaks_use <- rownames(peak_g_cor)[abs(peak_g_cor[, 1]) > peak_cor_threshold]
 
           if (length(peaks_use) == 0) {
-            log_message(
+            thisutils::log_message(
               sprintf("no correlating peaks found for %s", g),
               verbose = verbose == 2,
               message_type = "warning"
@@ -346,11 +346,11 @@ setMethod(
           # Check correlation of peaks with target gene
           gene_tfs <- purrr::reduce(gene_peak_tfs, union)
           tf_x <- gene_data[gene_groups, gene_tfs, drop = FALSE]
-          tf_g_cor <- as(sparse_cor(tf_x, g_x), "generalMatrix")
+          tf_g_cor <- as(thisutils::sparse_cor(tf_x, g_x), "generalMatrix")
           tf_g_cor[is.na(tf_g_cor)] <- 0
           tfs_use <- rownames(tf_g_cor)[abs(tf_g_cor[, 1]) > gene_cor_threshold]
           if (length(tfs_use) == 0) {
-            log_message(
+            thisutils::log_message(
               sprintf("no correlating TFs found for %s", g),
               verbose = verbose == 2,
               message_type = "warning"
@@ -381,7 +381,7 @@ setMethod(
           })
           frml_string <- frml_string[!purrr::map_lgl(frml_string, is.null)]
           if (length(frml_string) == 0) {
-            log_message(
+            thisutils::log_message(
               sprintf("no valid peak:TF pairs found for %s", g),
               verbose = verbose == 2,
               message_type = "warning"
@@ -416,13 +416,17 @@ setMethod(
           gene_x <- gene_data[gene_groups, union(g, gene_tfs), drop = FALSE]
           model_mat <- as.data.frame(cbind(gene_x, peak_x))
           if (scale) {
-            model_mat <- as.data.frame(scale(as_matrix(model_mat)))
+            model_mat <- as.data.frame(
+              scale(
+                thisutils::as_matrix(model_mat)
+              )
+            )
           }
           colnames(model_mat) <- stringr::str_replace_all(
             colnames(model_mat), "-", "_"
           )
 
-          log_message(
+          thisutils::log_message(
             "Fitting model with ", nfeats, " variables for ", g,
             verbose = verbose == 2
           )
@@ -436,12 +440,12 @@ setMethod(
             silent = TRUE
           )
           if (any(class(result) == "try-error")) {
-            log_message(
+            thisutils::log_message(
               sprintf("fitting model failed for %s", g),
               verbose = verbose == 2,
               message_type = "warning"
             )
-            log_message(
+            thisutils::log_message(
               result,
               verbose = verbose == 2,
               message_type = "warning"
@@ -464,7 +468,7 @@ setMethod(
         )
       }
       model_fits <- fit_models(
-        object = as_matrix(gene_data),
+        object = thisutils::as_matrix(gene_data),
         regulators = regulators,
         targets = targets,
         gene_cor_threshold = gene_cor_threshold,
@@ -478,7 +482,7 @@ setMethod(
 
     model_fits <- model_fits[!purrr::map_lgl(model_fits, is.null)]
     if (length(model_fits) == 0) {
-      log_message(
+      thisutils::log_message(
         "fitting model failed for all genes.",
         verbose = verbose == 2,
         message_type = "warning"
@@ -563,26 +567,26 @@ setMethod(
                         ...) {
     method <- match.arg(method)
 
-    log_message(
+    thisutils::log_message(
       sprintf(
         "Fitting models with %d regulators and %d targets",
         length(regulators), length(targets)
       ),
       verbose = verbose
     )
-    model_fits <- parallelize_fun(
+    model_fits <- thisutils::parallelize_fun(
       targets,
       function(g) {
         regulators_use <- setdiff(regulators, g)
         g_x <- object[, g, drop = FALSE]
         tf_x <- object[, regulators_use, drop = FALSE]
 
-        tf_g_cor <- as(sparse_cor(tf_x, g_x), "generalMatrix")
+        tf_g_cor <- as(thisutils::sparse_cor(tf_x, g_x), "generalMatrix")
         tf_g_cor[is.na(tf_g_cor)] <- 0
         tfs_use <- rownames(tf_g_cor)[abs(tf_g_cor[, 1]) > gene_cor_threshold]
 
         if (length(tfs_use) == 0) {
-          log_message(
+          thisutils::log_message(
             sprintf("no correlating TFs found for %s", g),
             verbose = verbose == 2,
             message_type = "warning"
@@ -630,7 +634,7 @@ setMethod(
         )
 
         if (inherits(result, "try-error")) {
-          log_message(
+          thisutils::log_message(
             "fitting model failed for: ", g,
             verbose = verbose == 2,
             message_type = "warning"

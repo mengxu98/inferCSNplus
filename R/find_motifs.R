@@ -25,7 +25,7 @@ setMethod(
       ...) {
     params <- Params(object)
     if (is.null(params$peak_assay)) {
-      log_message(
+      thisutils::log_message(
         "Skipping motif finding as no peak assay was found.",
         verbose = verbose,
         message_type = "warning"
@@ -33,7 +33,7 @@ setMethod(
       return(object)
     }
 
-    log_message(
+    thisutils::log_message(
       "Adding TF information",
       verbose = verbose
     )
@@ -76,7 +76,7 @@ setMethod(
     )
 
     if (params$filter_mode == "variable" && params$filter_by == "aggregate") {
-      log_message(
+      thisutils::log_message(
         "Processing motifs for all celltypes",
         verbose = verbose
       )
@@ -119,7 +119,7 @@ setMethod(
     genome,
     pfm,
     verbose) {
-  log_message(
+  thisutils::log_message(
     "Processing motifs for ", celltype,
     verbose = verbose
   )
@@ -131,7 +131,7 @@ setMethod(
   )
 
   if (length(celltype_peaks) == 0) {
-    log_message(
+    thisutils::log_message(
       "no significant peaks found for ", celltype,
       verbose = verbose,
       message_type = "warning"

@@ -93,7 +93,7 @@ setMethod(
       rownames(object) <- paste0(rep("cell_", nrow(object)), 1:nrow(object))
     }
     pseudotime <- result$P.PS[selected]
-    pseudotime <- normalization(pseudotime)
+    pseudotime <- thisutils::normalization(pseudotime)
 
     object <- list(
       matrix = object,
@@ -131,7 +131,7 @@ setMethod(
     result <- infer_vector(dimension)
     selected <- which(result$P.PS != "NA")
     pseudotime <- result$P.PS[selected]
-    pseudotime <- normalization(pseudotime)
+    pseudotime <- thisutils::normalization(pseudotime)
     object <- object[, selected]
     object@meta.data$pseudotime_vector <- pseudotime
 
