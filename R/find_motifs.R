@@ -113,6 +113,7 @@ setMethod(
     return(object)
   }
 )
+
 .process_celltype_motifs <- function(
     object,
     celltype,

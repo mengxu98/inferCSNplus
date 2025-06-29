@@ -73,11 +73,10 @@ single_network <- function(
 
   r_squared <- result$metrics$r_squared
   if (r_squared > r_squared_threshold) {
-    coefficients <- result$coefficients$coefficient |>
-      thisutils::normalization(
-        method = "unit_vector",
-        ...
-      )
+    coefficients <- thisutils::normalization(
+      result$coefficients$coefficient,
+      method = "unit_vector"
+    )
 
     if (length(coefficients) != ncol(x)) {
       coefficients <- rep(0, ncol(x))

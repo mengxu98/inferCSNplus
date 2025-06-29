@@ -143,7 +143,6 @@ reference:
   - get_attribute
   - metrics
   - print.Network
-  - simulate_sparse_matrix
   - subsampling
   - weight_sift
   - network_sift

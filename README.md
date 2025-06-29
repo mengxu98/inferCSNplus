@@ -149,4 +149,4 @@ More functions and usages about [*`inferCSN+`*](https://mengxu98.github.io/infer
 
 ## **Citation**
 
-If you use [*`inferCSN+`*](https://github.com/mengxu98plus/inferCSN) in your work, please cite it reference [*`here`*](https://mengxu98.github.io/inferCSNplus/authors.html#citation).
+If you use [*`inferCSN+`*](https://github.com/mengxu98/inferCSNplus) in your work, please cite it reference [*`here`*](https://mengxu98.github.io/inferCSNplus/authors.html#citation).
