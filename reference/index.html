@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inferCSN</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.1</span>
       </span>
     </div>
 
@@ -65,6 +65,30 @@
           <p><code><a href="inferCSN.html">inferCSN()</a></code> </p>
         </td>
         <td><p>inferring cell-type specific gene regulatory network</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h3 id="object-of-cell-type-specific-gene-regulatory-network">Object of cell type-specific gene regulatory network <a href="#object-of-cell-type-specific-gene-regulatory-network" class="anchor" aria-hidden="true"></a></h3>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="initiate_object.html">initiate_object()</a></code> </p>
+        </td>
+        <td><p>Initiate the <code>CSNObject</code> object</p></td>
+      </tr><tr><td>
+          <p><code><a href="CSNObject-class.html">CSNObject-class</a></code> </p>
+        </td>
+        <td><p>The CSNObject class</p></td>
+      </tr><tr><td>
+          <p><code><a href="Modules-class.html">Modules-class</a></code> </p>
+        </td>
+        <td><p>The Modules class</p></td>
+      </tr><tr><td>
+          <p><code><a href="Network-class.html">Network-class</a></code> </p>
+        </td>
+        <td><p>The Network class</p></td>
+      </tr><tr><td>
+          <p><code><a href="Regions-class.html">Regions-class</a></code> </p>
+        </td>
+        <td><p>The Regions class</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h3 id="network-visualization">Network visualization <a href="#network-visualization" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p>
@@ -177,26 +201,6 @@
           <p><code><a href="plot_scatter.html">plot_scatter()</a></code> </p>
         </td>
         <td><p>Plot expression data in a scatter plot</p></td>
-      </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="plotting-theme">Plotting theme <a href="#plotting-theme" class="anchor" aria-hidden="true"></a></h3>
-          <p class="section-desc"></p>
-        </th>
-      </tr></tbody><tbody><tr><td>
-          <p><code><a href="no_legend.html">no_legend()</a></code> </p>
-        </td>
-        <td><p>Removes legend from plot.</p></td>
-      </tr><tr><td>
-          <p><code><a href="no_margin.html">no_margin()</a></code> </p>
-        </td>
-        <td><p>Removes margins from plot.</p></td>
-      </tr><tr><td>
-          <p><code><a href="no_x_text.html">no_x_text()</a></code> </p>
-        </td>
-        <td><p>Removes x axis text.</p></td>
-      </tr><tr><td>
-          <p><code><a href="no_y_text.html">no_y_text()</a></code> </p>
-        </td>
-        <td><p>Removes y axis text.</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h3 id="network-evaluation">Network evaluation <a href="#network-evaluation" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p>
@@ -413,10 +417,6 @@
           <p><code><a href="print.html">print(<i>&lt;Network&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;Modules&gt;</i>)</a></code> <code><a href="print.html">print(<i>&lt;Regions&gt;</i>)</a></code> </p>
         </td>
         <td><p>Print Network objects</p></td>
-      </tr><tr><td>
-          <p><code><a href="simulate_sparse_matrix.html">simulate_sparse_matrix()</a></code> </p>
-        </td>
-        <td><p>Generate a simulated sparse matrix for single-cell data testing</p></td>
       </tr><tr><td>
           <p><code><a href="subsampling.html">subsampling()</a></code> </p>
         </td>
@@ -670,18 +670,6 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="grapes-ss-grapes.html">`%ss%`</a></code> </p>
-        </td>
-        <td><p>Value selection operator</p></td>
-      </tr><tr><td>
-          <p><code><a href="as_matrix.html">as_matrix()</a></code> </p>
-        </td>
-        <td><p>Convert sparse matrix into dense matrix</p></td>
-      </tr><tr><td>
-          <p><code><a href="check_sparsity.html">check_sparsity()</a></code> </p>
-        </td>
-        <td><p>Check sparsity of matrix</p></td>
-      </tr><tr><td>
           <p><code><a href="coef.srm.html">coef(<i>&lt;srm&gt;</i>)</a></code> <code><a href="coef.srm.html">coef(<i>&lt;srm_cv&gt;</i>)</a></code> </p>
         </td>
         <td><p>Extracts a specific solution in the regularization path</p></td>
@@ -770,10 +758,6 @@
         </td>
         <td><p>Format network table</p></td>
       </tr><tr><td>
-          <p><code><a href="normalization.html">normalization()</a></code> </p>
-        </td>
-        <td><p>Normalize numeric vector</p></td>
-      </tr><tr><td>
           <p><code><a href="table_to_matrix.html">table_to_matrix()</a></code> </p>
         </td>
         <td><p>Switch network table to matrix</p></td>
@@ -781,14 +765,6 @@
           <p><code><a href="order_genes.html">order_genes()</a></code> </p>
         </td>
         <td><p>Function that orders genes based on peak expression</p></td>
-      </tr><tr><td>
-          <p><code><a href="parallelize_fun.html">parallelize_fun()</a></code> </p>
-        </td>
-        <td><p>Parallelize a function</p></td>
-      </tr><tr><td>
-          <p><code><a href="pearson_correlation.html">pearson_correlation()</a></code> </p>
-        </td>
-        <td><p>Correlation and covariance calculation for sparse matrix</p></td>
       </tr><tr><td>
           <p><code><a href="pre_pseudotime_matrix.html">pre_pseudotime_matrix()</a></code> </p>
         </td>
@@ -821,50 +797,26 @@
           <p><code><a href="SetNetwork.html">SetNetwork()</a></code> </p>
         </td>
         <td><p>Set Network object</p></td>
-      </tr><tr><td>
-          <p><code><a href="sparse_cor.html">sparse_cor()</a></code> </p>
-        </td>
-        <td><p>Safe correlation function which returns a sparse matrix without missing values</p></td>
-      </tr><tr><td>
-          <p><code><a href="sparse_cov_cor.html">sparse_cov_cor()</a></code> </p>
-        </td>
-        <td><p>Fast correlation and covariance calcualtion for sparse matrices</p></td>
-      </tr><tr><td>
-          <p><code><a href="split_indices.html">split_indices()</a></code> </p>
-        </td>
-        <td><p>Split indices.</p></td>
-      </tr><tr><td>
-          <p><code><a href="log_message.html">log_message()</a></code> </p>
-        </td>
-        <td><p>Print diagnostic message</p></td>
-      </tr><tr><td>
-          <p><code><a href="r_square.html">r_square()</a></code> </p>
-        </td>
-        <td><p>\(R^2\) (coefficient of determination)</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="class">Class <a href="#class" class="anchor" aria-hidden="true"></a></h3>
+          <h3 id="plotting-theme">Plotting theme <a href="#plotting-theme" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="initiate_object.html">initiate_object()</a></code> </p>
+          <p><code><a href="no_legend.html">no_legend()</a></code> </p>
         </td>
-        <td><p>Initiate the <code>CSNObject</code> object</p></td>
+        <td><p>Removes legend from plot.</p></td>
       </tr><tr><td>
-          <p><code><a href="CSNObject-class.html">CSNObject-class</a></code> </p>
+          <p><code><a href="no_margin.html">no_margin()</a></code> </p>
         </td>
-        <td><p>The CSNObject class</p></td>
+        <td><p>Removes margins from plot.</p></td>
       </tr><tr><td>
-          <p><code><a href="Modules-class.html">Modules-class</a></code> </p>
+          <p><code><a href="no_x_text.html">no_x_text()</a></code> </p>
         </td>
-        <td><p>The Modules class</p></td>
+        <td><p>Removes x axis text.</p></td>
       </tr><tr><td>
-          <p><code><a href="Network-class.html">Network-class</a></code> </p>
+          <p><code><a href="no_y_text.html">no_y_text()</a></code> </p>
         </td>
-        <td><p>The Network class</p></td>
-      </tr><tr><td>
-          <p><code><a href="Regions-class.html">Regions-class</a></code> </p>
-        </td>
-        <td><p>The Regions class</p></td>
+        <td><p>Removes y axis text.</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h3 id="example-data-and-datasets">Example data and datasets <a href="#example-data-and-datasets" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p>

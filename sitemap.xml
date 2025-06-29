@@ -29,7 +29,6 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/add_type.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/aggregate_assay.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/aggregate_matrix.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/as_matrix.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/assign_epochs.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/assign_epochs_new1.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/assign_epochs_simple.html</loc></url>
@@ -49,7 +48,6 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/calculate_recall.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/calculate_si.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/calculate_trajectory.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/check_sparsity.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/coef.CSNObject.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/coef.Network.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/coef.srm.html</loc></url>
@@ -108,7 +106,6 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/get_pseudotime.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/get_tf_network.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/get_umap.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/grapes-ss-grapes.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/heatmap_by_treatment_group.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/hm_dyn.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/hm_dyn_clust.html</loc></url>
@@ -127,7 +124,6 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/inferCSN_logo.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/infer_vector.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/initiate_object.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/log_message.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/matrix_to_table.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/mean_module_expression.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/mean_subnetwork_expression.html</loc></url>
@@ -141,10 +137,7 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/no_margin.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/no_x_text.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/no_y_text.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/normalization.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/order_genes.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/parallelize_fun.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/pearson_correlation.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/phastConsElements20Mammals.UCSC.hg38.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/plotPerturbation.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/plotPerturbationTrajectory.html</loc></url>
@@ -179,19 +172,14 @@
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/print.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/print.logo.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/print.srm.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/r_square.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/rough_hierarchy.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/sample_and_epoch_reconstruct.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/score_targets.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/simulate_csn_data.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/simulate_sparse_matrix.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/single_network.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_cor.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_cov_cor.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/sparse_regression.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/split_epochs_by_group.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/split_epochs_by_pseudotime.html</loc></url>
-<url><loc>https://mengxu98.github.io/inferCSNplus/reference/split_indices.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/static_shortest_path.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/subnets.html</loc></url>
 <url><loc>https://mengxu98.github.io/inferCSNplus/reference/subsampling.html</loc></url>

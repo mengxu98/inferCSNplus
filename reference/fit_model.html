@@ -18,7 +18,7 @@ regularized models, Bayesian models, and machine learning approaches."><meta pro
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">inferCSN</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.1</span>
       </span>
     </div>
 
@@ -318,20 +318,20 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> Measure: GLM Deviance </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      Lambda Index Measure       SE Nonzero</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> min 0.00229    55  0.1726 0.002923       9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1se 0.03738    25  0.1752 0.003318       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> min 0.00229    55  0.1726 0.004135       9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1se 0.04503    23  0.1763 0.004349       2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $metrics</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   lambda r_squared alpha</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 0.037<span style="text-decoration: underline;">4</span>     0.425     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 0.045<span style="text-decoration: underline;">0</span>     0.422     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coefficients</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 18 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    variable    coefficient</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> (Intercept)       1.79 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> (Intercept)       1.81 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> g10               0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> g11               0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> g12               0    </span>
@@ -340,8 +340,8 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> g15               0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> g16               0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> g17               0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> g18              -<span style="color: #BB0000;">0.461</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> g2                0.155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> g18              -<span style="color: #BB0000;">0.451</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> g2                0.141</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> g3                0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">13</span> g4                0    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">14</span> g5                0    </span>
@@ -411,7 +411,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> $alpha</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                g10          g11          g12          g13          g14</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 8.957364e-66 8.760669e-66 8.377822e-66 1.243878e-65 3.002172e-65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 8.957365e-66 8.760670e-66 8.377822e-66 1.243878e-65 3.002172e-65</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 3.545564e-09 2.516613e-08 1.479814e-07 1.604524e-07 4.838636e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02</span>
@@ -423,7 +423,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>                g15          g16           g17          g18           g2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.000000e+00 0.000000e+00 1.941360e-261 1.000000e+00 0.000000e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 3.610688e-65 2.206659e-64  3.661515e-64 1.756837e-62 1.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 3.161978e-05 1.881745e-04  9.995182e-01 2.611448e-04 1.300169e-10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 3.161978e-05 1.881745e-04  9.995182e-01 2.611448e-04 1.300170e-10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 5.882353e-02 5.882353e-02  5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 5.882353e-02 5.882353e-02  5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 5.882353e-02 5.882353e-02  5.882353e-02 5.882353e-02 5.882353e-02</span>
@@ -433,8 +433,8 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 5.882353e-02 5.882353e-02  5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 g3           g4           g5           g6           g7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 2.179066e-58 5.196015e-64 1.761159e-63 2.872840e-65 3.658598e-65</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 1.023841e-10 9.277458e-11 8.769205e-10 2.539870e-10 1.268196e-09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 2.179066e-58 5.196016e-64 1.761160e-63 2.872841e-65 3.658599e-65</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 1.023841e-10 9.277459e-11 8.769206e-10 2.539871e-10 1.268196e-09</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02 5.882353e-02</span>
@@ -445,7 +445,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 g8           g9</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.000000e+00 0.000000e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 1.377645e-65 8.392539e-66</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 8.387163e-10 3.280365e-10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 8.387164e-10 3.280365e-10</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 5.882353e-02 5.882353e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 5.882353e-02 5.882353e-02</span>
@@ -456,7 +456,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mu</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                g10          g11           g12          g13          g14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.116287077 -0.126872606 -0.1462507042 -0.164518398 -0.189432800</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.116287077 -0.126872606 -0.1462507041 -0.164518398 -0.189432800</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.002193916  0.001813772 -0.0004730575 -0.005228989 -0.009370091</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.016168039  0.019836685  0.0226472343  0.022767313  0.024346373</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.000000000  0.000000000  0.0000000000  0.000000000  0.000000000</span>
@@ -502,8 +502,8 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mu2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                g10          g11          g12          g13          g14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.355710e-02 1.613107e-02 2.142368e-02 2.710072e-02 0.0359191983</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 3.912046e-05 3.759696e-05 3.453098e-05 6.164952e-05 0.0001221058</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.355710e-02 1.613107e-02 2.142368e-02 2.710072e-02 0.0359191982</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 3.912046e-05 3.759696e-05 3.453098e-05 6.164951e-05 0.0001221058</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 2.951050e-04 4.271936e-04 5.465967e-04 5.520500e-04 0.0006264453</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.0000000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.0000000000</span>
@@ -513,8 +513,8 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.0000000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.0000000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                g15          g16         g17          g18           g2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.0461607264 0.0621677585 0.087128693 0.1284450515 6.630373e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.0001347694 0.0002589729 0.000293719 0.0005593122 1.031606e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.0461607264 0.0621677585 0.087128693 0.1284450514 6.630373e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.0001347694 0.0002589729 0.000293719 0.0005593121 1.031606e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.0009081551 0.0010283670 0.001606492 0.0010504540 7.229834e-05</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.0000000000 0.0000000000 0.000000000 0.0000000000 0.000000e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.0000000000 0.0000000000 0.000000000 0.0000000000 0.000000e+00</span>
@@ -642,7 +642,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [461]  3.835859e-01  8.142847e-02 -5.577400e-03  5.091228e-02  1.247188e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [466]  8.092857e-03  1.022249e-01  1.277910e-01  1.992501e-01  8.371132e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [471]  1.859636e-01 -1.566000e-01 -6.236706e-01  8.933001e-02  8.539775e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [476]  1.814618e-01  1.850207e-01  1.395711e-01  5.854314e-04  9.796252e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [476]  1.814618e-01  1.850207e-01  1.395711e-01  5.854315e-04  9.796252e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [481]  2.540937e-01  2.316363e-01  1.499936e-01  2.280337e-01  1.568601e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [486]  8.323866e-02  1.240165e-02  2.423359e-02  1.522298e-01  1.808647e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [491] -2.965660e-02  2.137041e-01  4.582718e-02  8.664487e-02  2.006624e-01</span>
@@ -672,7 +672,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [611]  2.465019e-02  1.370117e-01 -8.805542e-01  1.751708e-01  2.962555e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [616]  2.706788e-02 -8.974760e-01  5.080584e-02  3.040700e-01  1.081144e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [621]  4.788507e-02  1.047808e-01  2.581759e-01  1.564182e-02  1.321156e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [626]  8.935984e-03  6.027269e-02 -4.532974e-02 -2.213961e-01  2.187793e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [626]  8.935983e-03  6.027269e-02 -4.532974e-02 -2.213961e-01  2.187793e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [631] -1.299206e+00  1.077523e-01  7.659174e-02  8.607494e-03  2.017435e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [636] -6.653379e-01  7.008773e-02  1.498208e-01  2.682082e-02  8.635920e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [641]  1.004119e-02  7.010968e-02  2.566790e-01  7.175569e-03  1.129424e-01</span>
@@ -716,7 +716,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [831]  1.892742e-01 -1.822501e-01  1.112196e-01  1.168071e-01  1.606596e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [836]  1.805618e-01  1.120433e-01 -4.221240e-01  1.839568e-01  9.725503e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [841]  1.379174e-01  2.109657e-01  3.108639e-02  4.931133e-02  2.559805e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [846]  8.318641e-04  6.920974e-02  7.317608e-02  9.589263e-02  1.564648e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [846]  8.318642e-04  6.920974e-02  7.317608e-02  9.589263e-02  1.564648e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [851]  1.486913e-01  2.347064e-01  2.128158e-01  2.175802e-01  1.886725e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [856]  1.299646e-01  1.681034e-02  1.339337e-01  2.132912e-01  4.469326e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [861] -6.903638e-01  1.982456e-02  1.825374e-01  1.141004e-01  1.383656e-01</span>
@@ -776,7 +776,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1131]  1.485205e-01  8.216612e-02  1.038588e-01  9.026274e-02  7.876977e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1136]  1.467564e-01  1.664147e-01 -8.029405e-01  1.648775e-01 -1.317215e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1141]  1.789719e-01  1.544027e-01  1.579564e-01  2.220081e-01  2.240175e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1146] -4.069511e-04 -7.970327e-01  4.741743e-03  1.093605e-01  7.820666e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1146] -4.069510e-04 -7.970327e-01  4.741743e-03  1.093605e-01  7.820666e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1151]  1.458130e-01  3.131478e-02 -1.213711e+00  1.413913e-01  1.173325e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1156]  2.141733e-01 -1.604353e-01  2.719053e-01 -7.583516e-03  1.760727e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1161]  6.248266e-02  8.880711e-02  1.522611e-01  1.020801e-01  1.400293e-01</span>
@@ -884,7 +884,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1671]  1.002149e-01  6.260646e-02  6.579942e-02  1.126581e-01  1.860287e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1676]  1.983352e-01  1.168527e-01  1.548941e-01 -7.615747e-01  9.123080e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1681]  1.028769e-01  9.190514e-02  2.063406e-01  5.227685e-02  1.457635e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1686] -1.089710e+00 -2.452782e-02 -1.493557e-03  1.255389e-01  1.977108e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1686] -1.089710e+00 -2.452782e-02 -1.493556e-03  1.255389e-01  1.977108e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1691]  6.938170e-03  2.213267e-01  4.019067e-02  7.192793e-02  1.473967e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1696]  1.428813e-01  9.243884e-02 -1.376098e+00  1.958727e-01  1.082555e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1701]  1.659583e-01 -1.224721e+00  1.198862e-01  1.264607e-01  1.273311e-01</span>
@@ -925,7 +925,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1876]  1.009877e-01  3.201664e-02  1.882601e-01  1.302310e-01  2.352519e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1881]  1.281969e-01  4.503585e-02  9.753896e-02  1.726937e-01 -1.162529e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1886] -9.845108e-01  2.618519e-02  2.329432e-01  1.991907e-01  1.716773e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1891]  8.293245e-03  1.292778e-01  1.148590e-01  1.976784e-01 -5.544043e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1891]  8.293246e-03  1.292778e-01  1.148590e-01  1.976784e-01 -5.544043e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1896]  1.334731e-01  2.161074e-01  1.209655e-01  1.525691e-01  7.926103e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1901]  2.658032e-01  2.290980e-01  8.346605e-02  2.430739e-01  1.609513e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1906]  1.573743e-01  1.487881e-01  1.268852e-01  1.323043e-01  9.492039e-02</span>
@@ -1079,7 +1079,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2646]  2.301454e-01  1.435294e-01  2.118604e-01  1.828488e-01  2.004751e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2651]  2.560275e-01  2.690055e-01 -1.101304e+00  2.758679e-01  2.203533e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2656]  1.509709e-01 -3.108602e-01  1.997103e-01 -1.009901e+00  8.795307e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2661] -6.153645e-03  2.462757e-01  8.422065e-02  8.923678e-02  1.676009e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2661] -6.153644e-03  2.462757e-01  8.422065e-02  8.923678e-02  1.676009e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2666]  9.783367e-02  2.292465e-01  1.923612e-01  2.046062e-01  2.188517e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2671] -1.416909e-01 -1.122877e-01 -1.774370e-02  6.658529e-02  7.501626e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [2676] -1.112888e-01  1.819488e-01 -2.588091e-01  1.291930e-01 -1.133061e-01</span>
@@ -1159,7 +1159,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3046]  1.913753e-01  5.318657e-02  1.746160e-01 -6.210179e-03  2.633675e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3051]  9.124340e-02  2.577849e-01  8.871186e-02  2.319621e-01  2.014440e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3056]  1.610835e-01  1.330525e-01 -1.554530e+00 -1.123090e+00  2.406051e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3061] -8.298648e-01 -3.885282e-03 -9.662502e-02  5.665491e-02  1.403303e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3061] -8.298648e-01 -3.885281e-03 -9.662502e-02  5.665491e-02  1.403303e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3066]  1.821913e-01  1.650977e-01  1.609011e-01  5.111299e-02  1.572062e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3071]  1.149822e-01 -5.938227e-02  1.109031e-01  6.174844e-02  8.543750e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3076]  2.006191e-01  2.338049e-01 -3.977645e-02  1.075839e-01  7.419839e-02</span>
@@ -1169,7 +1169,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3096]  5.039652e-02  1.239431e-01  2.181310e-01  3.855011e-02 -6.561566e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3101]  1.010236e-01  8.126777e-02  1.778210e-01  7.763541e-02  3.384264e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3106]  9.539436e-02  6.664517e-02  1.514467e-01 -1.212396e+00  9.244366e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3111]  1.911927e-01  1.623652e-01  1.505013e-01 -7.338569e-05  9.629673e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3111]  1.911927e-01  1.623652e-01  1.505013e-01 -7.338561e-05  9.629673e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3116]  6.468841e-02 -7.168749e-01  2.452871e-01  1.598400e-01 -3.853452e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3121] -1.003815e+00  1.323442e-01  1.565463e-01  1.012121e-01  6.408225e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3126]  2.217515e-01 -1.681217e-02  3.923770e-02  2.127903e-01  1.236099e-01</span>
@@ -1199,7 +1199,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3246]  4.559952e-02  5.733134e-02  1.274211e-01  1.212767e-01  1.976705e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3251]  2.074822e-01  2.331116e-01  3.415583e-01  7.832856e-02  2.823082e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3256]  1.467606e-01 -7.000328e-01 -1.185060e+00  9.083723e-02 -9.042598e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3261]  1.146314e-01  6.248173e-02  1.390169e-02  1.335612e-01  2.549019e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3261]  1.146314e-01  6.248173e-02  1.390168e-02  1.335612e-01  2.549019e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3266] -9.751001e-01  2.384159e-02 -2.360145e-01  3.140525e-02  1.080992e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3271]  6.481361e-02  1.964852e-01  1.248742e-01  1.896126e-01 -1.531274e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3276]  2.011192e-01 -8.753457e-02 -1.556436e+00  1.790797e-01  1.232521e-01</span>
@@ -1248,14 +1248,14 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3491]  1.231986e-01  1.381166e-01 -1.266769e-01 -1.198760e-01  1.904941e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3496]  1.590238e-01  2.442424e-01  2.467763e-01  1.148165e-01 -1.935120e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3501]  8.980020e-02  1.899265e-01  8.122289e-02  1.158610e-01  1.477924e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3506]  9.654100e-02  9.066500e-02  1.975430e-01  1.713264e-01  5.181192e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3506]  9.654100e-02  9.066500e-02  1.975429e-01  1.713264e-01  5.181192e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3511]  1.656680e-01  2.111697e-01  9.474902e-02  9.472749e-02  6.145752e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3516]  1.293840e-01  9.128403e-02  2.280161e-01 -5.257087e-02 -1.857982e+00</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3521]  1.872240e-01 -7.094113e-02  1.001098e-01  2.624698e-01  1.431599e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3526]  2.119851e-01  1.549969e-01  1.514038e-01  1.392651e-01  1.120324e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3531]  3.676928e-02  9.993957e-02  1.856599e-01  1.308765e-01 -8.442385e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3536]  1.752798e-01 -8.812974e-01  4.634719e-02 -9.713777e-03  1.563986e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3541]  1.395009e-01  2.368384e-03 -7.747540e-04  9.236645e-02  1.025160e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3541]  1.395009e-01  2.368384e-03 -7.747539e-04  9.236645e-02  1.025160e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3546]  1.059894e-01  4.002271e-02  6.206073e-02  1.058518e-02  1.074831e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3551]  9.550742e-03 -4.893530e-03  2.861027e-01 -7.098328e-02  2.298032e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3556]  3.224769e-01  8.947563e-02 -3.878928e-01  9.512591e-02  1.142817e-01</span>
@@ -1266,9 +1266,9 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3581]  7.963509e-02  1.087185e-01 -1.193994e+00  1.359619e-01  2.199968e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3586]  1.411253e-01  1.599669e-01  7.836192e-02  1.501470e-01  1.534452e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3591]  1.413908e-02  1.309754e-01 -2.442926e-01  9.409777e-02  1.601272e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3596]  6.953486e-02  9.738581e-02  1.980767e-01  1.154376e-01  2.938251e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3601]  1.549582e-01  2.084605e-02  6.920857e-02  2.176586e-02 -1.092823e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3606]  1.524046e-01  1.838519e-01  4.580266e-03  1.760077e-01  8.836468e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3596]  6.953486e-02  9.738581e-02  1.980766e-01  1.154376e-01  2.938251e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3601]  1.549582e-01  2.084605e-02  6.920857e-02  2.176587e-02 -1.092823e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3606]  1.524046e-01  1.838519e-01  4.580265e-03  1.760077e-01  8.836468e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3611]  5.502547e-02  1.166656e-01  1.298547e-01  8.577100e-02  1.960699e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3616]  1.594226e-01  1.100440e-02  1.300294e-01  3.011844e-02  1.163650e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3621] -3.847490e-02  2.265704e-01  3.721141e-01  1.448237e-01 -4.978136e-03</span>
@@ -1310,7 +1310,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3801]  3.901301e-02  7.565086e-02  2.026915e-01 -1.076841e+00  4.458593e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3806]  1.815693e-01  2.103340e-01  2.788017e-01  3.078742e-02  1.766298e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3811] -9.913445e-01  2.677123e-01  1.519668e-01  7.892465e-02  1.954983e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3816]  2.034317e-01  6.868587e-04 -7.951335e-01 -1.067064e+00  7.563593e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3816]  2.034317e-01  6.868588e-04 -7.951335e-01 -1.067064e+00  7.563593e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3821]  2.339191e-02  1.574570e-01 -5.501518e-01  2.144521e-01  2.067935e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3826]  1.393875e-01  1.243663e-01  7.628203e-02  1.453061e-01  1.904929e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3831]  6.024131e-02  9.588332e-02 -4.951466e-01 -7.688942e-01  4.228472e-01</span>
@@ -1322,7 +1322,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3861]  8.621704e-02 -9.573348e-01  1.537489e-01  1.065633e-01  1.234757e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3866] -1.233537e+00  9.136237e-02  1.794683e-01  1.252804e-01 -2.438747e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3871]  1.307777e-01  5.559178e-02  1.211277e-01 -1.235144e+00  8.736308e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3876]  1.959533e-01  1.039451e-01  1.020531e-01  1.289076e-01 -6.167375e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3876]  1.959533e-01  1.039451e-01  1.020531e-01  1.289076e-01 -6.167374e-03</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3881]  1.540493e-01  3.784035e-01  1.177939e-01  1.360924e-01  1.684261e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3886]  1.933639e-01  9.268771e-02  1.370750e-01  2.081962e-01  4.831850e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3891]  2.522661e-01 -1.629925e-01 -1.972161e-01 -4.396694e-01  2.658517e-01</span>
@@ -1341,10 +1341,10 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3956]  2.754221e-01  2.716267e-01 -6.424843e-01  2.027263e-01  1.991507e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3961]  3.889286e-02  3.503434e-02 -6.089921e-01  7.776716e-02  2.290992e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3966]  1.534151e-01  1.621433e-01  2.698869e-01 -7.002459e-01  8.418538e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3971] -5.298741e-04  6.025296e-02  3.823810e-02 -7.976624e-01  1.615803e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3971] -5.298740e-04  6.025296e-02  3.823810e-02 -7.976624e-01  1.615803e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3976] -1.567398e+00 -1.141228e+00  1.205923e-01  6.052310e-02  1.310510e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3981]  8.709255e-02  9.682795e-02  2.754398e-02  8.040508e-02 -1.020415e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3986]  3.528675e-04  1.440312e-01  1.585498e-01  8.416399e-02  1.881072e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3986]  3.528676e-04  1.440312e-01  1.585498e-01  8.416399e-02  1.881072e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3991] -8.776452e-01  1.131836e-01  1.998643e-01  1.307900e-01  1.214482e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [3996]  2.557893e-01  2.125517e-01  3.162041e-02  1.541764e-01  1.347834e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4001] -2.044169e-02  1.643658e-01  1.572517e-01  1.770893e-01  1.721738e-01</span>
@@ -1416,7 +1416,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4331]  2.164335e-01  8.219295e-02  9.597774e-02 -9.381296e-01  1.852173e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4336] -1.973511e-03  8.741272e-02  8.365425e-02  1.827442e-01  1.682327e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4341]  1.524122e-01  3.872563e-02  1.053215e-01  5.527579e-02  1.553281e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4346] -5.431245e-02  2.008864e-01  1.027304e-01  8.020066e-03  4.216459e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4346] -5.431245e-02  2.008864e-01  1.027304e-01  8.020067e-03  4.216459e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4351]  1.244218e-01  1.489061e-01  2.770207e-01  1.019772e-01 -4.384657e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4356]  5.709914e-02  1.278725e-01  1.783755e-01 -8.312586e-01  2.177522e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4361]  1.264474e-01 -1.176213e+00  2.333163e-01  1.474568e-01  5.573983e-02</span>
@@ -1430,7 +1430,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4401] -7.909875e-01  1.477778e-01  5.142562e-02  1.533793e-01  8.884026e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4406]  4.956822e-02  8.544373e-02  1.184254e-01  2.181189e-01  8.066718e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4411]  4.697815e-02  3.525576e-02 -3.066412e-01  9.837974e-02  2.536657e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4416]  2.290344e-01  5.110750e-02  2.982099e-01  2.022591e-01  2.117063e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4416]  2.290344e-01  5.110751e-02  2.982099e-01  2.022591e-01  2.117063e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4421]  4.262422e-02  1.546524e-01  1.682697e-01  1.222866e-01  8.531062e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4426]  1.551481e-01  1.953177e-01  2.428027e-01  1.080968e-01  1.799376e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4431]  1.778829e-01  5.443858e-02  2.330408e-01  2.120936e-01  1.611408e-01</span>
@@ -1541,7 +1541,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4956]  1.406404e-01  4.824614e-02  1.946771e-01  4.010881e-01  7.547915e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4961]  7.125978e-02 -7.581737e-01  1.172238e-01  1.395845e-01  1.663728e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4966] -7.048540e-02  8.282735e-02  1.163899e-01  1.856645e-01  1.836784e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4971]  2.685186e-01 -1.163222e-02  1.421540e-01  1.765020e-01  8.777760e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4971]  2.685186e-01 -1.163221e-02  1.421540e-01  1.765020e-01  8.777760e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4976] -1.959109e-01  1.451253e-01 -1.097897e+00  9.151683e-02  1.616499e-01</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4981]  2.131058e-01  1.893397e-01  1.903985e-01  7.623898e-03  9.974886e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4986]  1.728779e-01  1.976256e-01  1.351099e-01  1.269445e-01  1.906488e-01</span>
@@ -1549,16 +1549,16 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4996]  1.153970e-01  1.764876e-01  2.495129e-01  4.958011e-02  5.432840e-02</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $KL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 6.945632e+00 5.686264e+00 4.760700e+00 4.547474e-13 4.547474e-13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 4.547474e-13 4.547474e-13 4.547474e-13 4.547474e-13 4.547474e-13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  6.945632e+00  5.686264e+00  4.760699e+00 -2.533197e-07 -2.533197e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] -2.533197e-07 -2.533197e-07 -2.533197e-07 -2.533197e-07 -2.533197e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lbf</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1858.81317  144.16203   18.57076    0.00000    0.00000    0.00000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7]    0.00000    0.00000    0.00000    0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1.858813e+03 1.441620e+02 1.857076e+01 2.533197e-07 2.533197e-07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] 2.533197e-07 2.533197e-07 2.533197e-07 2.533197e-07 2.533197e-07</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $lbf_variable</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              g10        g11        g12        g13        g14        g15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 192.367153 229.766036 306.665694 389.150897 517.280167 666.085761</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 192.367152 229.766035 306.665693 389.150896 517.280166 666.085760</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  -2.782901  -2.805105  -2.849789  -2.454558  -1.573456  -1.388894</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]   1.946403   3.906205   5.677793   5.758703   6.862509  11.042244</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]   0.000000   0.000000   0.000000   0.000000   0.000000   0.000000</span>
@@ -1568,20 +1568,20 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]   0.000000   0.000000   0.000000   0.000000   0.000000   0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]   0.000000   0.000000   0.000000   0.000000   0.000000   0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10,]   0.000000   0.000000   0.000000   0.000000   0.000000   0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               g16          g17         g18         g2        g3        g4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 898.6619816 1261.3350675 1861.646388  91.724432 -1.083953 27.304973</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]   0.4212725    0.9276699    4.798478 146.995239 14.224200  1.277685</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  12.8258312   21.4034901   13.153536  -1.359384 -1.598318 -1.696876</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]   0.0000000    0.0000000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               g16        g17         g18         g2        g3        g4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 898.6619806 1261.33507 1861.646387  91.724432 -1.083953 27.304973</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]   0.4212726    0.92767    4.798478 146.995239 14.224200  1.277685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  12.8258311   21.40349   13.153536  -1.359384 -1.598318 -1.696876</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]   0.0000000    0.00000    0.000000   0.000000  0.000000  0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               g5        g6         g7          g8          g9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 39.5062640 76.739065 86.1655345 125.0070881 173.7189150</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  2.4983504 -1.617491 -1.3757121  -2.3524168  -2.8480343</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 39.5062637 76.739065 86.1655343 125.0070879 173.7189147</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  2.4983505 -1.617491 -1.3757120  -2.3524167  -2.8480342</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  0.5493672 -0.689766  0.9183012   0.5048234  -0.4339243</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.0000000  0.000000  0.0000000   0.0000000   0.0000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.0000000  0.000000  0.0000000   0.0000000   0.0000000</span>
@@ -1595,7 +1595,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.1720739</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $V</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.128444994 0.010316055 0.001606215 0.000000000 0.000000000 0.000000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 0.128445039 0.010316053 0.001606215 0.000000000 0.000000000 0.000000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] 0.000000000 0.000000000 0.000000000 0.000000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $pi</span>
@@ -1611,7 +1611,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $elbo</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] -3050.785 -2712.851 -2712.673 -2712.587 -2712.544 -2712.523 -2712.512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] -2712.507 -2712.505 -2712.504 -2712.503</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] -2712.507 -2712.505 -2712.503 -2712.503</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $niter</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 11</span>
@@ -1655,7 +1655,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>   E727_849   E815_146  E1210_404   E872_557 E3769_1333  E3161_174   E3818_29 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2.2208940  2.1967279  2.1861861  2.1604713  2.3042167  2.2328420  1.7916673 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> E3235_1053  E4639_961 E2868_1272  E4332_971 E2163_1317 E4658_1493  E3535_829 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2.0536391  2.1684473  1.5123464  2.2227083  2.1426670  0.8477495  2.1577884 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2.0536391  2.1684473  1.5123464  2.2227083  2.1426670  0.8477496  2.1577884 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> E4991_1142  E2129_272 E4087_1065  E1377_244 E2687_1031  E3560_696 E1303_1111 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2.1293912  2.2986003  2.1103597  2.1538318  2.1223292  2.2307758  2.1519268 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E423_1313  E137_1244   E674_803   E942_636   E817_569  E2439_137  E1465_256 </span>
@@ -1999,7 +1999,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E1361_271  E1270_227  E4748_582 E3469_1242   E3524_74  E2404_588  E1262_781 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2.0972964  2.0505120  2.0987736  2.0386572  2.1556969  2.1721953  2.1523018 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E3139_224  E4674_863 E4660_1189   E574_158  E2872_870    E70_860  E2209_530 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2.0455410  2.2259436  2.0235814  2.1373238  2.2611227  2.1014586  1.9963611 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2.0455410  2.2259435  2.0235814  2.1373238  2.2611227  2.1014586  1.9963611 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> E2826_1471 E1417_1380 E4833_1355   E491_344  E2074_883 E4051_1093  E4765_294 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0.9387486  1.1630403  1.4979587  2.1269732  2.1394505  2.0675640  2.0949218 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E1136_904  E2827_488 E2254_1016 E4771_1153  E2343_479   E96_1337  E1261_366 </span>
@@ -2785,7 +2785,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E1039_175  E1823_695  E2735_825  E747_1144   E4061_28 E4473_1013 E2132_1116 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2.0860318  2.0615189  2.0608975  2.0528415  1.8858330  1.9871630  2.1355544 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  E3101_314  E3422_770    E648_96 E1197_1418  E3804_834   E2927_11  E3977_768 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  2.1577850  2.1160065  2.1433512  1.1345366  2.2535381  1.8435336  2.1622081 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  2.1577850  2.1160065  2.1433512  1.1345367  2.2535381  1.8435336  2.1622081 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> E3413_1228  E1627_911    E86_904  E2897_504 E2311_1246  E1075_603 E3062_1260 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  2.0495609  2.1192841  2.1434676  1.9683252  2.1312202  2.0281257  2.2095242 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   E281_134  E1099_630 E1004_1362 E1862_1397   E32_1491 E4794_1119   E4195_83 </span>
@@ -3085,7 +3085,7 @@ See <em><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class=
 <span class="r-out co"><span class="r-pr">#&gt;</span>          g16          g17          g18           g2           g3           g4 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1.881745e-04 9.995182e-01 1.000000e+00 1.000000e+00 1.023841e-10 9.277457e-11 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           g5           g6           g7           g8           g9 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8.769205e-10 2.539871e-10 1.268196e-09 8.387163e-10 3.280365e-10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8.769205e-10 2.539871e-10 1.268196e-09 8.387164e-10 3.280365e-10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $X_column_scale_factors</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       g10       g11       g12       g13       g14       g15       g16       g17 </span>
