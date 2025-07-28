@@ -6,7 +6,7 @@ toc:
 url: https://mengxu98.github.io/inferCSNplus/
 
 template:
-  package: mxtemplate
+  package: thistemplate
 
 navbar:
   structure:
