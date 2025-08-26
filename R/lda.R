@@ -13,7 +13,8 @@ construct_lda_data <- function(
   networks_matrix_list <- purrr::map(
     network_list,
     .f = function(x) {
-      network_matrix <- table_to_matrix(x)
+      colnames(x) <- c("row", "col", "value")
+      network_matrix <- thisutils::table_to_matrix(x)
       network_matrix <- abs(network_matrix)
       rowsum <- as.numeric(rowSums(network_matrix))
       idrms <- as.numeric(which(rowsum == 0))

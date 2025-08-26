@@ -30,7 +30,8 @@ bool geneCompare(const std::string &a, const std::string &b) {
 //' @examples
 //' data("example_matrix")
 //' network_table <- inferCSN(example_matrix)
-//' network_matrix <- table_to_matrix(network_table)
+//' colnames(network_table) <- c("row", "col", "value")
+//' network_matrix <- thisutils::table_to_matrix(network_table)
 //' filter_sort_matrix(network_matrix)[1:6, 1:6]
 //'
 //' filter_sort_matrix(
