@@ -13,6 +13,7 @@
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
 ^\.vscode$
-^scripts$
 ^docs$
 ^pkgdown$
+^scripts$
+^test$

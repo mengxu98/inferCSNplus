@@ -218,7 +218,7 @@ setMethod(
 
     for (celltype in celltypes) {
       thisutils::log_message(
-        "Inferring network for celltype: '", celltype, "'",
+        "Inferring network for: {.val {celltype}}",
         verbose = verbose
       )
       celltype_genes <- get_attribute(
@@ -231,7 +231,7 @@ setMethod(
 
       if (length(celltype_genes) == 0) {
         thisutils::log_message(
-          "no target genes found for ", celltype, ", skipping",
+          "No target genes found for {.val {celltype}}, skipping",
           verbose = verbose,
           message_type = "warning"
         )
