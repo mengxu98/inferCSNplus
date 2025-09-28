@@ -4,7 +4,7 @@
 \alias{get_umap}
 \title{Compute UMAP embedding}
 \usage{
-get_umap(x, n_pcs = 30, ...)
+get_umap(x, n_pcs = NULL, verbose = TRUE, ...)
 }
 \arguments{
 \item{x}{data}

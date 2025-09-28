@@ -239,21 +239,24 @@ setMethod(
 #' @return umap
 get_umap <- function(
     x,
-    n_pcs = 30,
+    n_pcs = NULL,
+    verbose = TRUE,
     ...) {
+  if (is.null(n_pcs)) {
+    n_pcs <- min(30, ncol(x))
+    thisutils::log_message(
+      "Using {.val {n_pcs}} PCs for UMAP computation",
+      verbose = verbose
+    )
+  }
   if (ncol(x) > 100) {
     pca_mat <- irlba::prcomp_irlba(x, n = n_pcs)$x
     rownames(pca_mat) <- rownames(x)
     x <- as.matrix(pca_mat)
   }
-  umap_tbl <- uwot::umap(x, ...) %>%
-    {
-      colnames(.) <- c("UMAP_1", "UMAP_2")
-      .
-    } %>%
-    tibble::as_tibble(rownames = "gene")
-
-  return(umap_tbl)
+  umap_tbl <- uwot::umap(x, n_neighbors = n_pcs, ...)
+  colnames(umap_tbl) <- c("UMAP_1", "UMAP_2")
+  tibble::as_tibble(umap_tbl, rownames = "gene")
 }
 
 #' Compute network graph embedding using UMAP.
@@ -290,7 +293,7 @@ setMethod(
                         graph_name = "module_graph",
                         rna_assay = "RNA",
                         rna_layer = "data",
-                        umap_method = c("weighted", "corr", "coef", "none"),
+                        umap_method = c("weighted", "coef", "corr", "none"),
                         features = NULL,
                         seed = 1,
                         verbose = TRUE,
@@ -313,7 +316,7 @@ setMethod(
         if (is.null(features)) {
           features <- get_attribute(
             object,
-            attribute = "targets",
+            attribute = "genes",
             active_network = network,
             celltypes = celltype
           )
@@ -329,7 +332,10 @@ setMethod(
           )
           features <- intersect(features, colnames(rna_expr))
 
-          thisutils::log_message("Computing gene-gene correlation", verbose = verbose)
+          thisutils::log_message(
+            "Computing gene-gene correlation for {.val {celltype}}",
+            verbose = verbose
+          )
           rna_expr <- rna_expr[, features]
           gene_cor <- thisutils::sparse_cor(rna_expr)
           gene_cor_df <- gene_cor |>
@@ -368,15 +374,18 @@ setMethod(
             tibble::column_to_rownames("target") %>%
             as.matrix()
 
-          thisutils::log_message("Computing weighted regulatory factor", verbose = verbose)
+          thisutils::log_message(
+            "Computing weighted regulatory factor for {.val {celltype}}",
+            verbose = verbose
+          )
           reg_factor_mat <- abs(reg_mat) + 1
           coex_mat <- gene_cor[rownames(reg_factor_mat), colnames(reg_factor_mat)] * sqrt(reg_factor_mat)
         } else if (umap_method == "corr") {
           net_features <- get_attribute(
             object,
-            celltypes = NULL,
-            attribute = "targets",
-            active_network = network
+            attribute = "genes",
+            active_network = network,
+            celltypes = celltype
           )
           rna_expr <- t(LayerData(object, assay = rna_assay, layer = rna_layer))
 
@@ -389,7 +398,10 @@ setMethod(
             features <- net_features
           }
 
-          thisutils::log_message("Computing gene-gene correlation", verbose = verbose)
+          thisutils::log_message(
+            "Computing gene-gene correlation for {.val {celltype}}",
+            verbose = verbose
+          )
           rna_expr <- rna_expr[, features]
           coex_mat <- thisutils::sparse_cor(rna_expr)
           gene_cor_df <- coex_mat %>%
@@ -437,7 +449,10 @@ setMethod(
             dplyr::select(tf, target, tidyselect::everything()) %>%
             dplyr::group_by(target)
 
-          thisutils::log_message("Getting network graph", verbose = verbose)
+          thisutils::log_message(
+            "Getting network graph for {.val {celltype}}",
+            verbose = verbose
+          )
           gene_graph <- tidygraph::as_tbl_graph(gene_net) %>%
             tidygraph::activate(edges) %>%
             dplyr::mutate(
@@ -452,14 +467,19 @@ setMethod(
           return(object)
         }
 
-        thisutils::log_message("Computing UMAP embedding", verbose = verbose)
+        thisutils::log_message(
+          "Computing UMAP embedding for {.val {celltype}}",
+          verbose = verbose
+        )
         set.seed(seed)
         coex_umap <- get_umap(
-          thisutils::as_matrix(coex_mat),
-          ...
+          thisutils::as_matrix(coex_mat)
         )
 
-        thisutils::log_message("Getting network graph", verbose = verbose)
+        thisutils::log_message(
+          "Getting network graph for {.val {celltype}}",
+          verbose = verbose
+        )
         gene_graph <- tidygraph::as_tbl_graph(gene_net) |>
           tidygraph::activate(edges) |>
           dplyr::mutate(

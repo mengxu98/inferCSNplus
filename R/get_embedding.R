@@ -1,4 +1,5 @@
-#' @param cores Using n threads for \code{\link[uwot]{umap}}.
+#' @md
+#' @param cores Using n threads for [uwot::umap].
 #' @param seed Set a random seed, default sets to 1.
 #' @param dims The number of dimensions to use.
 #'

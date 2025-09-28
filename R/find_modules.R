@@ -119,7 +119,9 @@ setMethod(
       dplyr::group_by(tf) |>
       dplyr::filter(dplyr::n() > min_genes_per_module) |>
       dplyr::group_split()
-    names(module_pos) <- purrr::map_chr(module_pos, function(x) x$tf[[1]])
+    names(module_pos) <- purrr::map_chr(
+      module_pos, function(x) x$tf[[1]]
+    )
     module_pos <- purrr::map(module_pos, function(x) x$target)
 
     module_neg <- modules |>
@@ -127,7 +129,9 @@ setMethod(
       dplyr::group_by(tf) |>
       dplyr::filter(dplyr::n() > min_genes_per_module) |>
       dplyr::group_split()
-    names(module_neg) <- purrr::map_chr(module_neg, function(x) x$tf[[1]])
+    names(module_neg) <- purrr::map_chr(
+      module_neg, function(x) x$tf[[1]]
+    )
     module_neg <- purrr::map(module_neg, function(x) x$target)
 
     regions_pos <- modules |>
@@ -135,16 +139,28 @@ setMethod(
       dplyr::group_by(tf) |>
       dplyr::filter(dplyr::n() > min_genes_per_module) |>
       dplyr::group_split()
-    names(regions_pos) <- purrr::map_chr(regions_pos, function(x) x$tf[[1]])
-    regions_pos <- purrr::map(regions_pos, function(x) unlist(stringr::str_split(x$regions, ";")))
+    names(regions_pos) <- purrr::map_chr(
+      regions_pos, function(x) x$tf[[1]]
+    )
+    regions_pos <- purrr::map(
+      regions_pos, function(x) {
+        unlist(stringr::str_split(x$regions, ";"))
+      }
+    )
 
     regions_neg <- modules |>
       dplyr::filter(coefficient < 0) |>
       dplyr::group_by(tf) |>
       dplyr::filter(dplyr::n() > min_genes_per_module) |>
       dplyr::group_split()
-    names(regions_neg) <- purrr::map_chr(regions_neg, function(x) x$tf[[1]])
-    regions_neg <- purrr::map(regions_neg, function(x) unlist(stringr::str_split(x$regions, ";")))
+    names(regions_neg) <- purrr::map_chr(
+      regions_neg, function(x) x$tf[[1]]
+    )
+    regions_neg <- purrr::map(
+      regions_neg, function(x) {
+        unlist(stringr::str_split(x$regions, ";"))
+      }
+    )
 
     module_feats <- list(
       "genes_pos" = module_pos,
@@ -154,7 +170,7 @@ setMethod(
     )
 
     thisutils::log_message(
-      "Found ", length(unique(modules$tf)), " TF modules",
+      "Found {.val {length(unique(modules$tf))}} TF modules",
       verbose = verbose,
       message_type = "success"
     )
@@ -208,14 +224,13 @@ setMethod(
 
     net_obj <- purrr::map(
       net_obj, function(x) {
-        x <- find_modules(
+        find_modules(
           x,
           p_thresh = p_thresh,
           rsq_thresh = rsq_thresh,
           nvar_thresh = nvar_thresh,
           min_genes_per_module = min_genes_per_module
         )
-        return(x)
       }
     )
 
@@ -236,7 +251,7 @@ setMethod(
           )
         modules@features[["peaks_pos"]] <- peaks_pos
         modules@features[["peaks_neg"]] <- peaks_neg
-        return(modules)
+        modules
       }
     )
 

@@ -14,7 +14,7 @@ get_network_graph(object, ...)
   graph_name = "module_graph",
   rna_assay = "RNA",
   rna_layer = "data",
-  umap_method = c("weighted", "corr", "coef", "none"),
+  umap_method = c("weighted", "coef", "corr", "none"),
   features = NULL,
   seed = 1,
   verbose = TRUE,
